@@ -10,7 +10,7 @@ Here is the repository structure:
 * [compliance](#compliance): contains all the compliance benchmarks and controls
 
 
-## assets
+## Analytics
 ### How to define:
 All the files with `yaml` extension in analytics will be considered.
 
@@ -72,9 +72,9 @@ tags:
 `tags` is a map of string to array of strings. 
 Some keys like `category` are used to group the metrics in the UI.
 
-## finder
+## Queries
 ### How to define:
-All the files with `yaml` extension in finder will be considered `Finder Queries`.
+All the files with `yaml` extension in finder will be considered `Queries`.
 The ones in the `popular` folder will be shown in popular tab and the ones 
 in the `other` folder will be shown in other tab.
 
@@ -116,7 +116,7 @@ title: Cloud Networks
 </details>
 
 
-## compliance
+## Compliance
 Compliance consists of two parts: `benchmarks` and `controls`.
 ### How to define controls:
 All the files with `yaml` extension in `compliance/controls` directory will be considered a `control`.
