@@ -1,0 +1,28 @@
+ID: aws_rds_db_instance_and_cluster_enhanced_monitoring_enabled
+Title: RDS DB instance and cluster enhanced monitoring should be enabled
+Description: Enable AWS Relational Database Service (AWS RDS) to help monitor AWS
+  RDS availability. This provides detailed visibility into the health of your AWS
+  RDS database instances.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n        when
+    enabled_cloudwatch_logs_exports is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when enabled_cloudwatch_logs_exports
+    is not null then title || ' enhanced monitoring enabled.'\n        else title
+    || ' enhanced monitoring not enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_rds_db_cluster\n    )\n    union\n    (\n    select\n      arn
+    as resource,\n      case\n        when class = 'db.m1.small' then 'skip'\n        when
+    enhanced_monitoring_resource_arn is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when class = 'db.m1.small' then title
+    || ' enhanced monitoring not supported.'\n        when enhanced_monitoring_resource_arn
+    is not null then title || ' enhanced monitoring enabled.'\n        else title
+    || ' enhanced monitoring not enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_rds_db_instance\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

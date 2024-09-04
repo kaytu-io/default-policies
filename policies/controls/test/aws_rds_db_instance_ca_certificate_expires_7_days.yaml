@@ -1,0 +1,21 @@
+ID: aws_rds_db_instance_ca_certificate_expires_7_days
+Title: RDS DB instances CA certificates should not expire within next 7 days
+Description: Ensure RDS DB instances CA certificates are not getting expired within
+  the next 7 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when extract(day
+    from (to_timestamp(certificate ->> 'ValidTill','YYYY-MM-DDTHH:MI:SS')) - current_timestamp)
+    <= '7' then 'alarm'\n        else 'ok'\n      end as status,\n        title ||
+    ' expires ' || to_char(to_timestamp(certificate ->> 'ValidTill','YYYY-MM-DDTHH:MI:SS'),
+    'DD-Mon-YYYY') ||\n        ' (' || extract(day from (to_timestamp(certificate
+    ->> 'ValidTill','YYYY-MM-DDTHH:MI:SS')) - current_timestamp) || ' days).'\n      as
+    reason\n      \n      \n    from\n      aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

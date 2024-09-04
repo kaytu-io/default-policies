@@ -1,0 +1,22 @@
+ID: aws_glue_dev_endpoint_job_bookmarks_encryption_enabled
+Title: Glue dev endpoints job bookmark encryption should be enabled
+Description: Ensure Glue dev endpoints have job bookmark encryption enabled to protect
+  sensitive information at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      e.arn as resource,\n      case\n        when
+    job_bookmarks_encryption is not null and job_bookmarks_encryption ->> 'JobBookmarksEncryptionMode'
+    != 'DISABLED' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when job_bookmarks_encryption is not null and job_bookmarks_encryption
+    ->> 'JobBookmarksEncryptionMode' != 'DISABLED' then e.title || ' job bookmark
+    encryption enabled.'\n        else e.title || ' job bookmark encryption disabled.'\n
+    \     end as reason\n      \n    from\n      aws_glue_dev_endpoint as e\n      left
+    join aws_glue_security_configuration as c on e.security_configuration = c.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

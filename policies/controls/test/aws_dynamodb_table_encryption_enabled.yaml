@@ -1,0 +1,23 @@
+ID: aws_dynamodb_table_encryption_enabled
+Title: DynamoDB table should have encryption enabled
+Description: Ensure that encryption is enabled for your AWS DynamoDB tables. Because
+  sensitive data can exist at rest in these tables, enable encryption at rest to help
+  protect that data.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when sse_description
+    is not null and sse_description ->> 'SSEType' = 'KMS' then 'ok'\n        when
+    sse_description is null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when sse_description is not null and sse_description ->> 'SSEType'
+    = 'KMS'\n          then title || ' encrypted with AWS KMS.'\n        when sse_description
+    is null then title || ' encrypted with DynamoDB managed CMK.'\n        else title
+    || ' not encrypted with CMK.'\n      end as reason\n      \n      \n    from\n
+    \     aws_dynamodb_table;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

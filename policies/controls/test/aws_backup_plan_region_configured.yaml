@@ -1,0 +1,23 @@
+ID: aws_backup_plan_region_configured
+Title: Backup plan should exist in a region
+Description: Ensure that there exists at least one backup plan in a region. The rule
+  is non-compliant if there are no backup plans in a region.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with count_plans as (\n      select\n        region,\n        account_id,\n
+    \       count(*) as count\n      from\n        aws_backup_plan\n      group by\n
+    \       region,\n        account_id\n    )\n    select\n      'arn:' || r.partition
+    || '::' || r.region || ':' || r.account_id as resource,\n      case\n        when
+    cp.count > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when cp.count > 0 then cp.count || ' backup plan(s) exist in region '
+    || r.region || '.'\n        else 'No backup plans exist in region ' || r.region
+    || '.'\n      end as reason\n      \n    from\n      aws_region as r\n      left
+    join count_plans as cp on r.account_id = cp.account_id and r.region = cp.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

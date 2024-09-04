@@ -1,0 +1,29 @@
+ID: aws_elb_application_gateway_network_lb_multiple_az_configured
+Title: ELB application, network, and gateway load balancers should span multiple availability
+  zones
+Description: This control checks whether an Elastic Load Balancer V2 (Application,
+  Network, or Gateway Load Balancer) has registered instances from multiple Availability
+  Zones. The control fails if an Elastic Load Balancer V2 has instances registered
+  in fewer than two Availability Zones.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(availability_zones)
+    < 2 then 'alarm'\n        else 'ok'\n      end as status,\n      title || ' has
+    ' || jsonb_array_length(availability_zones) || ' availability zone(s).' as reason\n
+    \     \n      \n    from\n      aws_ec2_application_load_balancer\n    union\n
+    \   select\n      arn as resource,\n      case\n        when jsonb_array_length(availability_zones)
+    < 2 then 'alarm'\n        else 'ok'\n      end as status,\n      title || ' has
+    ' || jsonb_array_length(availability_zones) || ' availability zone(s).' as reason\n
+    \     \n      \n    from\n      aws_ec2_network_load_balancer\n    union\n    select\n
+    \     arn as resource,\n      case\n        when jsonb_array_length(availability_zones)
+    < 2 then 'alarm'\n        else 'ok'\n      end as status,\n      title || ' has
+    ' || jsonb_array_length(availability_zones) || ' availability zone(s).' as reason\n
+    \     \n      \n    from\n      aws_ec2_gateway_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

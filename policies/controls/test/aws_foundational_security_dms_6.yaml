@@ -1,0 +1,20 @@
+ID: aws_foundational_security_dms_6
+Title: 6 DMS replication instances should have automatic minor version upgrade enabled
+Description: This control checks if automatic minor version upgrade is enabled for
+  an AWS DMS replication instance. The control fails if automatic minor version upgrade
+  isn't enabled for a DMS replication instance.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when auto_minor_version_upgrade
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    auto_minor_version_upgrade then title || ' automatic minor version upgrade enabled.'\n
+    \       else title || ' automatic minor version upgrade disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_dms_replication_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

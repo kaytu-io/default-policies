@@ -1,0 +1,24 @@
+ID: aws_acm_certificate_not_expired
+Title: Ensure that all the expired ACM certificates are removed
+Description: This control ensures that all expired ACM certificates are removed from
+  AWS account.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    renewal_eligibility = 'INELIGIBLE' then 'skip'\n        when date(not_after) <
+    (current_date - interval '1' minute) then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when renewal_eligibility = 'INELIGIBLE' then title
+    || ' not eligible for renewal.'\n        when date(not_after) < (current_date
+    - interval '1' minute) then title || ' expired ' || to_char(not_after, 'DD-Mon-YYYY')
+    ||\n        ' (' || extract(day from not_after - current_date) || ' days ago).'\n
+    \       else title || ' expires ' || to_char(not_after, 'DD-Mon-YYYY') ||\n        '
+    (' || extract(day from not_after - current_date) || ' days).'\n       end as reason\n
+    \     \n      \n    from\n      aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

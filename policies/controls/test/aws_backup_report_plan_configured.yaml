@@ -1,0 +1,32 @@
+ID: aws_backup_report_plan_configured
+Title: Backup report plan should exist in a region where backup plan is enabled
+Description: Ensure that there is a minimum of one backup report plan in each region.
+  The rule will be considered non-compliant if a region with backup plans does not
+  have any backup report plans.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with backup_plan_configured_regions as (\n      select\n        distinct
+    region,\n        account_id\n      from\n        aws_backup_plan\n      group
+    by\n        region,\n        account_id\n    ), backup_report_plan_configured
+    as  (\n      select\n        distinct region,\n        account_id\n      from\n
+    \       aws_backup_report_plan\n      group by\n        region,\n        account_id\n
+    \   )\n    select\n      'arn:' || r.partition || '::' || r.region || ':' || r.account_id
+    as resource,\n      case\n        when cp.region is not null and rp.region is
+    not null then 'ok'\n        when cp.region is not null and rp.region is null then
+    'alarm'\n        else 'info'\n      end as status,\n      case\n        when cp.region
+    is not null and rp.region is not null then 'Backup report plan(s) exist in region
+    ' || r.region || '.'\n        when cp.region is not null and rp.region is null
+    then 'No backup report plan(s) exist in region ' || r.region || '.'\n        else
+    'No backup plan(s) configured in region ' || r.region || '.'\n      end as reason\n
+    \     \n    from\n      aws_region as r\n      left join backup_plan_configured_regions
+    as cp on r.account_id = cp.account_id and r.region = cp.region\n      left join
+    backup_report_plan_configured as rp on r.account_id = rp.account_id and r.region
+    = rp.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

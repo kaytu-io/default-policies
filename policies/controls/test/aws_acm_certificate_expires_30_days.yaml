@@ -1,0 +1,21 @@
+ID: aws_acm_certificate_expires_30_days
+Title: ACM certificates should not expire within 30 days
+Description: Ensure network integrity is protected by ensuring X509 certificates are
+  issued by AWS ACM.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    renewal_eligibility = 'INELIGIBLE' then 'skip'\n        when date(not_after) -
+    date(current_date) >= 30 then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when renewal_eligibility = 'INELIGIBLE' then title || ' not
+    eligible for renewal.'\n        else title || ' expires ' || to_char(not_after,
+    'DD-Mon-YYYY') ||\n        ' (' || extract(day from not_after - current_date)
+    || ' days).'\n      end as reason\n      \n      \n    from\n      aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

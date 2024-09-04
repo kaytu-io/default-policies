@@ -1,0 +1,20 @@
+ID: aws_waf_regional_rule_group_rule_attached
+Title: WAF regional rule group should have at least one rule attached
+Description: This control checks if WAF regional rule groups contain any rules. The
+  rule is non-compliant if there are no rules present within a WAF regional rule group.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when activated_rules
+    is null or jsonb_array_length(activated_rules) = 0 then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when activated_rules is null or
+    jsonb_array_length(activated_rules) = 0 then title || ' has no attached rules.'\n
+    \       else title || ' has ' || jsonb_array_length(activated_rules) || ' rule(s)
+    attached.'\n      end as reason\n      \n      \n    from\n      aws_wafregional_rule_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

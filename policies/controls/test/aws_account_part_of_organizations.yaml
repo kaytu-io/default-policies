@@ -1,0 +1,20 @@
+ID: aws_account_part_of_organizations
+Title: AWS account should be part of AWS Organizations
+Description: Ensure that an AWS account is part of AWS Organizations. The rule is
+  non-compliant if an AWS account is not part of AWS Organizations or AWS Organizations
+  master account ID does not match rule parameter MasterAccountId.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when organization_id
+    is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when organization_id is not null then title || ' is part of organization(s).'\n
+    \       else title || ' is not part of organization.'\n      end as reason\n      \n
+    \   from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

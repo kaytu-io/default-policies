@@ -1,0 +1,45 @@
+ID: aws_cis_v140_4_14
+Title: 4.14 Ensure a log metric filter and alarm exist for VPC changes
+Description: Real-time monitoring of API calls can be achieved by directing CloudTrail
+  Logs to CloudWatch Logs and establishing corresponding metric filters and alarms.
+  It is possible to have more than 1 VPC within an account, in addition it is also
+  possible to create a peer connection between 2 VPCs enabling network traffic to
+  route between VPCs. It is recommended that a metric filter and alarm be established
+  for changes made to VPCs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with trails as (\n      select\n        trail.account_id,\n
+    \       trail.name as trail_name,\n        trail.is_logging,\n        split_part(trail.log_group_arn,
+    ':', 7) as log_group_name\n      from\n        aws_cloudtrail_trail as trail,\n
+    \       jsonb_array_elements(trail.event_selectors) as se\n      where\n        trail.is_multi_region_trail
+    is true\n        and trail.is_logging\n        and se ->> 'ReadWriteType' = 'All'\n
+    \       and trail.log_group_arn is not null\n      order by\n        trail_name\n
+    \   ),\n    alarms as (\n      select\n        metric_name,\n        action_arn
+    as topic_arn\n      from\n        aws_cloudwatch_alarm,\n        jsonb_array_elements_text(aws_cloudwatch_alarm.alarm_actions)
+    as action_arn\n      order by\n        metric_name\n    ),\n    topic_subscriptions
+    as (\n      select\n        subscription_arn,\n        topic_arn\n      from\n
+    \       aws_sns_topic_subscription\n      order by\n        subscription_arn\n
+    \   ),\n    metric_filters as (\n      select\n        filter.name as filter_name,\n
+    \       filter_pattern,\n        log_group_name,\n        metric_transformation_name\n
+    \     from\n        aws_cloudwatch_log_metric_filter as filter\n      where\n
+    \       filter.filter_pattern ~ '\\s*\\$\\.eventName\\s*=\\s*CreateVpc.+\\$\\.eventName\\s*=\\s*DeleteVpc.+\\$\\.eventName\\s*=\\s*ModifyVpcAttribute.+\\$\\.eventName\\s*=\\s*AcceptVpcPeeringConnection.+\\$\\.eventName\\s*=\\s*CreateVpcPeeringConnection.+\\$\\.eventName\\s*=\\s*DeleteVpcPeeringConnection.+\\$\\.eventName\\s*=\\s*RejectVpcPeeringConnection.+\\$\\.eventName\\s*=\\s*AttachClassicLinkVpc.+\\$\\.eventName\\s*=\\s*DetachClassicLinkVpc.+\\$\\.eventName\\s*=\\s*DisableVpcClassicLink.+\\$\\.eventName\\s*=\\s*EnableVpcClassicLink'\n
+    \     order by\n        filter_name\n    ),\n    filter_data as (\n      select\n
+    \       t.account_id,\n        t.trail_name,\n        f.filter_name\n      from\n
+    \       trails as t\n      join\n        metric_filters as f on f.log_group_name
+    = t.log_group_name\n      join\n        alarms as alarm on alarm.metric_name =
+    f.metric_transformation_name\n      join\n        topic_subscriptions as subscription
+    on subscription.topic_arn = alarm.topic_arn\n    )\n    select\n      distinct
+    'arn:' || a.partition || ':::' || a.account_id as resource,\n      case\n        when
+    f.trail_name is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when f.trail_name is null then 'No log metric filter and alarm exist for
+    VPC changes.'\n        else filter_name || ' forwards events for VPC changes.'\n
+    \     end as reason\n      \n    from\n      aws_account as a\n      left join
+    filter_data as f on a.account_id = f.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

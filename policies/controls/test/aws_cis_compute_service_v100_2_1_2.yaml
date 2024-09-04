@@ -1,0 +1,23 @@
+ID: aws_cis_compute_service_v100_2_1_2
+Title: 2.1.2 Ensure Images (AMI's) are encrypted
+Description: Amazon Machine Images should utilize EBS Encrypted snapshots
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with encryption_status as (\n      select\n        image_id
+    as resource,\n        region,\n        account_id,\n        tags,\n        _ctx,\n
+    \       bool_and(coalesce((mapping -> 'Ebs' ->> 'Encrypted')::text = 'true', false))
+    as all_encrypted\n      from\n        aws_ec2_ami\n        cross join jsonb_array_elements(block_device_mappings)
+    as mapping\n      group by\n        image_id,\n        region,\n        account_id,\n
+    \       tags,\n        _ctx\n    )\n    select\n      resource,\n      case\n
+    \       when all_encrypted then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when all_encrypted then resource || ' all EBS volumes are
+    encrypted.'\n        else resource || ' all EBS volumes are not encrypted.'\n
+    \     end as reason\n      \n      \n    from\n      encryption_status;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

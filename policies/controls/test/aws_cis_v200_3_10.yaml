@@ -1,0 +1,31 @@
+ID: aws_cis_v200_3_10
+Title: 3.10 Ensure that Object-level logging for write events is enabled for S3 bucket
+Description: S3 object-level API operations such as GetObject, DeleteObject, and PutObject
+  are called data events. By default, CloudTrail trails don't log data events and
+  so it is recommended to enable Object-level logging for S3 buckets.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with s3_selectors as\n    (\n      select\n        name as
+    trail_name,\n        is_multi_region_trail,\n        bucket_selector\n      from\n
+    \       aws_cloudtrail_trail,\n        jsonb_array_elements(event_selectors) as
+    event_selector,\n        jsonb_array_elements(event_selector -> 'DataResources')
+    as data_resource,\n        jsonb_array_elements_text(data_resource -> 'Values')
+    as bucket_selector\n      where\n        is_multi_region_trail\n        and data_resource
+    ->> 'Type' = 'AWS::S3::Object'\n        and event_selector ->> 'ReadWriteType'
+    in\n        (\n          'WriteOnly',\n          'All'\n        )\n    )\n    select\n
+    \     b.arn as resource,\n      case\n        when count(bucket_selector) > 0
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    count(bucket_selector) > 0 then b.name || ' object-level write events logging
+    enabled.'\n        else b.name || ' object-level write events logging disabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_s3_bucket as b\n      left
+    join\n        s3_selectors\n        on bucket_selector like (b.arn || '%')\n        or
+    bucket_selector = 'arn:aws:s3'\n    group by\n      b.account_id, b.region, b.arn,
+    b.name, b.tags, b._ctx;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,33 @@
+ID: aws_cis_v300_1_7
+Title: 1.7 Eliminate use of the 'root' user for administrative and daily tasks
+Description: With the creation of an AWS account, a 'root user' is created that cannot
+  be disabled or deleted. That user has unrestricted access to and control over all
+  resources in the AWS account. It is highly recommended that the use of this account
+  be avoided for everyday tasks.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        when
+    password_last_used >= (current_date - interval '90' day) then 'alarm'\n        when
+    access_key_1_last_used_date <= (current_date - interval '90' day)  then 'alarm'\n
+    \       when access_key_2_last_used_date <= (current_date - interval '90' day)
+    \ then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    password_last_used is null then 'Root never logged in with password.'\n        else
+    'Root password used ' || to_char(password_last_used , 'DD-Mon-YYYY') || ' (' ||
+    extract(day from current_timestamp - password_last_used) || ' days).'\n      end
+    ||\n      case\n        when access_key_1_last_used_date is null then ' Access
+    Key 1 never used.'\n        else ' Access Key 1 used ' || to_char(access_key_1_last_used_date
+    , 'DD-Mon-YYYY') || ' (' || extract(day from current_timestamp - access_key_1_last_used_date)
+    || ' days).'\n      end ||\n        case\n        when access_key_2_last_used_date
+    is null then ' Access Key 2 never used.'\n        else ' Access Key 2 used ' ||
+    to_char(access_key_2_last_used_date , 'DD-Mon-YYYY') || ' (' || extract(day from
+    current_timestamp - access_key_2_last_used_date) || ' days).'\n      end as reason\n
+    \     \n    from\n      aws_iam_credential_report\n    where\n      user_name
+    = '<root_account>';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

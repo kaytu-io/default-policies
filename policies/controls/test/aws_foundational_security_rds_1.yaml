@@ -1,0 +1,29 @@
+ID: aws_foundational_security_rds_1
+Title: 1 RDS snapshots should be private
+Description: This control checks whether Amazon RDS snapshots are public. This control
+  is intended for RDS instances. It can also return findings for snapshots of Aurora
+  DB instances, Neptune DB instances, and Amazon DocumentDB clusters, even though
+  they are not evaluated for public accessibility. If these findings are not useful,
+  you can suppress them.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n        when
+    cluster_snapshot -> 'AttributeValues' = '[\"all\"]' then 'alarm'\n        else
+    'ok'\n      end status,\n      case\n        when cluster_snapshot -> 'AttributeValues'
+    = '[\"all\"]' then title || ' publicly restorable.'\n        else title || ' not
+    publicly restorable.'\n      end reason\n      \n      \n    from\n      aws_rds_db_cluster_snapshot,\n
+    \     jsonb_array_elements(db_cluster_snapshot_attributes) as cluster_snapshot\n
+    \   )\n    union\n    (\n    select\n      arn as resource,\n      case\n        when
+    database_snapshot -> 'AttributeValues' = '[\"all\"]' then 'alarm'\n        else
+    'ok'\n      end status,\n      case\n        when database_snapshot -> 'AttributeValues'
+    = '[\"all\"]' then title || ' publicly restorable.'\n        else title || ' not
+    publicly restorable.'\n      end reason\n      \n      \n    from\n      aws_rds_db_snapshot,\n
+    \     jsonb_array_elements(db_snapshot_attributes) as database_snapshot\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

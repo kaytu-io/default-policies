@@ -1,0 +1,26 @@
+ID: aws_lambda_function_use_latest_runtime
+Title: Lambda functions should use latest runtimes
+Description: 'This control checks that the Lambda function settings for runtimes match
+  the expected values set for the latest runtimes for each supported language. This
+  control checks for the following runtimes: nodejs20.x, nodejs18.x, nodejs16.x, python3.12,
+  python3.11, python3.10, python3.9, python3.8, ruby3.3, ruby3.2, java21, java17,
+  java11, java8.al2, dotnet8, dotnet6'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when package_type
+    <> 'Zip' then 'skip'\n        when runtime like any ($1) then  'ok'\n        when
+    runtime like any ($2) then 'alarm'\n        else 'info'\n      end as status,\n
+    \     case\n        when package_type <> 'Zip' then title || ' package type is
+    ' || package_type || '.'\n        when runtime like any ($1) then title || ' uses
+    latest runtime - ' || runtime || '.'\n        when runtime like any ($2) then
+    title || ' uses ' || runtime || ' which is not the latest version.'\n        else
+    title || ' uses runtime ' || runtime || ' which is yet to be released.'\n      end
+    as reason\n      \n      \n    from\n      aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

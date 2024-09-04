@@ -1,0 +1,26 @@
+ID: aws_cloudwatch_alarm_action_enabled
+Title: CloudWatch alarm should have an action configured
+Description: Checks if CloudWatch alarms have an action configured for the ALARM,
+  INSUFFICIENT_DATA, or OK state. Optionally checks if any actions match a named ARN.
+  The rule is non-compliant if there is no action specified for the alarm or optional
+  parameter.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(alarm_actions)
+    = 0\n        and jsonb_array_length(insufficient_data_actions) = 0\n        and
+    jsonb_array_length(ok_actions) = 0 then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when jsonb_array_length(alarm_actions) = 0\n        and
+    jsonb_array_length(insufficient_data_actions) = 0\n        and jsonb_array_length(ok_actions)
+    = 0 then title || ' no action enabled.'\n        when jsonb_array_length(alarm_actions)
+    != 0 then title || ' alarm action enabled.'\n        when jsonb_array_length(insufficient_data_actions)
+    != 0 then title || ' insufficient data action enabled.'\n        when jsonb_array_length(ok_actions)
+    != 0 then title || ' ok action enabled.'\n        else 'ok'\n      end as reason\n
+    \     \n      \n    from\n      aws_cloudwatch_alarm;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

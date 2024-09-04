@@ -1,0 +1,28 @@
+ID: aws_foundational_security_elasticbeanstalk_3
+Title: 3 Elastic Beanstalk should stream logs to CloudWatch
+Description: This control checks whether an Elastic Beanstalk environment is configured
+  to send logs to CloudWatch Logs. The control fails if an Elastic Beanstalk environment
+  isn't configured to send logs to CloudWatch Logs. Optionally, you can provide a
+  custom value for the RetentionInDays parameter if you want the control to pass only
+  if logs are retained for the specified number of days before expiration.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with beanstalk_environment_logs_enabled as (\n      select\n
+    \       distinct e.arn\n      from\n        aws_elastic_beanstalk_environment
+    as e,\n        jsonb_array_elements(e.configuration_settings) as c,\n        jsonb_array_elements(c
+    -> 'OptionSettings') as s\n      where\n        s ->> 'OptionName' = 'StreamLogs'\n
+    \       and s ->> 'Value' = 'true'\n      group by\n        arn\n    )\n    select\n
+    \     e.arn as resource,\n      case\n        when l.arn is not null then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when l.arn is
+    not null then title || ' send logs to AWS CloudWatch.'\n        else title ||
+    ' does not send logs to AWS CloudWatch.'\n      end as reason\n      \n      \n
+    \   from\n      aws_elastic_beanstalk_environment as e\n      left join beanstalk_environment_logs_enabled
+    as l on e.arn = l.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

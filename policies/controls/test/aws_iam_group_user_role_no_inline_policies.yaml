@@ -1,0 +1,25 @@
+ID: aws_iam_group_user_role_no_inline_policies
+Title: IAM groups, users, and roles should not have any inline policies
+Description: Ensure an AWS Identity and Access Management (IAM) user, IAM role or
+  IAM group does not have an inline policy to control access to systems and assets.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when inline_policies
+    is null then 'ok'\n        else 'alarm'\n      end status,\n      'User ' || title
+    || ' has ' || coalesce(jsonb_array_length(inline_policies), 0) || ' inline policies.'
+    as reason\n      \n    from\n      aws_iam_user\n    union\n    select\n      arn
+    as resource,\n      case\n        when inline_policies is null then 'ok'\n        else
+    'alarm'\n      end status,\n      'Role ' || title || ' has ' || coalesce(jsonb_array_length(inline_policies),
+    0) || ' inline policies.' as reason\n      \n    from\n      aws_iam_role\n    where\n
+    \     arn not like '%service-role/%'\n    union\n    select\n      arn as resource,\n
+    \     case\n        when inline_policies is null then 'ok'\n        else 'alarm'\n
+    \     end status,\n      'Group ' || title || ' has ' || coalesce(jsonb_array_length(inline_policies),
+    0) || ' inline policies.' as reason\n      \n    from\n      aws_iam_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

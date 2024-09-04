@@ -1,0 +1,25 @@
+ID: aws_elb_application_lb_redirect_http_request_to_https
+Title: ELB application load balancers should redirect HTTP requests to HTTPS
+Description: To help protect data in transit, ensure that your Application Load Balancer
+  automatically redirects unencrypted HTTP requests to HTTPS.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with detailed_listeners as (\n      select\n        arn,\n
+    \       load_balancer_arn,\n        protocol\n      from\n        aws_ec2_load_balancer_listener,\n
+    \       jsonb_array_elements(default_actions) as ac\n      where\n        split_part(arn,'/',2)
+    = 'app'\n        and protocol = 'HTTP'\n        and ac ->> 'Type' = 'redirect'\n
+    \       and ac -> 'RedirectConfig' ->> 'Protocol' = 'HTTPS'\n    )\n    select\n
+    \     a.arn as resource,\n      case\n        when b.load_balancer_arn is null
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    b.load_balancer_arn is not null then  a.title || ' associated with HTTP redirection.'\n
+    \       else a.title || ' not associated with HTTP redirection.'\n      end as
+    reason\n      \n      \n    from\n      aws_ec2_application_load_balancer a\n
+    \     left join detailed_listeners b on a.arn = b.load_balancer_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

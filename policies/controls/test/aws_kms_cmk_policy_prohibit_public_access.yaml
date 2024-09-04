@@ -1,0 +1,26 @@
+ID: aws_kms_cmk_policy_prohibit_public_access
+Title: KMS CMK policies should prohibit public access
+Description: Manage access to resources in the AWS Cloud by ensuring AWS KMS CMK cannot
+  be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with wildcard_action_policies as (\n      select\n        arn,\n
+    \       count(*) as statements_num\n      from\n        aws_kms_key,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s\n      where\n        s ->> 'Effect' = 'Allow'\n        and
+    (\n          ( s -> 'Principal' -> 'AWS') = '[\"*\"]'\n          or  s ->> 'Principal'
+    = '*'\n        )\n        and key_manager = 'CUSTOMER'\n      group by\n        arn\n
+    \   )\n    select\n      k.arn as resource,\n      case\n        when p.arn is
+    null then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when
+    p.arn is null then title || ' does not allow public access.'\n        else title
+    || ' contains ' || coalesce(p.statements_num, 0) ||\n        ' statements that
+    allow public access.'\n      end as reason\n      \n      \n    from\n      aws_kms_key
+    as k\n      left join wildcard_action_policies as p on p.arn = k.arn\n    where\n
+    \     key_manager = 'CUSTOMER';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

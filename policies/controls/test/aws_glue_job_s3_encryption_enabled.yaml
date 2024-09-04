@@ -1,0 +1,22 @@
+ID: aws_glue_job_s3_encryption_enabled
+Title: Glue jobs S3 encryption should be enabled
+Description: Ensure Glue jobs have S3 encryption enabled to protect sensitive information
+  at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      j.arn as resource,\n      case\n        when
+    e is not null and e ->> 'S3EncryptionMode' != 'DISABLED' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when e is not null and e ->>
+    'S3EncryptionMode' != 'DISABLED' then j.title || ' S3 encryption enabled.'\n        else
+    j.title || ' S3 encryption disabled.'\n      end as reason\n      \n    from\n
+    \     aws_glue_job as j\n      left join aws_glue_security_configuration as s
+    on j.security_configuration = s.name,\n      jsonb_array_elements(s.s3_encryption)
+    e;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

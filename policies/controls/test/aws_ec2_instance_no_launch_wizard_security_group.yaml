@@ -1,0 +1,25 @@
+ID: aws_ec2_instance_no_launch_wizard_security_group
+Title: EC2 instances should not be attached to 'launch wizard' security groups
+Description: Ensure EC2 instances provisioned in your AWS account are not associated
+  with security groups that have their name prefixed with 'launch-wizard', in order
+  to enforce using secure and custom security groups that exercise the principle of
+  least privilege.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with launch_wizard_sg_attached_instance as (\n      select\n
+    \       distinct arn as arn\n      from\n        aws_ec2_instance,\n        jsonb_array_elements(security_groups)
+    as sg\n      where\n        sg ->> 'GroupName' like 'launch-wizard%'\n    )\n
+    \   select\n      i.arn as resource,\n      case\n        when sg.arn is null
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    sg.arn is null then i.title || ' not associated with launch-wizard security group.'\n
+    \       else i.title || ' associated with launch-wizard security group.'\n      end
+    as reason\n      \n      \n    from\n      aws_ec2_instance as i\n      left join
+    launch_wizard_sg_attached_instance as sg on i.arn = sg.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

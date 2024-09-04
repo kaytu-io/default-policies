@@ -1,0 +1,26 @@
+ID: aws_s3_bucket_policy_restrict_public_access
+Title: S3 bucket policy should prohibit public access
+Description: This control checks that the access granted by the S3 bucket is restricted
+  by any of the principals, federated users, service principals, IP addresses, or
+  VPCs that you provide. The rule is compliant if a bucket policy is not present.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with public_buckets as (\n      select\n        distinct arn
+    as arn\n      from\n        aws_s3_bucket,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Principal' -> 'AWS')
+    as p\n      where\n        p = '*'\n        and s ->> 'Effect' = 'Allow'\n    )\n
+    \   select\n      b.arn as resource,\n      case\n        when b.policy_std is
+    null then 'info'\n        when p.arn is not null then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      case\n        when b.policy_std is null then title
+    || ' does not have defined policy or insufficient access to the policy.'\n        when
+    p.arn is not null then title || ' publicly accessible.'\n        else title ||
+    ' not publicly accessible.'\n      end as reason\n      \n      \n    from\n      aws_s3_bucket
+    as b\n      left join public_buckets as p on p.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

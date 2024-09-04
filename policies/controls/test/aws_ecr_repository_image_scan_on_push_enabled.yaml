@@ -1,0 +1,27 @@
+ID: aws_ecr_repository_image_scan_on_push_enabled
+Title: ECR repositories should have image scan on push enabled
+Description: Ensure AWS Elastic Container Registry (ECR) repositories have image scanning
+  enabled. The rule is non-compliant if image scanning is not enabled for the ECR
+  repository.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with check_enhanced_scanning as (\n      select\n        registry_id,\n
+    \       region\n      from\n        aws_ecr_registry_scanning_configuration,\n
+    \       jsonb_array_elements(scanning_configuration -> 'Rules')  as r\n      where\n
+    \       r ->> 'ScanFrequency' = 'CONTINUOUS_SCAN'\n        or  r ->> 'ScanFrequency'
+    = 'SCAN_ON_PUSH'\n    )\n    select\n      arn as resource,\n      case\n        when
+    image_scanning_configuration ->> 'ScanOnPush' = 'true' or s.registry_id is not
+    null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    image_scanning_configuration ->> 'ScanOnPush' = 'true' or s.registry_id is not
+    null  then title || ' scan on push enabled.'\n        else title || ' scan on
+    push disabled.'\n      end as reason\n      \n      \n    from\n      aws_ecr_repository
+    as r\n      left join check_enhanced_scanning as s on s.registry_id = r.account_id
+    and s.region = r.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_cis_compute_service_v100_4_10
+Title: 4.10 Ensure Lambda functions do not allow unknown cross account access via
+  permission policies
+Description: Ensure that all your Amazon Lambda functions are configured to allow
+  access only to trusted AWS accounts in order to protect against unauthorized cross-account
+  access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

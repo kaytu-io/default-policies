@@ -1,0 +1,22 @@
+ID: aws_cis_v130_1_15
+Title: 1.15 Ensure IAM Users Receive Permissions Only Through Groups
+Description: 'IAM users are granted access to services, functions, and data through
+  IAM policies. There are three ways to define policies for a user: 1) Edit the user
+  policy directly, aka an inline, or user, policy; 2) attach a policy directly to
+  a user; 3) add the user to an IAM group that has an attached policy.  Only the third
+  implementation is recommended.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when inline_policies
+    is null and attached_policy_arns is null then 'ok'\n        else 'alarm'\n      end
+    status,\n      name || ' has ' || coalesce(jsonb_array_length(inline_policies),0)
+    || ' inline and ' ||\n        coalesce(jsonb_array_length(attached_policy_arns),0)
+    || ' directly attached policies.' as reason\n      \n      \n    from\n      aws_iam_user;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

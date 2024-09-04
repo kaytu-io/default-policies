@@ -1,0 +1,20 @@
+ID: aws_ecs_cluster_no_registered_container_instance
+Title: At least one instance should be registered with ECS cluster
+Description: This control ensures that at least one container instance is registered
+  with an ECS cluster.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    registered_container_instances_count = 0 then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when registered_container_instances_count = 0
+    then title || ' has no container instance registered.'\n        else title ||
+    ' has ' || registered_container_instances_count || ' container instance(s) registered.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ecs_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

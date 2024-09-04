@@ -1,0 +1,26 @@
+ID: aws_rds_db_cluster_events_subscription
+Title: An RDS event notifications subscription should be configured for critical cluster
+  events
+Description: This control checks whether an AWS RDS event subscription exists that
+  has notifications enabled for the following source type, event category key-value
+  pairs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when source_type
+    <> 'db-cluster' then 'skip'\n        when source_type = 'db-cluster' and enabled
+    and event_categories_list @> '[\"failure\", \"maintenance\"]' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when source_type <> 'db-cluster'
+    then cust_subscription_id || ' event subscription of ' || source_type || ' type.'\n
+    \       when source_type = 'db-cluster' and enabled and event_categories_list
+    @> '[\"failure\", \"maintenance\"]' then cust_subscription_id || ' event subscription
+    enabled for critical db cluster events.'\n        else cust_subscription_id ||
+    ' event subscription missing critical db cluster events.'\n      end as reason\n
+    \     \n    from\n      aws_rds_db_event_subscription;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

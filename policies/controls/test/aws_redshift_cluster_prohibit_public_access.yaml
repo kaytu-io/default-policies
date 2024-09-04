@@ -1,0 +1,19 @@
+ID: aws_redshift_cluster_prohibit_public_access
+Title: Redshift clusters should prohibit public access
+Description: Manage access to resources in the AWS Cloud by ensuring that AWS Redshift
+  clusters are not public.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_namespace_arn as resource,\n      case\n
+    \       when publicly_accessible then 'alarm'\n        else 'ok'\n      end status,\n
+    \     case\n        when publicly_accessible then title || ' publicly accessible.'\n
+    \       else title || ' not publicly accessible.'\n      end reason\n\n      \n
+    \     \n    from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

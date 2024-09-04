@@ -1,0 +1,19 @@
+ID: aws_mq_broker_restrict_public_access
+Title: MQ brokers should restrict public access
+Description: Ensure whether MQ broker is not publicly accessible. The rule is compliant
+  if the MQ broker is publicly accessible.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when publicly_accessible
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    publicly_accessible then title || ' publicly accessible.'\n        else title
+    || ' not publicly accessible.'\n      end as reason\n      \n      \n    from\n
+    \     aws_mq_broker;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

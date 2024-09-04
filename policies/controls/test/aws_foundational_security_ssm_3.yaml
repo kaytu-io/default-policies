@@ -1,0 +1,23 @@
+ID: aws_foundational_security_ssm_3
+Title: 3 Instances managed by Systems Manager should have an association compliance
+  status of COMPLIANT
+Description: This control checks whether the status of the AWS Systems Manager association
+  compliance is COMPLIANT or non compliant after the association is run on an instance.
+  The control passes if the association compliance status is COMPLIANT.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when c.status
+    = 'COMPLIANT' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when c.status = 'COMPLIANT' then c.resource_id || ' association ' || c.title
+    || ' is compliant.'\n        else c.resource_id || ' association ' || c.title
+    || ' is non-compliant.'\n      end as reason\n\n      \n    from\n      aws_ssm_managed_instance
+    as i,\n      aws_ssm_managed_instance_compliance as c\n    where\n      c.resource_id
+    = i.instance_id\n      and c.compliance_type = 'Association';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

@@ -1,0 +1,21 @@
+ID: aws_waf_regional_web_acl_rule_attached
+Title: WAF regional web ACL should have at least one rule or rule group attached
+Description: This control checks if a WAF regional Web ACL contains any WAF rules
+  or rule groups. The rule is non-compliant if there are no WAF rules or rule groups
+  present within a Web ACL.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when rules
+    is null or jsonb_array_length(rules) = 0 then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when rules is null or jsonb_array_length(rules)
+    = 0 then title || ' has no attached rules.'\n        else title || ' has ' ||
+    jsonb_array_length(rules) || ' rule(s) attached.'\n      end as reason\n      \n
+    \     \n    from\n      aws_wafregional_web_acl;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

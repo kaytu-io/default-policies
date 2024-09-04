@@ -1,0 +1,32 @@
+ID: aws_emr_cluster_local_disk_encrypted_with_cmk
+Title: EMR cluster local disks should be encrypted with CMK
+Description: Ensure EMR cluster local disk are encrypted using CMK. This control fails
+  if an EMR cluster local disk isn't encrypted with CMK.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    s.name is null then 'alarm'\n        when (encryption_configuration -> 'AtRestEncryptionConfiguration'
+    -> 'LocalDiskEncryptionConfiguration') is null then 'alarm'\n        when s.name
+    is not null\n          and (encryption_configuration -> 'AtRestEncryptionConfiguration'
+    -> 'LocalDiskEncryptionConfiguration') is not null\n          and  (encryption_configuration
+    -> 'AtRestEncryptionConfiguration' -> 'LocalDiskEncryptionConfiguration' ->> 'EncryptionKeyProviderType')
+    = 'Custom' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when s.name is null then c.title || ' security configuration disabled.'\n
+    \       when (encryption_configuration -> 'AtRestEncryptionConfiguration' -> 'LocalDiskEncryptionConfiguration')
+    is null then c.title || ' local disk not encrypted.'\n        when s.name is not
+    null\n          and (encryption_configuration -> 'AtRestEncryptionConfiguration'
+    -> 'LocalDiskEncryptionConfiguration') is not null\n          and  (encryption_configuration
+    -> 'AtRestEncryptionConfiguration' -> 'LocalDiskEncryptionConfiguration' ->> 'EncryptionKeyProviderType')
+    = 'Custom' then c.title || ' local disk encrypted with CMK.'\n        else c.title
+    || ' local disk not encrypted with CMK.'\n      end as reason\n      \n      \n
+    \   from\n      aws_emr_cluster as c\n      left join aws_emr_security_configuration
+    as s on c.security_configuration = s.name and s.region = s.region and s.account_id
+    = c.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

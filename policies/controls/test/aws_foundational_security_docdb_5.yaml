@@ -1,0 +1,19 @@
+ID: aws_foundational_security_docdb_5
+Title: 5 Amazon DocumentDB clusters should have deletion protection enabled
+Description: This control checks whether an Amazon DocumentDB cluster has deletion
+  protection enabled. The control fails if the cluster doesn't have deletion protection
+  enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when deletion_protection
+    then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when deletion_protection
+    then title || ' deletion protection enabled.'\n        else title || ' deletion
+    protection disabled.'\n      end reason\n      \n      \n    from\n      aws_docdb_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

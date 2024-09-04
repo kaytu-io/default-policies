@@ -1,0 +1,20 @@
+ID: aws_foundational_security_waf_2
+Title: 2 AWS WAF Classic Regional rules should have at least one condition
+Description: This control checks whether an AWS WAF Regional rule has at least one
+  condition. The control fails if no conditions are present within a rule.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      rule_id as resource,\n      case\n        when
+    predicates is null or jsonb_array_length(predicates) = 0 then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when predicates is null or jsonb_array_length(predicates)
+    = 0 then title || ' has no attached conditions.'\n        else title || ' has
+    ' || jsonb_array_length(predicates) || ' condition(s) attached.'\n      end as
+    reason\n      \n    from\n      aws_wafregional_rule;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

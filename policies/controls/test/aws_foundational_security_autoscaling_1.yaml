@@ -1,0 +1,25 @@
+ID: aws_foundational_security_autoscaling_1
+Title: 1 Auto Scaling groups associated with a load balancer should use load balancer
+  health checks
+Description: This control checks whether your Auto Scaling groups that are associated
+  with a load balancer are using Elastic Load Balancing health checks. This ensures
+  that the group can determine an instance's health based on additional tests provided
+  by the load balancer. Using Elastic Load Balancing health checks can help support
+  the availability of applications that use EC2 Auto Scaling groups.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      autoscaling_group_arn as resource,\n      case\n
+    \       when load_balancer_names is null and target_group_arns is null then 'alarm'\n
+    \       when health_check_type != 'ELB' then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when load_balancer_names is null and target_group_arns
+    is null then title || ' not associated with a load balancer.'\n        when health_check_type
+    != 'ELB' then title || ' does not use ELB health check.'\n        else title ||
+    ' uses ELB health check.'\n      end as reason\n      \n      \n    from\n      aws_ec2_autoscaling_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

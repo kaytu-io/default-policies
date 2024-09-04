@@ -1,0 +1,27 @@
+ID: aws_foundational_security_lambda_1
+Title: 1 Lambda function policies should prohibit public access
+Description: This control checks whether the Lambda function resource-based policy
+  prohibits public access outside of your account. The Lambda function should not
+  be publicly accessible, as this may allow unintended access to your code stored
+  in the function.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with wildcard_action_policies as (\n      select\n        arn,\n
+    \       count(*) as statements_num\n      from\n        aws_lambda_function,\n
+    \       jsonb_array_elements(policy_std -> 'Statement') as s\n      where\n        s
+    ->> 'Effect' = 'Allow'\n        and (\n          ( s -> 'Principal' -> 'AWS')
+    = '[\"*\"]'\n          or s ->> 'Principal' = '*'\n        )\n      group by\n
+    \       arn\n    )\n    select\n      f.arn as resource,\n      case\n        when
+    p.arn is null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when p.arn is null then title || ' does not allow public access.'\n        else
+    title || ' contains ' || coalesce(p.statements_num,0) ||\n        ' statements
+    that allows public access.'\n      end as reason\n      \n      \n    from\n      aws_lambda_function
+    as f\n      left join wildcard_action_policies as p on p.arn = f.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

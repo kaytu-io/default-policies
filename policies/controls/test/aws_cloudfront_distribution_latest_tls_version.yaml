@@ -1,0 +1,20 @@
+ID: aws_cloudfront_distribution_latest_tls_version
+Title: CloudFront distributions should have latest TLS version
+Description: This control checks whether CloudFront distribution uses latest TLS version.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when viewer_certificate
+    ->> 'CertificateSource' = 'cloudfront'\n          and viewer_certificate ->> 'MinimumProtocolVersion'
+    = 'TLSv1.2_2021' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when viewer_certificate ->> 'CertificateSource' = 'cloudfront'\n          and
+    viewer_certificate ->> 'MinimumProtocolVersion' = 'TLSv1.2_2021' then title ||
+    ' uses latest TLS version.'\n        else title || ' not uses latest TLS version.'\n
+    \     end as reason\n      \n      \n    from\n      aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

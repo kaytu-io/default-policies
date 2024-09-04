@@ -1,0 +1,32 @@
+ID: aws_elb_classic_lb_with_outbound_rule
+Title: ELB classic load balancers should have at least one outbound rule
+Description: Ensure classic load balancers have at least one outbound rule in all
+  the attached security groups. A security group without any outbound rule rejects
+  all outgoing traffic. This means that all outgoing traffic originating from your
+  cloud assets (instances, containers, etc.) will be dropped when it reaches the ELB
+  layer.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with sg_with_outbound as (\n      select\n        arn,\n        sg\n
+    \     from\n        aws_ec2_classic_load_balancer,\n        jsonb_array_elements_text(security_groups)
+    as sg\n        left join aws_vpc_security_group_rule as sgr on sg = sgr.group_id\n
+    \     where\n        sgr.type = 'egress'\n      group by\n        sg, arn\n    ),
+    classic_lb_without_outbound as (\n      select\n        distinct arn\n      from\n
+    \       aws_ec2_classic_load_balancer,\n        jsonb_array_elements_text(security_groups)
+    as s\n      where\n        s not in ( select sg from sg_with_outbound)\n    )\n
+    \   select\n      distinct c.arn as resource,\n      case\n        when c.security_groups
+    is null then 'alarm'\n        when o.arn is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when c.security_groups is null
+    then c.title || ' does not have security group attached.'\n        when o.arn
+    is not null then c.title || ' all attached security groups do not have outbound
+    rule(s).'\n        else c.title || ' all attached security groups have outbound
+    rule(s).'\n      end as reason\n      \n      \n    from\n      aws_ec2_classic_load_balancer
+    as c\n      left join classic_lb_without_outbound as o on c.arn = o.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

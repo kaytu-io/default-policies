@@ -1,0 +1,28 @@
+ID: aws_cloudtrail_s3_data_events_enabled
+Title: All S3 buckets should log S3 data events in CloudTrail
+Description: The collection of Simple Storage Service (AWS S3) data events helps in
+  detecting any anomalous activity. The details include AWS account information that
+  accessed an AWS S3 bucket, IP address, and time of event.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with s3_selectors as (\n    select\n      name as trail_name,\n
+    \     is_multi_region_trail,\n      bucket_selector\n    from\n      aws_cloudtrail_trail,\n
+    \     jsonb_array_elements(event_selectors) as event_selector,\n      jsonb_array_elements(event_selector
+    -> 'DataResources') as data_resource,\n      jsonb_array_elements_text(data_resource
+    -> 'Values') as bucket_selector\n    where\n      is_multi_region_trail\n      and
+    data_resource ->> 'Type' = 'AWS::S3::Object'\n      and event_selector ->> 'ReadWriteType'
+    = 'All'\n  )\n  select\n    b.arn as resource,\n    case\n      when count(bucket_selector)
+    > 0 then 'ok'\n      else 'alarm'\n    end as status,\n    case\n      when count(bucket_selector)
+    > 0 then b.name || ' object-level data events logging enabled.'\n      else b.name
+    || ' object-level data events logging disabled.'\n    end as reason\n    \n    \n
+    \ from\n    aws_s3_bucket as b\n    left join s3_selectors on bucket_selector
+    like (b.arn || '%') or bucket_selector = 'arn:aws:s3'\n  group by\n    b.account_id,
+    b.region, b.arn, b.name, b.tags, b._ctx;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

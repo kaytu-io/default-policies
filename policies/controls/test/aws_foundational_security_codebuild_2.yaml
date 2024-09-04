@@ -1,0 +1,26 @@
+ID: aws_foundational_security_codebuild_2
+Title: 2 CodeBuild project environment variables should not contain clear text credentials
+Description: This control checks whether the project contains the environment variables
+  AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY. Authentication credentials AWS_ACCESS_KEY_ID
+  and AWS_SECRET_ACCESS_KEY should never be stored in clear text, as this could lead
+  to unintended data exposure and unauthorized access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with invalid_key_name as (\n      select\n        distinct
+    arn,\n        name\n      from\n        aws_codebuild_project,\n        jsonb_array_elements(environment
+    -> 'EnvironmentVariables') as env\n      where\n        env ->> 'Name' ilike any(array['%AWS_ACCESS_KEY_ID%',
+    '%AWS_SECRET_ACCESS_KEY%', '%PASSWORD%'])\n        and env ->> 'Type' = 'PLAINTEXT'\n
+    \   )\n    select\n      a.arn as resource,\n      case\n        when b.arn is
+    null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    b.arn is null then a.title || ' has no plaintext environment variables with sensitive
+    AWS values.'\n        else a.title || ' has plaintext environment variables with
+    sensitive AWS values.'\n      end as reason\n      \n      \n    from\n      aws_codebuild_project
+    as a\n      left join invalid_key_name b on a.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

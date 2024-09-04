@@ -1,0 +1,28 @@
+ID: aws_securityhub_enabled
+Title: AWS Security Hub should be enabled for an AWS Account
+Description: AWS Security Hub helps to monitor unauthorized personnel, connections,
+  devices, and software. AWS Security Hub aggregates, organizes, and prioritizes the
+  security alerts, or findings, from multiple AWS services.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        when r.region = any(array['af-south-1',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'ap-northeast-3']) then 'skip'\n
+    \       -- Skip any regions that are disabled in the account.\n        when r.opt_in_status
+    = 'not-opted-in' then 'skip'\n        when h.hub_arn is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when r.region = any(array['af-south-1',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'ap-northeast-3']) then r.region
+    ||  ' region not supported.'\n        when r.opt_in_status = 'not-opted-in' then
+    r.region || ' region is disabled.'\n        when h.hub_arn is not null then 'Security
+    Hub enabled in ' || r.region || '.'\n        else 'Security Hub disabled in '
+    || r.region || '.'\n      end as reason\n      \n    from\n      aws_region as
+    r\n      left join aws_securityhub_hub as h on r.account_id = h.account_id and
+    r.name = h.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

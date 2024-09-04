@@ -1,0 +1,27 @@
+ID: aws_sns_topic_policy_prohibit_publishing_access
+Title: SNS topic policies should prohibit publishing access
+Description: Manage access to resources in the AWS Cloud by ensuring SNS topics cannot
+  be accessed publicly for publishing.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with wildcard_action_policies as (\n      select\n        topic_arn,\n
+    \       count(*) as statements_num\n      from\n        aws_sns_topic,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Action') as a\n
+    \     where\n        s ->> 'Effect' = 'Allow'\n        and (\n          ( s ->
+    'Principal' -> 'AWS') = '[\"*\"]'\n          or s ->> 'Principal' = '*'\n        )\n
+    \       and a = 'sns:publish'\n        and s -> 'Condition' is null\n      group
+    by\n        topic_arn\n    )\n    select\n      t.topic_arn as resource,\n      case\n
+    \       when p.topic_arn is null then 'ok'\n        else 'alarm'\n      end as
+    status,\n      case\n        when p.topic_arn is null then title || ' does not
+    allow publish access without condition.'\n        else title || ' contains ' ||
+    coalesce(p.statements_num,0) || ' statements that allows publish access without
+    condition.'\n      end as reason\n      \n      \n    from\n      aws_sns_topic
+    as t\n      left join wildcard_action_policies as p on p.topic_arn = t.topic_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

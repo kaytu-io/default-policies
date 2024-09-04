@@ -1,0 +1,23 @@
+ID: aws_rds_db_snapshot_encrypted_at_rest
+Title: RDS DB snapshots should be encrypted at rest
+Description: Ensure that encryption is enabled for your AWS Relational Database Service
+  (AWS RDS) snapshots.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n        when
+    storage_encrypted then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when storage_encrypted then title || ' encrypted at rest.'\n        else
+    title || ' not encrypted at rest.'\n      end as reason\n      \n      \n    from\n
+    \     aws_rds_db_cluster_snapshot\n    )\n    union\n    (\n    select\n      arn
+    as resource,\n      case\n        when encrypted then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when encrypted then title || ' encrypted
+    at rest.'\n        else title || ' not encrypted at rest.'\n      end as reason\n
+    \     \n      \n    from\n      aws_rds_db_snapshot\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

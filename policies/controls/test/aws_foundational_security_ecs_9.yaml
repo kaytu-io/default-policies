@@ -1,0 +1,26 @@
+ID: aws_foundational_security_ecs_9
+Title: 9 ECS task definitions should have a logging configuration
+Description: This control checks if the latest active Amazon ECS task definition has
+  a logging configuration specified. The control fails if the task definition doesn't
+  have the logConfiguration property defined or if the value for logDriver is null
+  in at least one container definition.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with task_definitions_logging_enabled as (\n      select\n
+    \       distinct task_definition_arn as arn\n      from\n        aws_ecs_task_definition,\n
+    \       jsonb_array_elements(container_definitions) as c\n      where\n        c
+    ->> 'LogConfiguration' is not null\n    )\n    select\n      a.task_definition_arn
+    as resource,\n      case\n        when b.arn is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when b.arn is not null then
+    a.title || ' logging enabled.'\n        else a.title || ' logging disabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ecs_task_definition as
+    a\n      left join task_definitions_logging_enabled as b on a.task_definition_arn
+    = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

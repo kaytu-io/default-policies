@@ -1,0 +1,22 @@
+ID: aws_foundational_security_route53_2
+Title: 2 Route 53 public hosted zones should log DNS queries
+Description: This control checks if DNS query logging is enabled for an Amazon Route
+  53 public hosted zone. The control fails if DNS query logging isn't enabled for
+  a Route 53 public hosted zone.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when private_zone
+    then 'skip'\n        when query_logging_configs is not null or jsonb_array_length(query_logging_configs)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    private_zone then title || ' is private hosted zone.'\n        when query_logging_configs
+    is not null or jsonb_array_length(query_logging_configs) > 0 then title || ' query
+    logging to CloudWatch enabled.'\n        else title || ' query logging to CloudWatch
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_route53_zone;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

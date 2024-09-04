@@ -1,0 +1,20 @@
+ID: aws_config_configuration_recorder_no_failed_deliver_logs
+Title: Config configuration recorder should not fail to deliver logs
+Description: This control checks whether Config configuration recorder fails to deliver
+  logs. This control is non-compliant if Config configuration recorder fails to deliver
+  logs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when status
+    ->> 'LastStatus' = 'FAILURE' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when status ->> 'LastStatus' = 'FAILURE' then title || ' has
+    failed deliver logs.'\n        else title || ' does not have failed deliver logs.'\n
+    \     end as reason\n      \n    from\n      aws_config_configuration_recorder;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_apigateway_stage_use_waf_web_acl
+Title: API Gateway stage should be associated with waf
+Description: Ensure that an AWS API Gateway API stage is using a WAF Web ACL. This
+  rule is non-compliant if an AWS WAF Web ACL is not used.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when web_acl_arn
+    is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when web_acl_arn is not null then title || ' associated with WAF web ACL.'\n
+    \       else title || ' not associated with WAF web ACL.'\n      end as reason\n
+    \     \n      \n    from\n      aws_api_gateway_stage;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

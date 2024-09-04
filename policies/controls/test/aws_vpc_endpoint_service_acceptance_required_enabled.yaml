@@ -1,0 +1,19 @@
+ID: aws_vpc_endpoint_service_acceptance_required_enabled
+Title: VPC endpoint services should have acceptance required enabled
+Description: Ensure VPC endpoints connection requests to the service are accepted
+  by the service owner.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      service_id as resource,\n      case\n        when
+    acceptance_required then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when acceptance_required then title || ' acceptance_required enabled.'\n
+    \       else title || ' acceptance_required disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_vpc_endpoint_service;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

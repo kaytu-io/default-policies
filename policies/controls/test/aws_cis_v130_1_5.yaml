@@ -1,0 +1,22 @@
+ID: aws_cis_v130_1_5
+Title: 1.5 Ensure MFA is enabled for the \"root user\" account
+Description: The root user account is the most privileged user in an AWS account.
+  Multi-factor Authentication (MFA) adds an extra layer of protection on top of a
+  username and password. With MFA enabled, when a user signs in to an AWS website,
+  they will be prompted for their username and password as well as for an authentication
+  code from their AWS MFA device.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      case\n        when account_mfa_enabled then 'ok'\n        else
+    'alarm'\n      end status,\n      case\n        when account_mfa_enabled then
+    'MFA enabled for root account.'\n        else 'MFA not enabled for root account.'\n
+    \     end reason\n      \n    from\n      aws_iam_account_summary;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

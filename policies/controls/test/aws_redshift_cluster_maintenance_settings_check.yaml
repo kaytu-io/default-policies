@@ -1,0 +1,21 @@
+ID: aws_redshift_cluster_maintenance_settings_check
+Title: AWS Redshift should have required maintenance settings
+Description: Ensure whether AWS Redshift clusters have the specified maintenance settings.
+  Redshift clusters `allowVersionUpgrade` should be set to `true` and `automatedSnapshotRetentionPeriod`
+  should be greater than 7.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when allow_version_upgrade
+    and automated_snapshot_retention_period >= 7 then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when allow_version_upgrade and automated_snapshot_retention_period
+    >= 7 then title || ' has the required maintenance settings.'\n        else title
+    || ' does not have required maintenance settings.'\n      end as reason\n      \n
+    \     \n    from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

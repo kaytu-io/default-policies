@@ -1,0 +1,20 @@
+ID: aws_foundational_security_efs_2
+Title: 2 Amazon EFS volumes should be in backup plans
+Description: This control checks whether Amazon Elastic File System (Amazon EFS) file
+  systems are added to the backup plans in AWS Backup. The control fails if Amazon
+  EFS file systems are not included in the backup plans.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when automatic_backups
+    = 'enabled' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when automatic_backups = 'enabled' then title || ' automatic backups enabled.'\n
+    \       else title || ' automatic backups not enabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_efs_file_system;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

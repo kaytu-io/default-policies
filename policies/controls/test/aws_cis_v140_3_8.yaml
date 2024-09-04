@@ -1,0 +1,28 @@
+ID: aws_cis_v140_3_8
+Title: 3.8 Ensure rotation for customer created CMKs is enabled
+Description: AWS Key Management Service (KMS) allows customers to rotate the backing
+  key which is key material stored within the KMS which is tied to the key ID of the
+  Customer Created customer master key (CMK). It is the backing key that is used to
+  perform cryptographic operations such as encryption and decryption. Automated key
+  rotation currently retains all prior backing keys so that decryption of encrypted
+  data can take place transparently. It is recommended that CMK key rotation be enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when origin
+    = 'EXTERNAL' then 'skip'\n        when key_state = 'PendingDeletion' then 'skip'\n
+    \       when key_state = 'Disabled' then 'skip'\n        when not key_rotation_enabled
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    origin = 'EXTERNAL' then title || ' has imported key material.'\n        when
+    key_state = 'PendingDeletion' then title || ' is pending deletion.'\n        when
+    key_state = 'Disabled' then title || ' is disabled.'\n        when not key_rotation_enabled
+    then title || ' key rotation disabled.'\n        else title || ' key rotation
+    enabled.'\n      end as reason\n      \n      \n    from\n      aws_kms_key\n
+    \   where\n      key_manager = 'CUSTOMER';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

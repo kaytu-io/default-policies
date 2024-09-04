@@ -1,0 +1,21 @@
+ID: aws_opensearch_domain_internal_user_database_disabled
+Title: OpenSearch domains internal user database should be disabled
+Description: Ensure that AWS OpenSearch domain has internal user database disabled.
+  This control is non-compliant if the OpenSearch domain internal user database is
+  enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when advanced_security_options
+    ->> 'InternalUserDatabaseEnabled' = 'true' then 'alarm'\n        else 'ok'\n      end
+    status,\n      case\n        when advanced_security_options ->> 'InternalUserDatabaseEnabled'
+    = 'true' then title || ' internal user database enabled.'\n        else title
+    || ' internal user database disabled.'\n      end reason\n      \n      \n    from\n
+    \     aws_opensearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,26 @@
+ID: aws_foundational_security_ssm_2
+Title: 2 All EC2 instances managed by Systems Manager should be compliant with patching
+  requirements
+Description: This control checks whether the compliance status of the Amazon EC2 Systems
+  Manager patch compliance is COMPLIANT or non compliant after the patch installation
+  on the instance. It only checks instances that are managed by Systems Manager Patch
+  Manager.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when c.status
+    = '' then 'skip'\n        when c.status = 'COMPLIANT' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when c.status = '' then 'Patch
+    is not applicable for instance ' || i.title || '.'\n        when c.status = 'COMPLIANT'
+    then c.resource_id || ' patch ' || c.title || ' is compliant.'\n        else c.resource_id
+    || ' patch ' || c.title || ' is non-compliant.'\n      end as reason\n      \n
+    \   from\n      aws_ssm_managed_instance as i,\n      aws_ssm_managed_instance_compliance
+    as c\n    where\n      c.resource_id = i.instance_id\n      and c.compliance_type
+    = 'Patch';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

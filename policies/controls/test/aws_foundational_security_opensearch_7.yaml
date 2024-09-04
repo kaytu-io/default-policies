@@ -1,0 +1,22 @@
+ID: aws_foundational_security_opensearch_7
+Title: 7 OpenSearch domains should have fine-grained access control enabled
+Description: This control checks whether OpenSearch domains have fine-grained access
+  control enabled. The control fails if the fine-grained access control is not enabled.
+  Fine-grained access control requires advanced-security-optionsin the OpenSearch
+  parameter update-domain-config to be enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when advanced_security_options
+    is null or not (advanced_security_options -> 'Enabled')::boolean then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when advanced_security_options
+    is null or not (advanced_security_options -> 'Enabled')::boolean then title ||
+    ' has fine-grained access control disabled.'\n        else title || ' has fine-grained
+    access control enabled.'\n      end as reason\n      \n      \n    from\n      aws_opensearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

@@ -1,0 +1,31 @@
+ID: aws_soc_2_cc_7_3
+Title: CC7.3 The entity evaluates security events to determine whether they could
+  or have resulted in a failure of the entity to meet its objectives (security incidents)
+  and, if so, takes actions to prevent or address such failures
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_apigateway_stage_logging_enabled
+- aws_cloudtrail_trail_integrated_with_logs
+- aws_cloudtrail_trail_validation_enabled
+- aws_cloudwatch_alarm_action_enabled
+- aws_cloudwatch_log_group_retention_period_365
+- aws_elb_application_classic_lb_logging_enabled
+- aws_es_domain_logs_to_cloudwatch
+- aws_guardduty_enabled
+- aws_guardduty_finding_archived
+- aws_lambda_function_dead_letter_queue_configured
+- aws_log_group_encryption_at_rest_enabled
+- aws_opensearch_domain_audit_logging_enabled
+- aws_opensearch_domain_logs_to_cloudwatch
+- aws_rds_db_instance_logging_enabled
+- aws_redshift_cluster_audit_logging_enabled
+- aws_s3_bucket_event_notifications_enabled
+- aws_s3_bucket_logging_enabled
+- aws_securityhub_enabled
+- aws_vpc_flow_logs_enabled
+- aws_waf_web_acl_logging_enabled

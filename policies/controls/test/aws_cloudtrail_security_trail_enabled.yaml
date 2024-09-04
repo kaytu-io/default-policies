@@ -1,0 +1,50 @@
+ID: aws_cloudtrail_security_trail_enabled
+Title: At least one trail should be enabled with security best practices
+Description: This rule helps ensure the use of AWS recommended security best practices
+  for AWS CloudTrail, by checking for the enablement of multiple settings. These include
+  the use of log encryption, log validation, and enabling AWS CloudTrail in multiple
+  regions.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with trails_enabled as (\n      select\n        distinct arn,\n
+    \       is_logging,\n        event_selectors,\n        coalesce(\n          jsonb_agg(g)
+    filter ( where not (g = 'null') ),\n          $$[]$$::jsonb\n        ) as excludeManagementEventSources\n
+    \     from\n        aws_cloudtrail_trail\n        left join jsonb_array_elements(event_selectors)
+    as e on true\n        left join jsonb_array_elements_text(e -> 'ExcludeManagementEventSources')
+    as g on true\n      where\n        home_region = region\n      group by arn, is_logging,
+    event_selectors\n    ),\n    all_trails as (\n      select\n        a.arn as arn,\n
+    \       tags,\n        _ctx,\n        case\n          when a.is_logging is null
+    then b.is_logging\n          else a.is_logging\n        end as is_logging,\n        case\n
+    \         when a.event_selectors is null then b.event_selectors\n          else
+    a.event_selectors\n        end as event_selectors,\n        b.excludeManagementEventSources,\n
+    \       a.include_global_service_events,\n        a.is_multi_region_trail,\n        a.log_file_validation_enabled,\n
+    \       a.kms_key_id,\n        a.region,\n        a.account_id,\n        a.title\n
+    \     from\n        aws_cloudtrail_trail as a\n        left join trails_enabled
+    as b on a.arn = b.arn\n    )\n  select\n    arn as resource,\n    case\n      when
+    not is_logging then 'alarm'\n      when not include_global_service_events then
+    'alarm'\n      when not is_multi_region_trail then 'alarm'\n      when not log_file_validation_enabled
+    then 'alarm'\n      when kms_key_id is null then 'alarm'\n      when not (jsonb_array_length(event_selectors)
+    = 1 and event_selectors @> '[{\"ReadWriteType\":\"All\"}]') then 'alarm'\n      when
+    not (event_selectors @> '[{\"IncludeManagementEvents\":true}]') then 'alarm'\n
+    \     when jsonb_array_length(excludeManagementEventSources) > 0 then 'alarm'\n
+    \     else 'ok'\n    end as status,\n    case\n      when not is_logging then
+    title || ' disabled.'\n      when not include_global_service_events then title
+    || ' not recording global service events.'\n      when not is_multi_region_trail
+    then title || ' not a muti-region trail.'\n      when not log_file_validation_enabled
+    then title || ' log file validation disabled.'\n      when kms_key_id is null
+    then title || ' not encrypted with a KMS key.'\n      when not (jsonb_array_length(event_selectors)
+    = 1 and event_selectors @> '[{\"ReadWriteType\":\"All\"}]') then title || ' not
+    recording events for both reads and writes.'\n      when not (event_selectors
+    @> '[{\"IncludeManagementEvents\":true}]') then title || ' not recording management
+    events.'\n      when jsonb_array_length(excludeManagementEventSources) > 0 then
+    title || ' excludes management events for ' || trim(excludeManagementEventSources::text,
+    '[]') || '.'\n      else title || ' meets all security best practices.'\n    end
+    as reason\n    \n    \n  from\n    all_trails;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,59 @@
+ID: aws_lightsail_instance_ssh_rdp_http_ports_disabled
+Title: Disable SSH and RDP ports for Lightsail instances when not needed
+Description: Any ports enable within Lightsail by default are open and exposed to
+  the world. For SSH and RDP access you should remove and disable these ports when
+  not is use.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: |2
+        with open_ports as (
+          select
+            i.name,
+            jsonb_array_elements(i.networking -> 'Ports') as port
+          from
+            aws_lightsail_instance i
+        ),
+        port_cidrs as (
+          select
+            op.name,
+            (op.port ->> 'FromPort')::int as from_port,
+            (op.port ->> 'ToPort')::int as to_port,
+            op.port ->> 'Protocol' as protocol,
+            jsonb_array_elements_text(op.port -> 'Cidrs') as cidr,
+            jsonb_array_elements_text(op.port -> 'Ipv6Cidrs') as ipv6_cidr
+          from
+            open_ports op
+        ),
+        insecure_ports as (
+          select
+            name
+          from
+            port_cidrs
+          where
+            from_port in (22, 3389, 80)
+            and to_port in (22, 338, 80)
+            and protocol = 'tcp'
+            and (cidr = '0.0.0.0/0' or ipv6_cidr = '::/0')
+        )
+        select
+          i.name as resource,
+          case
+            when p.name is null then 'ok'
+            else 'alarm'
+          end as status,
+          case
+            when p.name is null then i.name || ' does not have SSH (22) or RDP (3389) or HTTP (80) ports open to 0.0.0.0/0 or ::/0.'
+            else i.name || ' has SSH (22) or RDP (3389) or HTTP (80) ports open to 0.0.0.0/0 or ::/0.'
+          end as reason,
+          i.tags
+        from
+          aws_lightsail_instance i
+          left join insecure_ports p on i.name = p.name;
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

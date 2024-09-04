@@ -1,0 +1,19 @@
+ID: aws_elb_classic_lb_no_registered_instance
+Title: ELB classic load balancers should have at least one registered instance
+Description: This control checks whether an ELB classic load balancer has registered
+  instances. The control fails if an ELB classic load balancer has zero instances
+  registered.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(instances)
+    = 0 then 'alarm'\n        else 'ok'\n      end as status,\n      title || ' has
+    ' || jsonb_array_length(instances) || ' instance(s) registered.' as reason\n      \n
+    \     \n    from\n      aws_ec2_classic_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

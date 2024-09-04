@@ -1,0 +1,22 @@
+ID: aws_cloudformation_stack_drift_detection_check
+Title: CloudFormation stacks differ from the expected configuration
+Description: Ensure that the actual configuration of a Cloud Formation stack differs,
+  or has drifted, from the expected configuration, a stack is considered to have drifted
+  if one or more of its resources differ from their expected configuration.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when stack_drift_status
+    = 'IN_SYNC' then 'ok'\n        when stack_drift_status = 'DRIFTED' then 'alarm'\n
+    \       else 'skip'\n      end as status,\n      case\n        when stack_drift_status
+    = 'IN_SYNC' then title || ' drift status is ' || stack_drift_status || '.'\n        when
+    stack_drift_status = 'DRIFTED' then title || ' drift status is ' || stack_drift_status
+    || '.'\n        else title || ' drift status is ' || stack_drift_status || '.'\n
+    \     end as reason\n      \n      \n    from\n      aws_cloudformation_stack;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

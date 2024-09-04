@@ -1,0 +1,28 @@
+ID: aws_cis_v200_1_19
+Title: 1.19 Ensure that all the expired SSL/TLS certificates stored in AWS IAM are
+  removed
+Description: To enable HTTPS connections to your website or application in AWS, you
+  need an SSL/TLS server certificate. You can use ACM or IAM to store and deploy server
+  certificates. Use IAM as a certificate manager only when you must support HTTPS
+  connections in a region that is not supported by ACM. IAM securely encrypts your
+  private keys and stores the encrypted version in IAM SSL certificate storage. IAM
+  supports deploying server certificates in all regions, but you must obtain your
+  certificate from an external provider for use with AWS. You cannot upload an ACM
+  certificate to IAM. Additionally, you cannot manage your certificates from the IAM
+  Console.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case when expiration
+    < (current_date - interval '1' second) then 'alarm'\n      else 'ok'\n      end
+    as status,\n      case when expiration < (current_date - interval '1' second)
+    then\n        name || ' expired ' || to_char(expiration, 'DD-Mon-YYYY') || '.'\n
+    \     else\n        name || ' valid until ' || to_char(expiration, 'DD-Mon-YYYY')
+    \ || '.'\n      end as reason\n      \n      \n    from\n      aws_iam_server_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

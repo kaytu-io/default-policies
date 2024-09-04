@@ -1,0 +1,25 @@
+ID: aws_vpc_subnet_multi_az_enabled
+Title: VPCs subnets should exist in multiple availability zones
+Description: Ensure that each VPC has subnets spread across multiple availability
+  zones.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with subnet_list as (\n      select\n        distinct availability_zone,\n
+    \       vpc_id,\n        count(*)\n      from\n        aws_vpc_subnet\n      group
+    by\n        vpc_id, availability_zone\n    ), zone_list as (\n      select\n        vpc_id,\n
+    \       count(*) as num\n      from\n        subnet_list\n      group by\n        vpc_id\n
+    \   )\n    select\n      arn as resource,\n      case\n        when l.num is null
+    then 'alarm'\n        when l.num > 1 then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when l.num is null then v.title || ' no subnet
+    exists.'\n        when l.num > 1 then v.title || ' subnets exist in ' || num ||
+    ' availability zones.'\n        else v.title || ' subnet(s) exist in single availability
+    zone.'\n      end as reason\n      \n      \n    from\n      aws_vpc as v\n      left
+    join zone_list as l on l.vpc_id = v.vpc_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

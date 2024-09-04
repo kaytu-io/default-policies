@@ -1,0 +1,32 @@
+ID: aws_foundational_security_rds_6
+Title: 6 Enhanced monitoring should be configured for RDS DB instances and clusters
+Description: This control checks whether enhanced monitoring is enabled for your RDS
+  DB instances. In Amazon RDS, Enhanced Monitoring enables a more rapid response to
+  performance changes in underlying infrastructure. These performance changes could
+  result in a lack of availability of the data. Enhanced Monitoring provides real-time
+  metrics of the operating system that your RDS DB instance runs on. An agent is installed
+  on the instance. The agent can obtain metrics more accurately than is possible from
+  the hypervisor layer.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n        when
+    enabled_cloudwatch_logs_exports is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when enabled_cloudwatch_logs_exports
+    is not null then title || ' enhanced monitoring enabled.'\n        else title
+    || ' enhanced monitoring not enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_rds_db_cluster\n    )\n    union\n    (\n    select\n      arn
+    as resource,\n      case\n        when class = 'db.m1.small' then 'skip'\n        when
+    enhanced_monitoring_resource_arn is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when class = 'db.m1.small' then title
+    || ' enhanced monitoring not supported.'\n        when enhanced_monitoring_resource_arn
+    is not null then title || ' enhanced monitoring enabled.'\n        else title
+    || ' enhanced monitoring not enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_rds_db_instance\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

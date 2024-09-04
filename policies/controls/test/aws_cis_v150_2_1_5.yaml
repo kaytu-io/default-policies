@@ -1,0 +1,39 @@
+ID: aws_cis_v150_2_1_5
+Title: 2.1.5 Ensure that S3 Buckets are configured with 'Block public access (bucket
+  settings)'
+Description: Amazon S3 provides Block public access (bucket settings) and Block public
+  access (account settings) to help you manage public access to Amazon S3 resources.
+  By default, S3 buckets and objects are created with public access disabled. However,
+  an IAM principle with sufficient S3 permissions can enable public access at the
+  bucket and/or object level. While enabled, Block public access (bucket settings)
+  prevents an individual bucket, and its contained objects, from becoming publicly
+  accessible. Similarly, Block public access (account settings) prevents all buckets,
+  and contained objects, from becoming publicly accessible across the entire account.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when (bucket.block_public_acls
+    or s3account.block_public_acls)\n          and (bucket.block_public_policy or
+    s3account.block_public_policy)\n          and (bucket.ignore_public_acls or s3account.ignore_public_acls)\n
+    \         and (bucket.restrict_public_buckets or s3account.restrict_public_buckets)\n
+    \         then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when (bucket.block_public_acls or s3account.block_public_acls)\n          and
+    (bucket.block_public_policy or s3account.block_public_policy)\n          and (bucket.ignore_public_acls
+    or s3account.ignore_public_acls)\n          and (bucket.restrict_public_buckets
+    or s3account.restrict_public_buckets)\n          then name || ' all public access
+    blocks enabled.'\n        else name || ' not enabled for: ' ||\n          concat_ws(',
+    ',\n            case when not (bucket.block_public_acls or s3account.block_public_acls)
+    then 'block_public_acls' end,\n            case when not (bucket.block_public_policy
+    or s3account.block_public_policy) then 'block_public_policy' end,\n            case
+    when not (bucket.ignore_public_acls or s3account.ignore_public_acls) then 'ignore_public_acls'
+    end,\n            case when not (bucket.restrict_public_buckets or s3account.restrict_public_buckets)
+    then 'restrict_public_buckets' end\n          ) || '.'\n      end as reason\n
+    \     \n      \n    from\n      aws_s3_bucket as bucket,\n      aws_s3_account_settings
+    as s3account\n    where\n      s3account.account_id = bucket.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

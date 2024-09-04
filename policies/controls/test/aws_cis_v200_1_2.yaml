@@ -1,0 +1,27 @@
+ID: aws_cis_v200_1_2
+Title: 1.2 Ensure security contact information is registered
+Description: AWS provides customers with the option of specifying the contact information
+  for account's security team. It is recommended that this information be provided.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with alternate_security_contact as (\n      select\n        name,\n
+    \       account_id\n      from\n        aws_account_alternate_contact\n      where\n
+    \       contact_type = 'SECURITY'\n    ),\n    account as (\n      select\n        arn,\n
+    \       partition,\n        title,\n        account_id,\n        _ctx\n      from\n
+    \       aws_account\n    )\n    select\n      arn as resource,\n      case\n        when
+    a.partition = 'aws-us-gov' then 'info'\n        -- Name is a required field if
+    setting a security contact\n        when c.name is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when a.partition = 'aws-us-gov'
+    then a.title || ' in GovCloud, manual verification required.'\n        when c.name
+    is not null then a.title || ' has security contact ' || c.name || ' registered.'\n
+    \       else a.title || ' security contact not registered.'\n      end as reason\n
+    \     \n    from\n      account as a,\n      alternate_security_contact as c\n
+    \   where\n      c.account_id = a.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

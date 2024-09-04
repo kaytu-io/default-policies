@@ -1,0 +1,19 @@
+ID: aws_ecs_cluster_no_active_services_count
+Title: ECS cluster should be configured with active services
+Description: This control checks if ECS cluster have active services. This control
+  fails if ECS cluster does not have any active services.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    active_services_count > 0 then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when active_services_count > 0 then title || ' has ' || active_services_count
+    || ' active service(s).'\n        else title || ' has no active service.'\n      end
+    as reason\n      \n      \n    from\n      aws_ecs_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

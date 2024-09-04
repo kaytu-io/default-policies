@@ -1,0 +1,25 @@
+ID: aws_iam_user_with_administrator_access_mfa_enabled
+Title: IAM administrator users should have MFA enabled
+Description: Manage access to resources in the AWS Cloud by ensuring MFA is enabled
+  for users with administrative privileges.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with admin_users as (\n      select\n        user_id,\n        name,\n
+    \       attachments\n      from\n        aws_iam_user,\n        jsonb_array_elements_text(attached_policy_arns)
+    as attachments\n      where\n        split_part(attachments, '/', 2) = 'AdministratorAccess'\n
+    \   )\n    select\n      u.arn as resource,\n      case\n        when au.user_id
+    is null then 'skip'\n        when au.user_id is not null and u.mfa_enabled then
+    'ok'\n        else 'alarm'\n      end as status,\n      case\n        when au.user_id
+    is null then u.name || ' does not have administrator access.'\n        when au.user_id
+    is not null and u.mfa_enabled then u.name || ' has MFA token enabled.'\n        else
+    u.name || ' has MFA token disabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_iam_user as u\n      left join admin_users au on u.user_id = au.user_id\n
+    \   order by\n      u.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

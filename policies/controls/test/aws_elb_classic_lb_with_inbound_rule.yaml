@@ -1,0 +1,29 @@
+ID: aws_elb_classic_lb_with_inbound_rule
+Title: ELB classic load balancers should have at least one inbound rule
+Description: Ensure classic load balancer have at least one inbound rule in all the
+  attached security groups.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with sg_with_inbound as (\n      select\n        arn,\n        sg\n
+    \     from\n        aws_ec2_classic_load_balancer,\n        jsonb_array_elements_text(security_groups)
+    as sg\n        left join aws_vpc_security_group_rule as sgr on sg = sgr.group_id\n
+    \     where\n        sgr.type = 'ingress'\n      group by\n        sg, arn\n    ),
+    classic_lb_without_inbound as (\n      select\n        distinct arn\n      from\n
+    \       aws_ec2_classic_load_balancer,\n        jsonb_array_elements_text(security_groups)
+    as s\n      where\n        s not in ( select sg from sg_with_inbound)\n    )\n
+    \   select\n      distinct c.arn as resource,\n      case\n        when c.security_groups
+    is null then 'alarm'\n        when i.arn is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when c.security_groups is null
+    then c.title || ' does not have security group attached.'\n        when i.arn
+    is not null then c.title || ' all attached security groups do not have inbound
+    rule(s).'\n        else c.title || ' all attached security groups have inbound
+    rule(s).'\n      end as reason\n      \n      \n    from\n      aws_ec2_classic_load_balancer
+    as c\n      left join classic_lb_without_inbound as i on c.arn = i.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

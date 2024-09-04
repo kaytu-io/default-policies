@@ -1,0 +1,24 @@
+ID: aws_foundational_security_rds_14
+Title: 14 Amazon Aurora clusters should have backtracking enabled
+Description: This control checks whether Amazon Aurora clusters have backtracking
+  enabled. Backups help you to recover more quickly from a security incident. They
+  also strengthens the resilience of your systems. Aurora backtracking reduces the
+  time to recover a database to a point in time. It does not require a database restore
+  to so.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when engine
+    not ilike '%aurora-mysql%' then 'skip'\n        when backtrack_window is not null
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    engine not ilike '%aurora-mysql%' then title || ' not Aurora MySQL-compatible
+    edition.'\n        when backtrack_window is not null then title || ' backtracking
+    enabled.'\n        else title || ' backtracking not enabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_rds_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

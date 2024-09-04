@@ -1,0 +1,29 @@
+ID: aws_foundational_security_apigateway_1
+Title: 1 API Gateway REST and WebSocket API logging should be enabled
+Description: This control checks whether all stages of an Amazon API Gateway REST
+  or WebSocket API have logging enabled. The control fails if logging is not enabled
+  for all methods of a stage or if loggingLevel is neither ERROR nor INFO.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with all_stages as (\n      select\n        name as stage_name,\n
+    \       'arn:' || partition || ':apigateway:' || region || '::/apis/' || rest_api_id
+    || '/stages/' || name as arn,\n        method_settings -> '*/*' ->> 'LoggingLevel'
+    as log_level,\n        title,\n        region,\n        account_id,\n        tags,\n
+    \       _ctx\n      from\n        aws_api_gateway_stage\n      union\n      select\n
+    \       stage_name,\n        'arn:' || partition || ':apigateway:' || region ||
+    '::/apis/' || api_id || '/stages/' || stage_name as arn,\n        default_route_logging_level
+    as log_level,\n        title,\n        region,\n        account_id,\n        tags,\n
+    \       _ctx\n      from\n        aws_api_gatewayv2_stage\n    )\n    select\n
+    \     arn as resource,\n      case\n        when log_level is null or log_level
+    = '' or log_level = 'OFF' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when log_level is null or log_level = '' or log_level = 'OFF'
+    then title || ' logging not enabled.'\n        else title || ' logging enabled.'\n
+    \     end as reason\n      \n      \n    from\n      all_stages;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

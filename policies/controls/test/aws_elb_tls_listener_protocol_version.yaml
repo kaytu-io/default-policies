@@ -1,0 +1,24 @@
+ID: aws_elb_tls_listener_protocol_version
+Title: ELB listeners SSL/TLS protocol version should be checked
+Description: Using insecure ciphers for your ELB Predefined or Custom Security Policy,
+  could make the SSL connection between the client and the load balancer vulnerable
+  to exploits. TLS 1.0 was recommended to be disabled by PCI Council after June 30,
+  2016.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      load_balancer_arn as resource,\n      case\n
+    \       when protocol <> 'HTTPS' then 'skip'\n        when protocol = 'HTTPS'
+    and ssl_policy like any(array['Protocol-SSLv3', 'Protocol-TLSv1']) then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when protocol <>
+    'HTTPS' then title || ' uses protocol ' || protocol || '.'\n        when ssl_policy
+    like any (array['Protocol-SSLv3', 'Protocol-TLSv1']) then title || ' uses insecure
+    SSL or TLS cipher.'\n        else title || ' uses secure SSL or TLS cipher.'\n
+    \     end as reason\n      \n    from\n      aws_ec2_load_balancer_listener;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

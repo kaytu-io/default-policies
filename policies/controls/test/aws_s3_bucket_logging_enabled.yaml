@@ -1,0 +1,19 @@
+ID: aws_s3_bucket_logging_enabled
+Title: S3 bucket logging should be enabled
+Description: AWS Simple Storage Service (AWS S3) server access logging provides a
+  method to monitor the network for potential cybersecurity events.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when logging
+    -> 'TargetBucket' is null then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when logging -> 'TargetBucket' is null then title || ' logging
+    disabled.'\n        else title || ' logging enabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_s3_bucket;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

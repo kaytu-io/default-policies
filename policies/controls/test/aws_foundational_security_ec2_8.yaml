@@ -1,0 +1,21 @@
+ID: aws_foundational_security_ec2_8
+Title: 8 EC2 instances should use IMDSv2
+Description: This control checks whether your EC2 instance metadata version is configured
+  with Instance Metadata Service Version 2 (IMDSv2). The control passes if HttpTokens
+  is set to required for IMDSv2. The control fails if HttpTokens is set to optional.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when metadata_options
+    ->> 'HttpTokens' = 'optional' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when metadata_options ->> 'HttpTokens' = 'optional' then title
+    || ' not configured to use Instance Metadata Service Version 2 (IMDSv2).'\n        else
+    title || ' configured to use Instance Metadata Service Version 2 (IMDSv2).'\n
+    \     end as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

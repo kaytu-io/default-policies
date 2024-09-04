@@ -1,0 +1,32 @@
+ID: aws_s3_public_access_block_bucket_account
+Title: S3 public access should be blocked at account and bucket levels
+Description: Manage access to resources in the AWS Cloud by ensuring that AWS Simple
+  Storage Service (AWS S3) buckets cannot be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when (bucket.block_public_acls
+    or s3account.block_public_acls)\n          and (bucket.block_public_policy or
+    s3account.block_public_policy)\n          and (bucket.ignore_public_acls or s3account.ignore_public_acls)\n
+    \         and (bucket.restrict_public_buckets or s3account.restrict_public_buckets)\n
+    \         then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when (bucket.block_public_acls or s3account.block_public_acls)\n          and
+    (bucket.block_public_policy or s3account.block_public_policy)\n          and (bucket.ignore_public_acls
+    or s3account.ignore_public_acls)\n          and (bucket.restrict_public_buckets
+    or s3account.restrict_public_buckets)\n          then name || ' all public access
+    blocks enabled.'\n        else name || ' not enabled for: ' ||\n          concat_ws(',
+    ',\n            case when not (bucket.block_public_acls or s3account.block_public_acls)
+    then 'block_public_acls' end,\n            case when not (bucket.block_public_policy
+    or s3account.block_public_policy) then 'block_public_policy' end,\n            case
+    when not (bucket.ignore_public_acls or s3account.ignore_public_acls) then 'ignore_public_acls'
+    end,\n            case when not (bucket.restrict_public_buckets or s3account.restrict_public_buckets)
+    then 'restrict_public_buckets' end\n          ) || '.'\n      end as reason\n
+    \     \n      \n    from\n      aws_s3_bucket as bucket,\n      aws_s3_account_settings
+    as s3account\n    where\n      s3account.account_id = bucket.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

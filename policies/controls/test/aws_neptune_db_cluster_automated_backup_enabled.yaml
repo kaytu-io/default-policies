@@ -1,0 +1,21 @@
+ID: aws_neptune_db_cluster_automated_backup_enabled
+Title: Neptune DB clusters should have automated backups enabled
+Description: This control checks whether a Neptune DB cluster has automated backups
+  enabled, and a backup retention period greater than or equal to 7 days. The control
+  fails if backups aren't enabled for the Neptune DB cluster, or if the retention
+  period is less than 7 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when backup_retention_period
+    >= 7 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    backup_retention_period >= 7 then title || ' automated backups enabled.'\n        else
+    title || ' automated backups disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_neptune_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

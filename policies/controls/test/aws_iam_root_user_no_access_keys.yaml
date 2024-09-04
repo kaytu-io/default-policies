@@ -1,0 +1,20 @@
+ID: aws_iam_root_user_no_access_keys
+Title: IAM root user should not have access keys
+Description: Access to systems and assets can be controlled by checking that the root
+  user does not have access keys attached to their AWS Identity and Access Management
+  (IAM) role.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      case\n        when account_access_keys_present > 0 then 'alarm'\n
+    \       else 'ok'\n      end status,\n      case\n        when account_access_keys_present
+    > 0 then 'Root user access keys exist.'\n        else 'No root user access keys
+    exist.'\n      end reason\n      \n    from\n      aws_iam_account_summary;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

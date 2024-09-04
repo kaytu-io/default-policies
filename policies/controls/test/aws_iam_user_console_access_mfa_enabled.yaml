@@ -1,0 +1,21 @@
+ID: aws_iam_user_console_access_mfa_enabled
+Title: IAM users with console access should have MFA enabled
+Description: Manage access to resources in the AWS Cloud by ensuring that MFA is enabled
+  for all AWS Identity and Access Management (IAM) users that have a console password.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        when
+    password_enabled and not mfa_active then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when not password_enabled then user_name || '
+    password login disabled.'\n        when password_enabled and not mfa_active then
+    user_name || ' password login enabled but no MFA device configured.'\n        else
+    user_name || ' password login enabled and MFA device configured.'\n      end as
+    reason\n      \n    from\n      aws_iam_credential_report;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

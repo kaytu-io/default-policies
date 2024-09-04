@@ -1,0 +1,18 @@
+ID: aws_foundational_security_neptune_1
+Title: 1 Neptune DB clusters should be encrypted at rest
+Description: This control checks whether a Neptune DB cluster is encrypted at rest.
+  The control fails if a Neptune DB cluster isn't encrypted at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when storage_encrypted
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    storage_encrypted then title || ' encrypted at rest.'\n        else title || '
+    not encrypted at rest.'\n      end as reason\n      \n      \n    from\n      aws_neptune_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

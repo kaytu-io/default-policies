@@ -1,0 +1,20 @@
+ID: aws_route53_zone_query_logging_enabled
+Title: Route 53 zones should have query logging enabled
+Description: Ensure Route 53 zones have query logging enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when private_zone
+    then 'skip'\n        when query_logging_configs is not null or jsonb_array_length(query_logging_configs)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    private_zone then title || ' is private hosted zone.'\n        when query_logging_configs
+    is not null or jsonb_array_length(query_logging_configs) > 0 then title || ' query
+    logging to CloudWatch enabled.'\n        else title || ' query logging to CloudWatch
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_route53_zone;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

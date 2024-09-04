@@ -1,0 +1,26 @@
+ID: aws_wafv2_web_acl_rule_attached
+Title: A WAFV2 web ACL should have at least one rule or rule group
+Description: This control checks whether a WAFV2 web access control list (web ACL)
+  contains at least one WAF rule or WAF rule group. The control fails if a web ACL
+  does not contain any WAF rules or rule groups.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with rule_group_count as (\n      select\n        arn,\n        count(*)
+    as rule_group_count\n      from\n        aws_wafv2_web_acl,\n        jsonb_array_elements(rules)
+    as r\n      where\n        r -> 'Statement' -> 'RuleGroupReferenceStatement' ->>
+    'ARN' is not null\n      group by\n        arn\n    )\n    select\n      a.arn
+    as resource,\n      case\n        when rules is null or jsonb_array_length(rules)
+    = 0 then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    rules is null or jsonb_array_length(rules) = 0 then title || ' has no attached
+    rules.'\n        else title || ' has ' || c.rule_group_count || ' rule group(s)
+    and ' || (jsonb_array_length(rules) - c.rule_group_count) || ' rule(s) attached.'\n
+    \     end as reason\n      \n      \n    from\n      aws_wafv2_web_acl as a\n
+    \     left join rule_group_count as c on c.arn = a.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

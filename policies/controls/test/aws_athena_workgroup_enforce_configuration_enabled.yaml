@@ -1,0 +1,19 @@
+ID: aws_athena_workgroup_enforce_configuration_enabled
+Title: Athena workgroups should enforce configuration
+Description: This control checks if an Athena workgroup enforces configuration. The
+  control fails if an Athena workgroup doesn't enforce configuration.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      name as resource,\n      case\n        when enforce_workgroup_configuration
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    enforce_workgroup_configuration then name || ' has enforce workgroup configuration
+    enabled.'\n        else name || ' has enforce workgroup configuration disabled.'\n
+    \     end as reason\n      \n    from\n      aws_athena_workgroup;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

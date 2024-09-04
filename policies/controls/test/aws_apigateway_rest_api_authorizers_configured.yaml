@@ -1,0 +1,19 @@
+ID: aws_apigateway_rest_api_authorizers_configured
+Title: API Gateway stages should have authorizers configured
+Description: Ensure API Gateway stages have authorizers configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      p.name as resource,\n      case\n        when
+    jsonb_array_length(a.provider_arns) > 0 then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when jsonb_array_length(a.provider_arns) > 0 then
+    p.name || ' authorizers configured.'\n        else p.name || ' authorizers not
+    configured.'\n      end as reason\n      \n      \n    from\n      aws_api_gateway_rest_api
+    as p\n      left join aws_api_gateway_authorizer as a on p.api_id = a.rest_api_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

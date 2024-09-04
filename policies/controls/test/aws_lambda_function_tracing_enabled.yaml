@@ -1,0 +1,21 @@
+ID: aws_lambda_function_tracing_enabled
+Title: Lambda functions tracing should be enabled
+Description: AWS X-Ray can be used to visualize the components of application, identify
+  performance bottlenecks, and troubleshoot requests that resulted in an error. Lambda
+  functions send trace data to X-Ray, and X-Ray processes the data to generate a service
+  map and searchable trace summaries.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when tracing_config
+    ->> 'Mode' = 'PassThrough' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when tracing_config ->> 'Mode' = 'PassThrough' then title
+    || ' has tracing disabled.'\n        else title || ' has tracing enabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

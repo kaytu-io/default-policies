@@ -1,0 +1,22 @@
+ID: aws_dynamodb_table_point_in_time_recovery_enabled
+Title: DynamoDB table point-in-time recovery should be enabled
+Description: Enable this rule to check that information has been backed up. It also
+  maintains the backups by ensuring that point-in-time recovery is enabled in AWS
+  DynamoDB.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when lower(
+    point_in_time_recovery_description ->> 'PointInTimeRecoveryStatus' ) = 'disabled'
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    lower( point_in_time_recovery_description ->> 'PointInTimeRecoveryStatus' ) =
+    'disabled' then title || ' point-in-time recovery not enabled.'\n        else
+    title || ' point-in-time recovery enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_dynamodb_table;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

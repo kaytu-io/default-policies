@@ -1,0 +1,23 @@
+ID: aws_rds_db_instance_protected_by_backup_plan
+Title: RDS DB instance should be protected by backup plan
+Description: Ensure that AWS Relational Database Service (AWS RDS) instances are protected
+  by a backup plan. The rule is non-compliant if the AWS RDS Database instance is
+  not covered by a backup plan.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with backup_protected_rds_isntance as (\n      select\n        resource_arn
+    as arn\n      from\n        aws_backup_protected_resource as b\n      where\n
+    \       resource_type = 'RDS'\n    )\n    select\n      r.arn as resource,\n      case\n
+    \       when b.arn is not null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when b.arn is not null then r.title || ' is protected by backup
+    plan.'\n        else r.title || ' is not protected by backup plan.'\n      end
+    as reason\n      \n      \n    from\n      aws_rds_db_instance as r\n      left
+    join backup_protected_rds_isntance as b on r.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

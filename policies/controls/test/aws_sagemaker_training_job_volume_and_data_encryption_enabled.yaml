@@ -1,0 +1,22 @@
+ID: aws_sagemaker_training_job_volume_and_data_encryption_enabled
+Title: SageMaker training jobs volumes and outputs should have KMS encryption enabled
+Description: Ensure that SageMaker training jobs have volumes and outputs with KMS
+  encryption enabled in order to have a more granular control over the data-at-rest
+  encryption/decryption process and to meet compliance requirements.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when output_data_config
+    ->> 'KmsKeyId' is null or output_data_config ->> 'KmsKeyId' = '' then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when output_data_config
+    ->> 'KmsKeyId' is null or output_data_config ->> 'KmsKeyId' = '' then title ||
+    ' volume and output data encryption disabled.'\n        else title || ' volume
+    and output data encryption enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_sagemaker_training_job;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

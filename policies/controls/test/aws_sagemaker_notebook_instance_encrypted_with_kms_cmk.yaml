@@ -1,0 +1,26 @@
+ID: aws_sagemaker_notebook_instance_encrypted_with_kms_cmk
+Title: SageMaker notebook instances should be encrypted using CMK
+Description: This control checks if SageMaker notebook instance storage volumes are
+  encrypted with AWS KMS Customer Master Keys (CMKs) instead of AWS managed-keys.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with sagemaker_notebook_instances as (\n      select\n        arn,\n
+    \       region,\n        account_id,\n        kms_key_id,\n        title,\n        tags,\n
+    \       _ctx\n      from\n        aws_sagemaker_notebook_instance\n    ), kms_keys
+    as (\n      select\n        arn,\n        key_manager,\n        enabled\n      from\n
+    \       aws_kms_key\n    )\n    select\n      i.arn as resource,\n      case\n
+    \       when kms_key_id is null then 'alarm'\n        when k.key_manager = 'CUSTOMER'
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    kms_key_id is null then i.title || ' encryption disabled.'\n        when k.key_manager
+    = 'CUSTOMER' then i.title || ' encryption at rest with CMK enabled.'\n        else
+    i.title || ' encryption at rest with CMK disabled.'\n      end as reason\n      \n
+    \     \n    from\n      sagemaker_notebook_instances as i\n      left join kms_keys
+    as k on i.kms_key_id = k.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,20 @@
+ID: aws_foundational_security_iam_4
+Title: 4 IAM root user access key should not exist
+Description: This control checks whether the root user access key is present. The
+  root account is the most privileged user in an AWS account. AWS access keys provide
+  programmatic access to a given account.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      case\n        when account_access_keys_present > 0 then 'alarm'\n
+    \       else 'ok'\n      end status,\n      case\n        when account_access_keys_present
+    > 0 then 'Root user access keys exist.'\n        else 'No root user access keys
+    exist.'\n      end reason\n      \n    from\n      aws_iam_account_summary;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

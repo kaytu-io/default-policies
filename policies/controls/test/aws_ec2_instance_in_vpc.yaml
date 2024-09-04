@@ -1,0 +1,20 @@
+ID: aws_ec2_instance_in_vpc
+Title: EC2 instances should be in a VPC
+Description: Deploy AWS Elastic Compute Cloud (AWS EC2) instances within an AWS Virtual
+  Private Cloud (AWS VPC) to enable secure communication between an instance and other
+  services within the amazon VPC, without requiring an internet gateway, NAT device,
+  or VPN connection.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when vpc_id
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    vpc_id is null then title || ' not in VPC.'\n        else title || ' in VPC.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

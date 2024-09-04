@@ -1,0 +1,40 @@
+ID: aws_foundational_security_rds_23
+Title: 23 RDS databases and clusters should not use a database engine default port
+Description: This control checks whether the RDS cluster or instance uses a port other
+  than the default port of the database engine.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n          when
+    engine similar to '%(aurora|mysql|mariadb)%' and port = '3306' then 'alarm'\n
+    \         when engine like '%postgres%' and port = '5432' then 'alarm'\n          when
+    engine like 'oracle%' and port = '1521' then 'alarm'\n          when engine like
+    'sqlserver%' and port = '1433' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n          when engine similar to '%(aurora|mysql|mariadb)%' and port
+    = '3306' then  title || ' ' ||  engine || ' uses a default port.'\n          when
+    engine like '%postgres%' and port = '5432' then  title || ' ' ||  engine || '
+    uses a default port.'\n          when engine like 'oracle%' and port = '1521'
+    then  title || ' ' ||  engine || ' uses a default port.'\n          when engine
+    like 'sqlserver%' and port = '1433' then  title || ' ' ||  engine || ' uses a
+    default port.'\n        else title || ' doesnt use a default port.'\n      end
+    as reason\n      \n      \n    from\n      aws_rds_db_cluster\n    )\n    union\n
+    \   (\n    select\n      arn as resource,\n      case\n          when engine similar
+    to '%(aurora|mysql|mariadb)%' and port = '3306' then 'alarm'\n          when engine
+    like '%postgres%' and port = '5432' then 'alarm'\n          when engine like 'oracle%'
+    and port = '1521' then 'alarm'\n          when engine like 'sqlserver%' and port
+    = '1433' then 'alarm'\n        else 'ok'\n      end as status,\n      case\n          when
+    engine similar to '%(aurora|mysql|mariadb)%' and port = '3306' then  title ||
+    ' ' ||  engine || ' uses a default port.'\n          when engine like '%postgres%'
+    and port = '5432' then  title || ' ' ||  engine || ' uses a default port.'\n          when
+    engine like 'oracle%' and port = '1521' then  title || ' ' ||  engine || ' uses
+    a default port.'\n          when engine like 'sqlserver%' and port = '1433' then
+    \ title || ' ' ||  engine || ' uses a default port.'\n        else title || '
+    doesnt use a default port.'\n      end as reason\n      \n      \n    from\n      aws_rds_db_instance\n
+    \   );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

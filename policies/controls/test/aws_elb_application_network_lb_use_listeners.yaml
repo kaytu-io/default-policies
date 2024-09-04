@@ -1,0 +1,27 @@
+ID: aws_elb_application_network_lb_use_listeners
+Title: ELB application and network load balancers should use listeners
+Description: Ensure that application and network load balancer must have one or more
+  listeners. A listener is a process that checks for connection requests, using the
+  protocol and port that you configure. The rules that you define for a listener determine
+  how the load balancer routes requests to its registered targets.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with load_balancers as (\n      select\n        n.arn,\n        n.title,\n
+    \       n.region,\n        n.account_id,\n        tags,\n        _ctx\n      from\n
+    \       aws_ec2_network_load_balancer as n\n      union\n      select\n        a.arn,\n
+    \       a.title,\n        a.region,\n        a.account_id,\n        tags,\n        _ctx\n
+    \     from\n        aws_ec2_application_load_balancer as a\n    )\n    select\n
+    \     distinct lb.arn as resource,\n      case\n        when l.load_balancer_arn
+    is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when l.load_balancer_arn is not null then lb.title || ' uses listener.'\n
+    \       else lb.title || ' does not uses listener.'\n      end as reason\n      \n
+    \     \n    from\n      load_balancers as lb\n      left join aws_ec2_load_balancer_listener
+    as l on lb.arn = l.load_balancer_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

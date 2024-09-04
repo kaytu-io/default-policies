@@ -1,0 +1,31 @@
+ID: aws_cis_v300_4_16
+Title: 4.16 Ensure AWS Security Hub is enabled
+Description: Security Hub collects security data from across AWS accounts, services,
+  and supported third-party partner products and helps you analyze your security trends
+  and identify the highest priority security issues. When you enable Security Hub,
+  it begins to consume, aggregate, organize, and prioritize findings from AWS services
+  that you have enabled, such as Amazon GuardDuty, Amazon Inspector, and Amazon Macie.
+  You can also enable integrations with AWS partner security products.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        when r.region = any(array['af-south-1',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'ap-northeast-3']) then 'skip'\n
+    \       -- Skip any regions that are disabled in the account.\n        when r.opt_in_status
+    = 'not-opted-in' then 'skip'\n        when h.hub_arn is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when r.region = any(array['af-south-1',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'ap-northeast-3']) then r.region
+    ||  ' region not supported.'\n        when r.opt_in_status = 'not-opted-in' then
+    r.region || ' region is disabled.'\n        when h.hub_arn is not null then 'Security
+    Hub enabled in ' || r.region || '.'\n        else 'Security Hub disabled in '
+    || r.region || '.'\n      end as reason\n      \n    from\n      aws_region as
+    r\n      left join aws_securityhub_hub as h on r.account_id = h.account_id and
+    r.name = h.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,15 @@
+ID: aws_soc_2_cc_7_1
+Title: CC7.1 To meet its objectives, the entity uses detection and monitoring procedures
+  to identify (1) changes to configurations that result in the introduction of new
+  vulnerabilities, and (2) susceptibilities to newly discovered vulnerabilities
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_ec2_instance_ssm_managed
+- aws_guardduty_enabled
+- aws_securityhub_enabled
+- aws_ssm_managed_instance_compliance_association_compliant

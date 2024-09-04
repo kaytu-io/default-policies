@@ -1,0 +1,20 @@
+ID: aws_sqs_queue_encrypted_at_rest
+Title: AWS SQS queues should be encrypted at rest
+Description: This control checks whether AWS SQS queues are encrypted at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      queue_arn as resource,\n      case\n        when
+    sqs_managed_sse_enabled then 'ok'\n        when kms_master_key_id is null then
+    'alarm'\n        else 'ok'\n      end as status,\n      case\n        when sqs_managed_sse_enabled
+    then  title || ' secured with managed SQS-SSE.'\n        when kms_master_key_id
+    is null then title || ' encryption at rest disabled.'\n        else title || '
+    encryption at rest enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_sqs_queue;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

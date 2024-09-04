@@ -1,0 +1,23 @@
+ID: aws_elasticache_redis_cluster_automatic_backup_retention_15_days
+Title: ElastiCache Redis cluster automatic backup should be enabled with retention
+  period of 15 days or greater
+Description: When automatic backups are enabled, AWS ElastiCache creates a backup
+  of the cluster on a daily basis. The backup can be retained for a number of days
+  as specified by your organization. Automatic backups can help guard against data
+  loss.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when snapshot_retention_limit
+    < 15 then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    snapshot_retention_limit = 0 then title || ' automatic backups not enabled.'\n
+    \       when snapshot_retention_limit < 15 then title || ' automatic backup retention
+    period is less than 15 days.'\n        else title || ' automatic backup retention
+    period is more than 15 days.'\n      end as reason\n      \n    from\n      aws_elasticache_replication_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

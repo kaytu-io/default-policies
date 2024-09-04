@@ -1,0 +1,32 @@
+ID: aws_elasticache_replication_group_encryption_at_rest_enabled_with_kms_cmk
+Title: ElastiCache for Redis replication groups should be encrypted with CMK
+Description: Ensure ElastiCache for Redis replication group are encrypted using CMK.
+  The rule is non-compliant if the ElastiCache for Redis replication group is not
+  encrypted using CMK.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with aws_elasticache_replication_groups as (\n      select\n
+    \       arn,\n        at_rest_encryption_enabled,\n        title,\n        kms_key_id,\n
+    \       region,\n        account_id,\n        _ctx\n      from\n        aws_elasticache_replication_group\n
+    \     order by\n        arn\n    ),\n    kms_keys as (\n      select\n        k.arn,\n
+    \       k.region,\n        k.account_id,\n        k.enabled\n      from\n        aws_kms_key
+    as k\n    )\n    select\n      r.arn as resource,\n      case\n        when not
+    at_rest_encryption_enabled then 'alarm'\n        when at_rest_encryption_enabled
+    and kms_key_id is null then 'alarm'\n        when at_rest_encryption_enabled and
+    kms_key_id is not null and k.enabled then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when not at_rest_encryption_enabled then r.title
+    || ' encryption at rest disabled.'\n        when at_rest_encryption_enabled and
+    kms_key_id is null then r.title || ' encryption at rest not enabled with CMK.'\n
+    \       when at_rest_encryption_enabled and kms_key_id is not null and k.enabled
+    then r.title || ' encryption at rest enabled with CMK.'\n        else r.title
+    || ' encryption at rest enabled with disabled CMK.'\n      end as reason\n      \n
+    \   from\n      aws_elasticache_replication_groups as r\n      left join kms_keys
+    as k on k.arn = r.kms_key_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

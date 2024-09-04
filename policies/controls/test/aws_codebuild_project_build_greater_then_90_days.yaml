@@ -1,0 +1,28 @@
+ID: aws_codebuild_project_build_greater_then_90_days
+Title: CodeBuild projects should not be unused for 90 days or greater
+Description: Ensure CodeBuild projects are curently in use. It is recommended to remove
+  the stale ones.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with latest_codebuild_build as (\n      select\n        project_name,\n
+    \       region,\n        account_id,\n        min(date_part('day', now() - end_time))
+    as build_time\n      from\n        aws_codebuild_build\n      group by\n        project_name,\n
+    \       region,\n        account_id\n    ),\n    codebuild_projects as (\n      select\n
+    \       arn,\n        name,\n        region,\n        account_id,\n        title,\n
+    \       tags,\n        _ctx\n      from\n        aws_codebuild_project\n      group
+    by\n        name,\n        tags,\n        arn,\n        title,\n        region,\n
+    \       account_id,\n        _ctx\n    )\n    select\n      p.arn as resource,\n
+    \     case\n        when b.build_time is null then 'alarm'\n        when b.build_time
+    < 90 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    b.build_time is null then p.title || ' has no builds.'\n        else p.title ||
+    ' was build ' || build_time || ' day(s) before.'\n      end as reason\n      \n
+    \     \n    from\n      codebuild_projects as p\n      left join latest_codebuild_build
+    as b on p.name = b.project_name and p.region = b.region and p.account_id = b.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,21 @@
+ID: aws_foundational_security_es_8
+Title: 8 Connections to Elasticsearch domains should be encrypted using TLS 1.2
+Description: This control checks whether connections to Elasticsearch domains are
+  required to use TLS 1.2. The check fails if the Elasticsearch domain TLSSecurityPolicy
+  is not Policy-Min-TLS-1-2-2019-07.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when domain_endpoint_options
+    ->> 'TLSSecurityPolicy' = 'Policy-Min-TLS-1-2-2019-07' then 'ok'\n        else
+    'alarm'\n      end status,\n      case\n        when domain_endpoint_options ->>
+    'TLSSecurityPolicy' = 'Policy-Min-TLS-1-2-2019-07' then title || ' encrypted using
+    TLS 1.2.'\n        else title || ' not encrypted using TLS 1.2.'\n      end as
+    reason\n      \n      \n    from\n      aws_elasticsearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

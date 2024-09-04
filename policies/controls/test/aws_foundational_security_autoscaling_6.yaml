@@ -1,0 +1,30 @@
+ID: aws_foundational_security_autoscaling_6
+Title: 6 Auto Scaling groups should use multiple instance types in multiple Availability
+  Zones
+Description: This control checks whether an Amazon EC2 Auto Scaling group uses multiple
+  instance types. The control fails if the Auto Scaling group has only one instance
+  type defined.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with autoscaling_groups as (\n      select\n        autoscaling_group_arn,\n
+    \       title,\n        mixed_instances_policy_launch_template_overrides,\n        region,\n
+    \       tags,\n        _ctx,\n        account_id\n      from\n        aws_ec2_autoscaling_group\n
+    \   ),\n    distinct_instance_types_count as (\n      select\n        autoscaling_group_arn,\n
+    \       count(distinct(e -> 'InstanceType')) as distinct_instance_types\n    from\n
+    \       autoscaling_groups,\n        jsonb_array_elements(mixed_instances_policy_launch_template_overrides)
+    as e\n    group by\n        autoscaling_group_arn,\n        title,\n        mixed_instances_policy_launch_template_overrides\n
+    \   )\n    select\n      a.autoscaling_group_arn as resource,\n      case\n        when
+    b.distinct_instance_types > 1 then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when b.distinct_instance_types > 1 then title || ' uses '
+    || b.distinct_instance_types || ' instance types.'\n        else title || ' does
+    not use multiple instance types.'\n      end as reason\n      \n      \n    from\n
+    \     autoscaling_groups as a\n      left join distinct_instance_types_count as
+    b on a.autoscaling_group_arn = b.autoscaling_group_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

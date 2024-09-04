@@ -1,0 +1,25 @@
+ID: aws_cloudfront_distribution_origin_access_identity_enabled
+Title: CloudFront distributions should have origin access identity enabled
+Description: This control checks whether an AWS CloudFront distribution with AWS S3
+  Origin type has Origin Access Identity (OAI) configured. The control fails if OAI
+  is not configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when o
+    ->> 'DomainName' not like '%s3.amazonaws.com' then 'skip'\n        when o ->>
+    'DomainName' like '%s3.amazonaws.com'\n        and o -> 'S3OriginConfig' ->> 'OriginAccessIdentity'
+    = '' then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    o ->> 'DomainName' not like '%s3.amazonaws.com' then title || ' origin type is
+    not s3.'\n        when o ->> 'DomainName' like '%s3.amazonaws.com'\n        and
+    o -> 'S3OriginConfig' ->> 'OriginAccessIdentity' = '' then title || ' origin access
+    identity not configured.'\n        else title || ' origin access identity configured.'\n
+    \     end as reason\n      \n      \n    from\n      aws_cloudfront_distribution,\n
+    \     jsonb_array_elements(origins) as o;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,21 @@
+ID: aws_foundational_security_iam_3
+Title: 3 IAM users' access keys should be rotated every 90 days or less
+Description: This control checks whether the active access keys are rotated within
+  90 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':iam::' || account_id
+    || ':user/' || user_name || '/accesskey/' || access_key_id as resource,\n      case\n
+    \       when create_date <= (current_date - interval '90' day) then 'alarm'\n
+    \       else 'ok'\n      end status,\n      user_name || ' ' || access_key_id
+    || ' created ' || to_char(create_date , 'DD-Mon-YYYY') ||\n        ' (' || extract(day
+    from current_timestamp - create_date) || ' days).'\n      as reason\n      \n
+    \   from\n      aws_iam_access_key;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

@@ -1,0 +1,25 @@
+ID: aws_sqs_queue_policy_prohibit_public_access
+Title: SQS queue policies should prohibit public access
+Description: Manage access to resources in the AWS Cloud by ensuring AWS SQS queues
+  cannot be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with wildcard_action_policies as (\n      select\n        queue_arn,\n
+    \       count(*) as statements_num\n      from\n        aws_sqs_queue,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s\n      where\n        s ->> 'Effect' = 'Allow'\n        and
+    (\n          ( s -> 'Principal' -> 'AWS') = '[\"*\"]'\n          or s ->> 'Principal'
+    = '*'\n        )\n      group by\n        queue_arn\n    )\n    select\n      q.queue_arn
+    as resource,\n      case\n        when p.queue_arn is null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when p.queue_arn is null then
+    title || ' does not allow public access.'\n        else title || ' contains '
+    || coalesce(p.statements_num,0) ||\n        ' statements that allows public access.'\n
+    \     end as reason\n\n      \n      \n    from\n      aws_sqs_queue as q\n      left
+    join wildcard_action_policies as p on q.queue_arn = p.queue_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

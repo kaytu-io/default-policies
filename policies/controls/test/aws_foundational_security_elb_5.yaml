@@ -1,0 +1,28 @@
+ID: aws_foundational_security_elb_5
+Title: 5 Application and Classic Load Balancers logging should be enabled
+Description: This control checks whether the Application Load Balancer and the Classic
+  Load Balancer have logging enabled. The control fails if access_logs.s3.enabled
+  is false.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n      select\n        arn as resource,\n        case\n          when
+    load_balancer_attributes @> '[{\"Key\": \"access_logs.s3.enabled\", \"Value\":
+    \"true\"}]' then 'ok'\n          else 'alarm'\n        end as status,\n        case\n
+    \         when load_balancer_attributes @> '[{\"Key\": \"access_logs.s3.enabled\",
+    \"Value\": \"true\"}]' then title || ' logging enabled.'\n          else title
+    || ' logging disabled.'\n        end as reason\n        \n        \n      from\n
+    \       aws_ec2_application_load_balancer\n    )\n    union\n    (\n      select\n
+    \       'arn:' || partition || ':elasticloadbalancing:' || region || ':' || account_id
+    || ':loadbalancer/' || title as resource,\n        case\n          when access_log_enabled
+    = 'true' then 'ok'\n          else 'alarm'\n        end as status,\n        case\n
+    \         when access_log_enabled = 'true' then title || ' logging enabled.'\n
+    \         else title || ' logging disabled.'\n        end as reason\n        \n
+    \       \n      from\n        aws_ec2_classic_load_balancer\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

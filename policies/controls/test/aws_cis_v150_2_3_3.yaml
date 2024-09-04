@@ -1,0 +1,21 @@
+ID: aws_cis_v150_2_3_3
+Title: 2.3.3 Ensure that public access is not given to RDS Instance
+Description: Ensure and verify that RDS database instances provisioned in your AWS
+  account do restrict unauthorized access in order to minimize security risks. To
+  restrict access to any publicly accessible RDS database instance, you must disable
+  the database Publicly Accessible flag and update the VPC security group associated
+  with the instance.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when publicly_accessible
+    then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when publicly_accessible
+    then title || ' publicly accessible.'\n        else title || ' not publicly accessible.'\n
+    \     end reason\n      \n      \n    from\n      aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

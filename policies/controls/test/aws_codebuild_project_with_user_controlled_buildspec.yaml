@@ -1,0 +1,20 @@
+ID: aws_codebuild_project_with_user_controlled_buildspec
+Title: CodeBuild projects should not use an user controlled buildspec
+Description: This control checks if buildspec.yml is used from a trusted source which
+  user cant interfere with.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when split_part(source
+    ->> 'Buildspec', '.', -1) = 'yml' then 'alarm'\n        else 'ok'\n      end as
+    status,\n      case\n        when split_part(source ->> 'Buildspec', '.', -1)
+    = 'yml' then title || ' uses a user controlled buildspec.'\n        else title
+    || ' does not uses a user controlled buildspec.'\n      end as reason\n      \n
+    \     \n    from\n      aws_codebuild_project;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

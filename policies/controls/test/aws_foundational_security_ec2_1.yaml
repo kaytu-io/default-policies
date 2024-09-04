@@ -1,0 +1,27 @@
+ID: aws_foundational_security_ec2_1
+Title: 1 Amazon EBS snapshots should not be public, determined by the ability to be
+  restorable by anyone
+Description: Amazon EBS snapshots should not be public, determined by the ability
+  to be restorable by anyone. EBS snapshots are used to back up the data on your EBS
+  volumes to Amazon S3 at a specific point in time. You can use the snapshots to restore
+  previous states of EBS volumes. It is rarely acceptable to share a snapshot with
+  the public. Typically the decision to share a snapshot publicly was made in error
+  or without a complete understanding of the implications. This check helps ensure
+  that all such sharing was fully planned and intentional.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':ec2:' || region || ':'
+    || account_id || ':snapshot/' || snapshot_id as resource,\n      case\n        when
+    create_volume_permissions @> '[{\"Group\": \"all\", \"UserId\": null}]' then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when create_volume_permissions
+    @> '[{\"Group\": \"all\", \"UserId\": null}]' then title || ' is publicly restorable.'\n
+    \       else title || ' is not publicly restorable.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ebs_snapshot;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

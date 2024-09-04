@@ -1,0 +1,14 @@
+ID: aws_soc_2_cc_8_1
+Title: CC8.1 The entity authorizes, designs, develops or acquires, configures, documents,
+  tests, approves, and implements changes to infrastructure, data, software, and procedures
+  to meet its objectives
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_codebuild_project_plaintext_env_variables_no_sensitive_aws_values
+- aws_codebuild_project_source_repo_oauth_configured
+- aws_config_enabled_all_regions

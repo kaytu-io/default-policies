@@ -1,0 +1,20 @@
+ID: aws_cis_compute_service_v100_4_4
+Title: 4.4 Ensure least privilege is used with Lambda function access
+Description: Lambda is fully integrated with IAM, allowing you to control precisely
+  what each Lambda function can do within the AWS Cloud. As you develop a Lambda function,
+  you expand the scope of this policy to enable access to other resources. For example,
+  for a function that processes objects put into an S3 bucket, it requires read access
+  to objects stored in that bucket.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

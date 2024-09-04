@@ -1,0 +1,22 @@
+ID: aws_iam_user_hardware_mfa_enabled
+Title: IAM users should have hardware MFA enabled
+Description: Manage access to resources in the AWS Cloud by ensuring hardware MFA
+  is enabled for the user.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      u.arn as resource,\n      case\n        when
+    serial_number is null then 'alarm'\n        when serial_number like any(array['%mfa%','%sms-mfa%'])
+    then 'info'\n        else 'ok'\n      end as status,\n      case\n        when
+    serial_number is null then u.name || ' MFA device not configured.'\n        when
+    serial_number like any(array['%mfa%','%sms-mfa%']) then u.name || ' MFA enabled,
+    but the MFA associated is a virtual device.'\n        else u.name || ' hardware
+    MFA device enabled.'\n      end as reason\n      \n      \n    from\n      aws_iam_virtual_mfa_device
+    as m\n      right join aws_iam_user as u on m.user_id = u.user_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

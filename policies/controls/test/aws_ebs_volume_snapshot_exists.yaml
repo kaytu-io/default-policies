@@ -1,0 +1,22 @@
+ID: aws_ebs_volume_snapshot_exists
+Title: EBS volume snapshots should exist
+Description: Ensure that EBS volume snapshots exist. This rule is non-compliant if
+  the EBS volume does not have any snapshot.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with volume_with_snapshots as (\n      select\n        volume_id,\n
+    \       count(*) as snap_count\n      from\n        aws_ebs_snapshot\n      group
+    by\n        volume_id\n    )\n    select\n      v.arn as resource,\n      case\n
+    \       when s.volume_id is not null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when s.volume_id is not null then v.title || '
+    has ' || s.snap_count || ' snapshot(s).'\n        else v.title || ' does not have
+    snapshot.'\n      end as reason\n      \n      \n    from\n      aws_ebs_volume
+    as v\n      left join volume_with_snapshots as s on s.volume_id = v.volume_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

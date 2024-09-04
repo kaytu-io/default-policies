@@ -1,0 +1,23 @@
+ID: aws_workspaces_workspace_volume_encryption_enabled
+Title: WorkSpaces root and user volume encryption should be enabled
+Description: To help protect data at rest, ensure encryption is enabled for your WorkSpaces
+  root and user volumes.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when user_volume_encryption_enabled
+    and root_volume_encryption_enabled then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when user_volume_encryption_enabled and root_volume_encryption_enabled
+    then title || ' user and root volume encryption enabled.'\n        else\n          case\n
+    \           when not user_volume_encryption_enabled and not root_volume_encryption_enabled
+    then title || ' user and root volume encryption disabled.'\n            when not
+    root_volume_encryption_enabled then title || ' root volume encryption disabled.'\n
+    \           else  title || ' user volume encryption disabled.'\n          end\n
+    \     end as reason\n      \n      \n    from\n      aws_workspaces_workspace;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,18 @@
+ID: aws_s3_bucket_versioning_enabled
+Title: S3 bucket versioning should be enabled
+Description: AWS Simple Storage Service (AWS S3) bucket versioning helps keep multiple
+  variants of an object in the same AWS S3 bucket.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when versioning_enabled
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    versioning_enabled then name || ' versioning enabled.'\n        else name || '
+    versioning disabled.'\n      end as reason\n      \n      \n    from\n      aws_s3_bucket;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

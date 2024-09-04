@@ -1,0 +1,27 @@
+ID: aws_vpc_security_group_restrict_ingress_tcp_udp_all
+Title: VPC security groups should restrict ingress TCP and UDP access from 0.0.0.0/0
+Description: Manage access to resources in the AWS Cloud by ensuring common ports
+  are restricted on AWS Elastic Compute Cloud (AWS EC2) Security Groups.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with bad_rules as (\n      select\n        group_id,\n        count(*)
+    as num_bad_rules\n      from\n        aws_vpc_security_group_rule\n      where\n
+    \       type = 'ingress'\n        and cidr_ipv4 = '0.0.0.0/0'\n        and (\n
+    \         ip_protocol in ('tcp', 'udp')\n          or (\n            ip_protocol
+    = '-1'\n            and from_port is null\n          )\n        )\n      group
+    by\n        group_id\n    )\n    select\n      arn as resource,\n      case\n
+    \       when bad_rules.group_id is null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when bad_rules.group_id is null then sg.group_id
+    || ' does not allow ingress to TCP or UDP ports from 0.0.0.0/0.'\n        else
+    sg.group_id || ' contains ' || bad_rules.num_bad_rules || ' rule(s) that allow
+    ingress to TCP or UDP ports from 0.0.0.0/0.'\n      end as reason\n      \n      \n
+    \   from\n      aws_vpc_security_group as sg\n      left join bad_rules on bad_rules.group_id
+    = sg.group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

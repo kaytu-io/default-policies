@@ -1,0 +1,25 @@
+ID: aws_rds_db_cluster_aurora_protected_by_backup_plan
+Title: RDS Aurora clusters should be protected by backup plan
+Description: Checks if AWS Aurora DB clusters are protected by a backup plan. The
+  rule is non-compliant if the AWS Relational Database Service (AWS RDS) Database
+  Cluster is not protected by a backup plan.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with backup_protected_cluster as (\n      select\n        resource_arn
+    as arn\n      from\n        aws_backup_protected_resource as b\n      where\n
+    \       resource_type = 'Aurora'\n    )\n    select\n      c.arn as resource,\n
+    \     case\n        when c.engine not like '%aurora%' then 'skip'\n        when
+    b.arn is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when c.engine not like '%aurora%' then c.title || ' not Aurora resources.'\n
+    \       when b.arn is not null then c.title || ' is protected by backup plan.'\n
+    \       else c.title || ' is not protected by backup plan.'\n      end as reason\n
+    \     \n      \n    from\n      aws_rds_db_cluster as c\n      left join backup_protected_cluster
+    as b on c.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

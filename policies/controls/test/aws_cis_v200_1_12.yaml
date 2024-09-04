@@ -1,0 +1,44 @@
+ID: aws_cis_v200_1_12
+Title: 1.12 Ensure credentials unused for 45 days or greater are disabled
+Description: AWS IAM users can access AWS resources using different types of credentials,
+  such as passwords or access keys. It is recommended that all credentials that have
+  been unused in 45 or greater days be deactivated or removed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        --root_account
+    will have always password associated even though AWS credential report returns
+    'not_supported' for password_enabled\n        when user_name = '<root_account>'\n
+    \         then 'info'\n        when password_enabled and password_last_used is
+    null and password_last_changed < (current_date - interval '45' day)\n          then
+    'alarm'\n        when password_enabled and password_last_used  < (current_date
+    - interval '45' day)\n          then 'alarm'\n        when access_key_1_active
+    and access_key_1_last_used_date is null and access_key_1_last_rotated < (current_date
+    - interval '45' day)\n          then 'alarm'\n        when access_key_1_active
+    and access_key_1_last_used_date  < (current_date - interval '45' day)\n          then
+    'alarm'\n        when access_key_2_active and access_key_2_last_used_date is null
+    and access_key_2_last_rotated < (current_date - interval '45' day)\n          then
+    'alarm'\n        when access_key_2_active and access_key_2_last_used_date  < (current_date
+    - interval '45' day)\n          then 'alarm'\n        else 'ok'\n      end status,\n
+    \     user_name ||\n        case\n          when not password_enabled\n            then
+    ' password not enabled,'\n          when password_enabled and password_last_used
+    is null\n            then ' password created ' || to_char(password_last_changed,
+    'DD-Mon-YYYY') || ' never used,'\n          else\n            ' password used
+    ' || to_char(password_last_used, 'DD-Mon-YYYY') || ','\n        end ||\n        case\n
+    \         when not access_key_1_active\n            then ' key 1 not enabled,'\n
+    \         when access_key_1_active and access_key_1_last_used_date is null\n            then
+    ' key 1 created ' || to_char(access_key_1_last_rotated, 'DD-Mon-YYYY') || ' never
+    used,'\n          else\n            ' key 1 used ' || to_char(access_key_1_last_used_date,
+    'DD-Mon-YYYY') || ','\n        end ||\n          case\n          when not access_key_2_active\n
+    \           then ' key 2 not enabled.'\n          when access_key_2_active and
+    access_key_2_last_used_date is null\n            then ' key 2 created ' || to_char(access_key_2_last_rotated,
+    'DD-Mon-YYYY') || ' never used.'\n          else\n            ' key 2 used ' ||
+    to_char(access_key_2_last_used_date, 'DD-Mon-YYYY') || '.'\n        end\n      as
+    reason\n      \n    from\n      aws_iam_credential_report;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,33 @@
+ID: aws_iam_access_analyzer_enabled_without_findings
+Title: IAM Access analyzer should be enabled without findings
+Description: This control checks whether the IAM Access analyzer is enabled without
+  findings. If you grant permissions to an S3 bucket in one of your organization member
+  accounts to a principal in another organization member account, IAM Access Analyzer
+  does not generate a finding. But if you grant permission to a principal in an account
+  that is not a member of the organization, IAM Access Analyzer generates a finding.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        -- Skip any regions that
+    are disabled in the account.\n        when r.opt_in_status = 'not-opted-in' then
+    'skip'\n        when aa.status = 'ACTIVE' and aa.findings is null then 'ok'\n
+    \       when aa.status = 'ACTIVE' and jsonb_array_length(aa.findings) > 0 then
+    'alarm'\n        when aa.status = 'NOT_AVAILABLE' then 'alarm'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when r.opt_in_status = 'not-opted-in'
+    then r.region || ' region is disabled.'\n        when aa.status = 'ACTIVE' and
+    aa.findings is null then aa.name || ' does not have active findings in region
+    ' || r.region || '.'\n        when aa.status = 'ACTIVE' and jsonb_array_length(aa.findings)
+    > 0 then aa.name || ' has active findings in region ' || r.region || '.'\n        when
+    aa.status = 'NOT_AVAILABLE' then aa.name || ' is not enabled in region ' || r.region
+    || '.'\n        else 'IAM Access Analyzer is not active in region ' || r.region
+    || '.'\n      end as reason\n      \n      \n    from\n      aws_region as r\n
+    \     left join aws_accessanalyzer_analyzer as aa on r.account_id = aa.account_id
+    and r.region = aa.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,21 @@
+ID: aws_kms_key_not_pending_deletion
+Title: KMS keys should not be pending deletion
+Description: To help protect data at rest, ensure necessary customer master keys (CMKs)
+  are not scheduled for deletion in AWS Key Management Service (AWS KMS).
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when key_state
+    = 'PendingDeletion' then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when key_state = 'PendingDeletion' then title || ' scheduled for deletion
+    and will be deleted in ' || extract(day from deletion_date - current_timestamp)
+    || ' day(s).'\n        else title || ' not scheduled for deletion.'\n      end
+    as reason\n      \n      \n    from\n      aws_kms_key\n    where\n      key_manager
+    = 'CUSTOMER';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

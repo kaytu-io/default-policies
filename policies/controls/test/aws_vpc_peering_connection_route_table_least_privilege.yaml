@@ -1,0 +1,27 @@
+ID: aws_vpc_peering_connection_route_table_least_privilege
+Title: VPCs peering connection route tables should have least privilege
+Description: Ensure that all VPCs peering connection route tables have least privilege.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with vpc_peering_routing_tables as (\n      select\n        r
+    ->> 'VpcPeeringConnectionId' as peering_connection_id\n      from\n        aws_vpc_route_table,\n
+    \       jsonb_array_elements(routes) as r\n        inner join aws_vpc_peering_connection
+    as c on r ->> 'VpcPeeringConnectionId' = c.id\n      where\n        ( r ->> 'DestinationCidrBlock'
+    = '0.0.0.0/0'\n          or r ->> 'DestinationCidrBlock' = '::/0'\n          or
+    (r ->> 'DestinationCidrBlock')::cidr = c.accepter_cidr_block\n          or (r
+    ->> 'DestinationCidrBlock')::cidr = c.requester_cidr_block\n        )\n      group
+    by\n      r ->> 'VpcPeeringConnectionId'\n    )\n    select\n      c.id as resource,\n
+    \     case\n        when t.peering_connection_id is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when t.peering_connection_id is
+    not null then c.title || ' does not have least privilege access.'\n        else
+    c.title || ' have least privilege access.'\n      end as reason\n      \n      \n
+    \   from\n      aws_vpc_peering_connection as c\n      left join vpc_peering_routing_tables
+    as t on t.peering_connection_id = c.id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

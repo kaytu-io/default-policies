@@ -1,0 +1,28 @@
+ID: aws_cis_v120_4_1
+Title: 4.1 Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+Description: Security groups provide stateful filtering of ingress/egress network
+  traffic to AWS resources. It is recommended that no security group allows unrestricted
+  ingress access to port 22.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with ingress_ssh_rules as (\n      select\n        group_id,\n
+    \       count(*) as num_ssh_rules\n      from\n        aws_vpc_security_group_rule\n
+    \     where\n        type = 'ingress'\n        and cidr_ipv4 = '0.0.0.0/0'\n        and
+    (\n            ( ip_protocol = '-1'\n            and from_port is null\n            )\n
+    \           or (\n                from_port >= 22\n                and to_port
+    <= 22\n            )\n        )\n      group by\n        group_id\n    )\n    select\n
+    \     arn as resource,\n      case\n        when ingress_ssh_rules.group_id is
+    null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    ingress_ssh_rules.group_id is null then sg.group_id || ' ingress restricted for
+    SSH from 0.0.0.0/0.'\n        else  sg.group_id || ' contains ' || ingress_ssh_rules.num_ssh_rules
+    || ' ingress rule(s) allowing SSH from 0.0.0.0/0.'\n      end as reason\n      \n
+    \     \n    from\n      aws_vpc_security_group as sg\n      left join ingress_ssh_rules
+    on ingress_ssh_rules.group_id = sg.group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_directory_service_certificate_expires_90_days
+Title: Directory Service certificates should not expire within 90 days
+Description: Is is recommended to monitor certificate expiration and implement automated
+  alerts to notify the responsible team for timely certificate replacement or removal.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_id as resource,\n      case\n        when
+    date(expiry_date_time) - date(current_date) >= 90 then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      title || ' expires ' || to_char(expiry_date_time,
+    'DD-Mon-YYYY') ||\n        ' (' || extract(day from expiry_date_time - current_date)
+    || ' days).' as reason\n      \n    from\n      aws_directory_service_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

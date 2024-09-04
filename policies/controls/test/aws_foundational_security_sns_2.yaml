@@ -1,0 +1,27 @@
+ID: aws_foundational_security_sns_2
+Title: 2 Logging of delivery status should be enabled for notification messages sent
+  to a topic
+Description: This control checks whether logging is enabled for the delivery status
+  of notification messages sent to an Amazon SNS topic for the endpoints. This control
+  fails if the delivery status notification for messages is not enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      topic_arn as resource,\n      case\n        when
+    application_failure_feedback_role_arn is null\n          and firehose_failure_feedback_role_arn
+    is null\n          and http_failure_feedback_role_arn is null\n          and lambda_failure_feedback_role_arn
+    is null\n          and sqs_failure_feedback_role_arn is null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when application_failure_feedback_role_arn
+    is null\n          and firehose_failure_feedback_role_arn is null\n          and
+    http_failure_feedback_role_arn is null\n          and lambda_failure_feedback_role_arn
+    is null\n          and sqs_failure_feedback_role_arn is null then title || ' has
+    delivery status logging for notification messages disabled.'\n        else title
+    || ' has delivery status logging for notification messages enabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_sns_topic;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

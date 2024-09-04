@@ -1,0 +1,34 @@
+ID: aws_guardduty_enabled
+Title: GuardDuty should be enabled
+Description: AWS GuardDuty can help to monitor and detect potential cybersecurity
+  events by using threat intelligence feeds.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        when r.region = any(array['af-south-1',
+    'ap-northeast-3', 'ap-southeast-3', 'eu-south-1', 'cn-north-1', 'cn-northwest-1',
+    'me-south-1', 'us-gov-east-1']) then 'skip'\n        -- Skip any regions that
+    are disabled in the account.\n        when r.opt_in_status = 'not-opted-in' then
+    'skip'\n        when status = 'ENABLED' and master_account ->> 'AccountId' is
+    null then 'ok'\n        when status = 'ENABLED' and master_account ->> 'AccountId'
+    is not null then 'info'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when r.region = any(array['af-south-1', 'ap-northeast-3', 'ap-southeast-3',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'me-south-1', 'us-gov-east-1'])
+    then r.region || ' region not supported.'\n        when r.opt_in_status = 'not-opted-in'
+    then r.region || ' region is disabled.'\n        when status is null then 'No
+    GuardDuty detector found in ' || r.region || '.'\n        when status = 'ENABLED'
+    and master_account ->> 'AccountId' is null then r.region || ' detector ' || d.title
+    || ' enabled.'\n        when status = 'ENABLED' and master_account ->> 'AccountId'
+    is not null then r.region || ' detector ' || d.title || ' is managed by account
+    ' || (master_account ->> 'AccountId') ||  ' via delegated admin.'\n        else
+    r.region || ' detector ' || d.title || ' disabled.'\n      end as reason\n      \n
+    \   from\n      aws_region as r\n      left join aws_guardduty_detector d on r.account_id
+    = d.account_id and r.name = d.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

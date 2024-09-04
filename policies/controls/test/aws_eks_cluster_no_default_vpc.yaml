@@ -1,0 +1,24 @@
+ID: aws_eks_cluster_no_default_vpc
+Title: EKS clusters should not be configured within a default VPC
+Description: Ensure to configure a new VPC for your EKS cluster as default VPC comes
+  with a default configuration that lacks the proper security controls. Your network
+  should be well configured and should follow the least privilege principle, meaning
+  only the necessary privileges are granted.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with default_vpc_cluster as (\n      select\n        distinct
+    c.arn\n      from\n        aws_eks_cluster as c\n        left join aws_vpc as
+    v on v.vpc_id = c.resources_vpc_config ->> 'VpcId'\n      where\n        v.is_default\n
+    \   )\n    select\n      c.arn as resource,\n      case\n        when v.arn is
+    not null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    v.arn is not null then title || ' uses default VPC.'\n        else title || '
+    does not use default VPC.'\n      end as reason\n      \n      \n    from\n      aws_eks_cluster
+    as c\n      left join default_vpc_cluster as v on v.arn = c.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

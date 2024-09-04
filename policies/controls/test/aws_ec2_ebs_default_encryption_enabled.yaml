@@ -1,0 +1,20 @@
+ID: aws_ec2_ebs_default_encryption_enabled
+Title: EBS default encryption should be enabled
+Description: To help protect data at rest, ensure that encryption is enabled for your
+  AWS Elastic Block Store (AWS EBS) volumes.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || '::' || region || ':'
+    || account_id as resource,\n      case\n        when not default_ebs_encryption_enabled
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    not default_ebs_encryption_enabled then region || ' default EBS encryption disabled.'\n
+    \       else region || ' default EBS encryption enabled.'\n      end as reason\n
+    \     \n    from\n      aws_ec2_regional_settings;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

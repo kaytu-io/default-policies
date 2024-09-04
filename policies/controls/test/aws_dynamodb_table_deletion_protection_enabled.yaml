@@ -1,0 +1,20 @@
+ID: aws_dynamodb_table_deletion_protection_enabled
+Title: DynamoDB table should have deletion protection enabled
+Description: This control checks whether an Amazon DynamoDB table has deletion protection
+  enabled. The control fails if a DynamoDB table doesn't have deletion protection
+  enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when deletion_protection_enabled
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    deletion_protection_enabled then title || ' deletion protection enabled.'\n        else
+    title || ' deletion protection disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_dynamodb_table;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

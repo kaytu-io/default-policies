@@ -1,0 +1,23 @@
+ID: aws_kms_cmk_unused
+Title: KMS key should be in use
+Description: This control checks whether there are any unused CMK (Customer Master
+  Key) KMS (Key Management Service) keys.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when not
+    enabled and key_state = 'PendingDeletion' then 'ok'\n        when not enabled
+    and key_state <> 'PendingDeletion' then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when not enabled and key_state = 'PendingDeletion'
+    then title || ' scheduled for deletion in ' || extract(day from deletion_date
+    - current_timestamp) || ' day(s).'\n        when not enabled and key_state <>
+    'PendingDeletion' then title || ' is unused.'\n        else title || ' is in use.'\n
+    \     end as reason\n      \n      \n    from\n      aws_kms_key\n    where\n
+    \     key_manager = 'CUSTOMER';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

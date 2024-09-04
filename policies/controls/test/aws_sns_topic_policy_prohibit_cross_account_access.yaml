@@ -1,0 +1,27 @@
+ID: aws_sns_topic_policy_prohibit_cross_account_access
+Title: SNS topic policies should prohibit cross account access
+Description: Manage access to resources in the AWS Cloud by ensuring SNS topics does
+  not have cross account access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with cross_account_policies as (\n      select\n        topic_arn,\n
+    \       count(*) as statements_num\n      from\n        aws_sns_topic,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Principal' -> 'AWS')
+    as p\n      where\n        s ->> 'Effect' = 'Allow'\n        and (\n          (
+    s -> 'Principal' -> 'AWS') = '[\"*\"]'\n          or s ->> 'Principal' = '*'\n
+    \         or split_part(p, ':', 5) <> account_id\n        )\n      group by\n
+    \       topic_arn\n    )\n    select\n      t.topic_arn as resource,\n      case\n
+    \       when p.topic_arn is null then 'ok'\n        else 'alarm'\n      end as
+    status,\n      case\n        when p.topic_arn is null then title || ' does not
+    allow cross account access.'\n        else title || ' contains ' || coalesce(p.statements_num,0)
+    || ' statements that allows cross account access.'\n      end as reason\n      \n
+    \     \n    from\n      aws_sns_topic as t\n      left join cross_account_policies
+    as p on p.topic_arn = t.topic_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

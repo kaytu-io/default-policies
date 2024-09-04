@@ -1,0 +1,18 @@
+ID: aws_appstream_fleet_idle_disconnect_timeout_600_seconds
+Title: AppStream fleet idle disconnect timeout should be set to less than or equal
+  to 10 mins
+Description: Ensure session idle disconnect timeout is set to 10 minutes or less.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when idle_disconnect_timeout_in_seconds
+    <= 600 then 'ok'\n        else 'alarm'\n      end as status,\n      title || '
+    idle disconnect timeout in seconds is set to ' || idle_disconnect_timeout_in_seconds
+    || ' seconds.' as reason\n      \n      \n    from\n      aws_appstream_fleet;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

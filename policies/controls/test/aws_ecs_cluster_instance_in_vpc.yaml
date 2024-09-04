@@ -1,0 +1,20 @@
+ID: aws_ecs_cluster_instance_in_vpc
+Title: ECS cluster instances should be in a VPC
+Description: Deploy AWS ECS cluster instance within an AWS Virtual Private Cloud (AWS
+  VPC) for a secure communication between a instance and other services within the
+  AWS VPC.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      c.arn as resource,\n      case\n        when
+    i.vpc_id is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when i.vpc_id is null then c.title || ' not in VPC.'\n        else c.title
+    || ' in VPC.'\n      end as reason\n      \n      \n    from\n      aws_ecs_container_instance
+    as c\n      left join aws_ec2_instance as i on c.ec2_instance_id = i.instance_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,18 @@
+ID: aws_cis_v140_1_3
+Title: 1.3 Ensure security questions are registered in the AWS account
+Description: The AWS support portal allows account owners to establish security questions
+  that can be used to authenticate individuals calling AWS customer service for support.
+  It is recommended that security questions be established.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

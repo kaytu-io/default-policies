@@ -1,0 +1,25 @@
+ID: aws_foundational_security_networkfirewall_4
+Title: 4 The default stateless action for Network Firewall policies should be drop
+  or forward for full packets
+Description: A firewall policy defines how your firewall monitors and handles traffic
+  in Amazon VPC. You configure stateless and stateful rule groups to filter packets
+  and traffic flows. Defaulting to Pass can allow unintended traffic.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when (not
+    (firewall_policy -> 'StatelessDefaultActions') ? 'aws:drop'\n            and not
+    (firewall_policy -> 'StatelessDefaultActions') ? 'aws:forward_to_sfe') then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when (not (firewall_policy
+    -> 'StatelessDefaultActions') ? 'aws:drop'\n          and not (firewall_policy
+    -> 'StatelessDefaultActions') ? 'aws:forward_to_sfe') then title || ' stateless
+    action is neither drop nor forward for full packets.'\n        else title || '
+    stateless action is either drop or forward for full packets.'\n      end as reason\n
+    \     \n      \n    from\n      aws_networkfirewall_firewall_policy;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

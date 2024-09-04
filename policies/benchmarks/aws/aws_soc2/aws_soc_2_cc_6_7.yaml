@@ -1,0 +1,20 @@
+ID: aws_soc_2_cc_6_7
+Title: CC6.7 The entity restricts the transmission, movement, and removal of information
+  to authorized internal and external users and processes, and protects it during
+  transmission, movement, or removal to meet the entity’s objectives
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_acm_certificate_expires_30_days
+- aws_apigateway_stage_cache_encryption_at_rest_enabled
+- aws_cloudfront_distribution_encryption_in_transit_enabled
+- aws_elb_application_lb_drop_http_headers
+- aws_elb_application_lb_redirect_http_request_to_https
+- aws_elb_classic_lb_use_ssl_certificate
+- aws_elb_classic_lb_use_tls_https_listeners
+- aws_es_domain_node_to_node_encryption_enabled
+- aws_redshift_cluster_encryption_in_transit_enabled

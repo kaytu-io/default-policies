@@ -1,0 +1,30 @@
+ID: aws_foundational_security_emr_2
+Title: 2 Amazon EMR block public access setting should be enabled
+Description: This control checks whether your account is configured with Amazon EMR
+  block public access. The control fails if the block public access setting isn't
+  enabled or if any port other than port 22 is allowed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with emr_port_configuration as(\n      select\n        region,\n
+    \       account_id\n      from\n        aws_emr_block_public_access_configuration,\n
+    \       jsonb_array_elements(permitted_public_security_group_rule_ranges) as r\n
+    \     where\n        (r -> 'MaxRange')::int = 22\n        and (r-> 'MinRange')::int
+    = 22\n        and block_public_security_group_rules\n    )\n    select\n      'arn:'
+    || c.partition || '::' || c.region || ':' || c.account_id as resource,\n      case\n
+    \       when not block_public_security_group_rules then 'alarm'\n        when
+    block_public_security_group_rules and p.region is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when not block_public_security_group_rules
+    then c.region || ' EMR block public access disabled.'\n        when block_public_security_group_rules
+    and p.region is not null then c.region || ' EMR block public access enabled.'\n
+    \       else c.region || ' EMR block public access enabled for ports other than
+    22.'\n      end as reason\n      \n    from\n      aws_emr_block_public_access_configuration
+    as c\n      left join emr_port_configuration as p on p.region = c.region and p.account_id
+    = c.account_id\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

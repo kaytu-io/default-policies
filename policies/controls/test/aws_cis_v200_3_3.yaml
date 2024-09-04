@@ -1,0 +1,40 @@
+ID: aws_cis_v200_3_3
+Title: 3.3 Ensure the S3 bucket used to store CloudTrail logs is not publicly accessible
+Description: CloudTrail logs a record of every API call made in your AWS account.
+  These logs file are stored in an S3 bucket. It is recommended that the bucket policy
+  or access control list (ACL) applied to the S3 bucket that CloudTrail logs to prevent
+  public access to the CloudTrail logs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with public_bucket_data as (\n    -- note the counts are not
+    exactly CORRECT because of the jsonb_array_elements joins,\n    -- but will be
+    non-zero if any matches are found\n    select\n      t.s3_bucket_name as name,\n
+    \     b.arn,\n      t.region,\n      t.account_id,\n      t.tags,\n      t._ctx,\n
+    \     count(acl_grant) filter (where acl_grant -> 'Grantee' ->> 'URI' like '%acs.amazonaws.com/groups/global/AllUsers')
+    as all_user_grants,\n      count(acl_grant) filter (where acl_grant -> 'Grantee'
+    ->> 'URI' like '%acs.amazonaws.com/groups/global/AuthenticatedUsers') as auth_user_grants,\n
+    \     count(s) filter (where s ->> 'Effect' = 'Allow' and  p = '*' ) as anon_statements\n
+    \   from\n      aws_cloudtrail_trail as t\n    left join aws_s3_bucket as b on
+    t.s3_bucket_name = b.name\n    left join jsonb_array_elements(acl -> 'Grants')
+    as acl_grant on true\n    left join jsonb_array_elements(policy_std -> 'Statement')
+    as s  on true\n    left join jsonb_array_elements_text(s -> 'Principal' -> 'AWS')
+    as p  on true\n    group by\n      t.s3_bucket_name,\n      b.arn,\n      t.region,\n
+    \     t.account_id,\n      t.tags,\n      t._ctx\n    )\n    select\n      case\n
+    \       when arn is null then 'arn:aws:s3::' || name\n        else arn\n      end
+    as resource,\n      case\n        when arn is null then 'skip'\n        when all_user_grants
+    > 0 then 'alarm'\n        when auth_user_grants > 0 then 'alarm'\n        when
+    anon_statements > 0 then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when arn is null then name || ' not found in account ' || account_id ||
+    '.'\n        when all_user_grants > 0 then name || ' grants access to AllUsers
+    in ACL.'\n        when auth_user_grants > 0 then name || ' grants access to AuthenticatedUsers
+    in ACL.'\n        when anon_statements > 0 then name || ' grants access to AWS:*\"
+    in bucket policy.'\n        else name || ' does not grant anonymous access in
+    ACL or bucket policy.'\n      end as reason\n      \n      \n    from\n      public_bucket_data;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

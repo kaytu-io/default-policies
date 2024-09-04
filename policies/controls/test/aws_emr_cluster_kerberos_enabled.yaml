@@ -1,0 +1,20 @@
+ID: aws_emr_cluster_kerberos_enabled
+Title: EMR cluster Kerberos should be enabled
+Description: The access permissions and authorizations can be managed and incorporated
+  with the principles of least privilege and separation of duties, by enabling Kerberos
+  for AWS EMR clusters.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    kerberos_attributes is null then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when kerberos_attributes is null then title || ' Kerberos
+    not enabled.'\n        else title || ' Kerberos enabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_emr_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

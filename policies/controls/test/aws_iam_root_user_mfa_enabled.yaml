@@ -1,0 +1,19 @@
+ID: aws_iam_root_user_mfa_enabled
+Title: IAM root user MFA should be enabled
+Description: Manage access to resources in the AWS Cloud by ensuring MFA is enabled
+  for the root user.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      case\n        when account_mfa_enabled then 'ok'\n        else
+    'alarm'\n      end status,\n      case\n        when account_mfa_enabled then
+    'MFA enabled for root account.'\n        else 'MFA not enabled for root account.'\n
+    \     end reason\n      \n    from\n      aws_iam_account_summary;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

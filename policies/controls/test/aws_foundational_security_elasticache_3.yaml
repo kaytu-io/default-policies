@@ -1,0 +1,20 @@
+ID: aws_foundational_security_elasticache_3
+Title: 3 ElastiCache for Redis replication groups should have automatic failover enabled
+Description: This control checks if ElastiCache for Redis replication groups have
+  automatic failover enabled. This control fails if automatic failover isn't enabled
+  for a Redis replication group.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when automatic_failover
+    = 'enabled' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when automatic_failover = 'enabled' then title || ' automatic failover
+    enabled.'\n        else title || ' automatic failover disabled.'\n      end as
+    reason\n      \n    from\n      aws_elasticache_replication_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

@@ -1,0 +1,21 @@
+ID: aws_foundational_security_cloudformation_1
+Title: 1 CloudFormation stacks should be integrated with Simple Notification Service
+  (SNS)
+Description: This control checks whether an Amazon Simple Notification Service notification
+  is integrated with a CloudFormation stack. The control fails for a CloudFormation
+  stack if there is no SNS notification associated with it.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when jsonb_array_length(notification_arns)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    jsonb_array_length(notification_arns) > 0 then title || ' notifications enabled.'\n
+    \       else title || ' notifications disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_cloudformation_stack;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

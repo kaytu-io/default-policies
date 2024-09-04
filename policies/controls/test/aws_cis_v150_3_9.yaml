@@ -1,0 +1,28 @@
+ID: aws_cis_v150_3_9
+Title: 3.9 Ensure VPC flow logging is enabled in all VPCs
+Description: VPC Flow Logs is a feature that enables you to capture information about
+  the IP traffic going to and from network interfaces in your VPC. After you've created
+  a flow log, you can view and retrieve its data in Amazon CloudWatch Logs. It is
+  recommended that VPC Flow Logs be enabled for packet \"Rejects\" for VPCs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with vpcs as (\n      select\n        arn,\n        account_id,\n
+    \       region,\n        owner_id,\n        vpc_id,\n        tags,\n        _ctx\n
+    \     from\n        aws_vpc\n      order by\n        vpc_id\n    ),\n    flowlogs
+    as (\n      select\n        resource_id,\n        account_id,\n        region\n
+    \     from\n        aws_vpc_flow_log\n      order by\n        resource_id\n    )\n
+    \   select\n      v.arn as resource,\n      case\n        when v.account_id <>
+    v.owner_id then 'skip'\n        when f.resource_id is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when v.account_id <> v.owner_id
+    then v.vpc_id || ' is a shared VPC.'\n        when f.resource_id is not null then
+    v.vpc_id || ' flow logging enabled.'\n        else v.vpc_id || ' flow logging
+    disabled.'\n      end as reason\n      \n      \n    from\n      vpcs as v\n      left
+    join flowlogs as f on v.vpc_id = f.resource_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

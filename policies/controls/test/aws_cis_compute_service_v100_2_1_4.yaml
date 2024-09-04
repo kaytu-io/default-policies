@@ -1,0 +1,18 @@
+ID: aws_cis_compute_service_v100_2_1_4
+Title: 2.1.4 Ensure Images (AMI) are not older than 90 days
+Description: Ensure that your AMIs are not older than 90 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      image_id as resource,\n      case\n        when
+    creation_date >= (current_date - interval '90 days') then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      title || ' created ' || to_char(creation_date , 'DD-Mon-YYYY')
+    || ' (' || extract(day from current_timestamp - creation_date) || ' days).' as
+    reason\n      \n      \n    from\n      aws_ec2_ami;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

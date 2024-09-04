@@ -1,0 +1,20 @@
+ID: aws_cloudfront_distribution_logging_enabled
+Title: CloudFront distributions access logs should be enabled
+Description: This control checks if AWS CloudFront distributions are configured to
+  capture information from AWS Simple Storage Service (AWS S3) server access logs.
+  This rule is non-compliant if a CloudFront distribution does not have logging configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when logging
+    ->> 'Enabled' = 'true' then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when logging ->> 'Enabled' = 'true' then title || ' logging
+    enabled.'\n        else title || ' logging disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

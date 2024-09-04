@@ -1,0 +1,25 @@
+ID: aws_cis_v120_2_6
+Title: 2.6 Ensure S3 bucket access logging is enabled on the CloudTrail S3 bucket
+Description: S3 Bucket Access Logging generates a log that contains access records
+  for each request made to your S3 bucket. An access log record contains details about
+  the request, such as the request type, the resources specified in the request worked,
+  and the time and date the request was processed. It is recommended that bucket access
+  logging be enabled on the CloudTrail S3 bucket.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      t.arn as resource,\n      case\n        when
+    b.logging is not null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when b.logging is not null then t.title || '''s logging bucket
+    ' || t.s3_bucket_name || ' has access logging enabled.'\n        else t.title
+    || '''s logging bucket ' || t.s3_bucket_name || ' has access logging disabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_cloudtrail_trail t\n
+    \     inner join aws_s3_bucket b on t.s3_bucket_name = b.name\n    where\n      t.region
+    = t.home_region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

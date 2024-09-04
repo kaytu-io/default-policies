@@ -1,0 +1,20 @@
+ID: aws_foundational_security_autoscaling_5
+Title: 5 Amazon EC2 instances launched using Auto Scaling group launch configurations
+  should not have Public IP addresses
+Description: This control checks whether an Auto Scaling groups associated launch
+  configuration assigns a public IP address to the group's instances.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      launch_configuration_arn as resource,\n      case\n
+    \       when associate_public_ip_address then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when associate_public_ip_address then title ||
+    ' public IP enabled.'\n        else title || ' public IP disabled.'\n      end
+    as reason\n      \n    from\n      aws_ec2_launch_configuration;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

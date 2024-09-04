@@ -1,0 +1,24 @@
+ID: aws_foundational_security_elb_4
+Title: 4 Application load balancers should be configured to drop HTTP headers
+Description: This control evaluates AWS Application Load Balancers (ALB) to ensure
+  they are configured to drop invalid HTTP headers. The control fails if the value
+  of routing.http.drop_invalid_header_fields.enabled is set to false. By default,
+  ALBs are not configured to drop invalid HTTP header values. Removing these header
+  values prevents HTTP desync attacks.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\": \"routing.http.drop_invalid_header_fields.enabled\", \"Value\":
+    \"true\"}]' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when load_balancer_attributes @> '[{\"Key\": \"routing.http.drop_invalid_header_fields.enabled\",
+    \"Value\": \"true\"}]' then title || ' configured to drop http headers.'\n        else
+    title || ' not configured to drop http headers.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ec2_application_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

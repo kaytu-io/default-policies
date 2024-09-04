@@ -1,0 +1,25 @@
+ID: aws_autoscaling_ec2_launch_configuration_no_sensitive_data
+Title: EC2 auto scaling group launch configurations user data should not have any
+  sensitive data
+Description: Ensure that sensitive information is not included in the user data of
+  the launch configuration. It is recommended to utilize Secrets Manager as an alternative
+  for securely managing sensitive data.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      launch_configuration_arn as resource,\n      case\n
+    \       when\n          user_data like any (array [ '%pass%', '%secret%', '%token%',
+    '%key%' ])\n          or user_data ~ '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]'
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when\n
+    \         user_data like any (array [ '%pass%', '%secret%', '%token%', '%key%'
+    ])\n          or user_data ~ '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]'
+    then title || ' has potential secret patterns in user data.'\n        else title
+    || ' does not contain secret patterns in user data.'\n      end as reason\n      \n
+    \   from\n      aws_ec2_launch_configuration;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

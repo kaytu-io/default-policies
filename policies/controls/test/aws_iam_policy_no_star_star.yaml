@@ -1,0 +1,28 @@
+ID: aws_iam_policy_no_star_star
+Title: IAM policy should not have statements with admin access
+Description: 'AWS Identity and Access Management (IAM) can help you incorporate the
+  principles of least privilege and separation of duties with access permissions and
+  authorizations, restricting policies from containing ''Effect'': ''Allow'' with
+  ''Action'': ''*'' over ''Resource'': ''*''.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with bad_policies as (\n      select\n        arn,\n        count(*)
+    as num_bad_statements\n      from\n        aws_iam_policy,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Resource') as resource,\n
+    \       jsonb_array_elements_text(s -> 'Action') as action\n      where\n        not
+    is_aws_managed\n        and s ->> 'Effect' = 'Allow'\n        and resource = '*'\n
+    \       and (\n          (action = '*'\n          or action = '*:*'\n          )\n
+    \       )\n      group by\n        arn\n    )\n    select\n      p.arn as resource,\n
+    \     case\n        when bad.arn is null then 'ok'\n        else 'alarm'\n      end
+    status,\n      p.name || ' contains ' || coalesce(bad.num_bad_statements,0)  ||\n
+    \       ' statements that allow action \"*\" on resource \"*\".' as reason\n      \n
+    \     \n    from\n      aws_iam_policy as p\n      left join bad_policies as bad
+    on p.arn = bad.arn\n    where\n      not p.is_aws_managed;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

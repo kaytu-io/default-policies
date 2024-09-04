@@ -1,0 +1,20 @@
+ID: aws_foundational_security_redshift_4
+Title: 4 Amazon Redshift clusters should have audit logging enabled
+Description: This control checks whether an Amazon Redshift cluster has audit logging
+  enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when automated_snapshot_retention_period
+    >= 7 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    automated_snapshot_retention_period >= 7 then title || ' automatic snapshots enabled
+    with retention period greater than equals 7 days.'\n        else title || ' automatic
+    snapshots enabled with retention period less than 7 days.'\n      end as reason\n
+    \     \n      \n    from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

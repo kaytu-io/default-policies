@@ -1,0 +1,20 @@
+ID: aws_acmpca_root_certificate_authority_disabled
+Title: AWS Private CA root certificate authority should be disabled
+Description: This control checks if AWS Private CA has a root certificate authority
+  (CA) that is disabled. The control fails if the root CA is enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when type
+    <> 'ROOT' then 'skip'\n        when status = 'DISABLED' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when type <> 'ROOT' then title
+    || ' is not root CA.'\n        when status = 'DISABLED' then title || ' root CA
+    disabled.'\n        else title || ' root CA not disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_acmpca_certificate_authority;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

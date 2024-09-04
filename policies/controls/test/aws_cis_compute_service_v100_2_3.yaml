@@ -1,0 +1,22 @@
+ID: aws_cis_compute_service_v100_2_3
+Title: 2.3 Ensure Tag Policies are enabled
+Description: Tag policies help you standardize tags on all tagged resources across
+  your organization.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with tag_policy_enabled as (\n      select\n        _ctx,\n
+    \       account_id,\n        region,\n        count(*) as count\n      from\n
+    \       aws_organizations_policy\n      where\n        type = 'TAG_POLICY'\n      group
+    by\n        _ctx,\n        region,\n        account_id\n    )\n    select\n      case\n
+    \       when count > 0 then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when count > 0 then 'Organizational tag policies are enabled.'\n
+    \       else 'Organizational tag policies are disabled.'\n      end as reason\n
+    \     \n    from\n      tag_policy_enabled;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

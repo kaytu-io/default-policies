@@ -1,0 +1,12 @@
+ID: aws_soc_2_cc_6_8
+Title: CC6.8 The entity implements controls to prevent or detect and act upon the
+  introduction of unauthorized or malicious software to meet the entity’s objectives
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_guardduty_enabled
+- aws_securityhub_enabled

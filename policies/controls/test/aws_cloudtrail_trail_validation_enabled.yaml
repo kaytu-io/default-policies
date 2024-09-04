@@ -1,0 +1,23 @@
+ID: aws_cloudtrail_trail_validation_enabled
+Title: CloudTrail trail log file validation should be enabled
+Description: 'Utilize AWS CloudTrail log file validation to check the integrity of
+  CloudTrail logs. Log file validation helps determine if a log file was modified
+  or deleted or unchanged after CloudTrail delivered it. This feature is built using
+  industry standard algorithms: SHA-256 for hashing and SHA-256 with RSA for digital
+  signing. This makes it computationally infeasible to modify, delete or forge CloudTrail
+  log files without detection.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when log_file_validation_enabled
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    log_file_validation_enabled then title || ' log file validation enabled.'\n        else
+    title || ' log file validation disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_cloudtrail_trail\n    where\n      region = home_region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

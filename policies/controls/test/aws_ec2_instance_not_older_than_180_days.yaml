@@ -1,0 +1,18 @@
+ID: aws_ec2_instance_not_older_than_180_days
+Title: Ensure no AWS EC2 Instances are older than 180 days
+Description: Identify any running AWS EC2 instances older than 180 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      instance_id as resource,\n      launch_time,\n
+    \     case\n        when launch_time >= (current_date - interval '180 days') then
+    'ok'\n        else 'alarm'\n      end as status,\n      title || ' created ' ||
+    to_char(launch_time , 'DD-Mon-YYYY') || ' (' || extract(day from current_timestamp
+    - launch_time) || ' days).' as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

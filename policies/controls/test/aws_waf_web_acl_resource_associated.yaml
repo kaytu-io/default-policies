@@ -1,0 +1,20 @@
+ID: aws_waf_web_acl_resource_associated
+Title: WAF web ACL should be associated with an Application Load Balancer, API Gateway
+  stage, or CloudFront distributions
+Description: This control checks if the web ACL is associated with an Application
+  Load Balancer, API Gateway stage, or CloudFront distributions.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(resources)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    jsonb_array_length(resources) > 0 then title || ' associated with ' || jsonb_array_length(resources)
+    || ' AWS resource(s).'\n        else title || ' not assoicated with AWS resource.'\n
+    \     end as reason\n      \n      \n    from\n      aws_wafregional_web_acl;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

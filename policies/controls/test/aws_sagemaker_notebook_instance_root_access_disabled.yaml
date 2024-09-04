@@ -1,0 +1,20 @@
+ID: aws_sagemaker_notebook_instance_root_access_disabled
+Title: SageMaker notebook instances root access should be disabled
+Description: Users with root access have administrator privileges and users can access
+  and edit all files on a notebook instance. It is recommeneded to disable root access
+  to restrict users from accessing and editing all the files.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when root_access
+    = 'Disabled' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when root_access = 'Disabled' then title || ' root access disabled.'\n
+    \       else title || ' root access enabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_sagemaker_notebook_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

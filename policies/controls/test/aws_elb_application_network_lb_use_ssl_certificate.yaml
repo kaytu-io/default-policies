@@ -1,0 +1,30 @@
+ID: aws_elb_application_network_lb_use_ssl_certificate
+Title: ELB application and network load balancers should only use SSL or HTTPS listeners
+Description: Ensure that Application Load Balancers and Network Load Balancers are
+  configured to use certificates from AWS Certificate Manager (ACM). This rule is
+  compliant if at least 1 load balancer is configured without a certificate from ACM.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with listeners_without_certificate as (\n      select\n        load_balancer_arn,\n
+    \       count(*) as count\n      from\n        aws_ec2_load_balancer_listener\n
+    \     where arn not in\n        ( select arn from aws_ec2_load_balancer_listener,
+    jsonb_array_elements(certificates) as c\n          where c ->> 'CertificateArn'
+    like 'arn:aws:acm%' )\n      group by load_balancer_arn\n    ),\n    all_application_network_load_balacer
+    as (\n      select\n        arn,\n        account_id,\n        region,\n        title,\n
+    \       _ctx\n      from\n        aws_ec2_application_load_balancer\n      union\n
+    \     select\n        arn,\n        account_id,\n        region,\n        title,\n
+    \       _ctx\n      from\n        aws_ec2_network_load_balancer\n    )\n    select\n
+    \     a.arn as resource,\n      case\n        when b.load_balancer_arn is null
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    b.load_balancer_arn is null then a.title || ' uses certificates provided by ACM.'\n
+    \       else a.title || ' has ' || b.count || ' listeners which do not use certificates
+    provided by ACM.'\n      end as reason\n      \n    from\n      all_application_network_load_balacer
+    as a\n      left join listeners_without_certificate as b on a.arn = b.load_balancer_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

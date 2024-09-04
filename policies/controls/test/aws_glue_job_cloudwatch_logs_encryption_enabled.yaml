@@ -1,0 +1,22 @@
+ID: aws_glue_job_cloudwatch_logs_encryption_enabled
+Title: Glue jobs CloudWatch logs encryption should be enabled
+Description: Ensure Glue jobs have CloudWatch logs encryption enabled to protect sensitive
+  information at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      j.arn as resource,\n      case\n        when
+    cloud_watch_encryption is not null and cloud_watch_encryption ->> 'CloudWatchEncryptionMode'
+    != 'DISABLED' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when cloud_watch_encryption is not null and cloud_watch_encryption ->>
+    'CloudWatchEncryptionMode' != 'DISABLED' then j.title || ' CloudWatch logs encryption
+    enabled.'\n        else j.title || ' CloudWatch logs encryption disabled.'\n      end
+    as reason\n      \n    from\n      aws_glue_job as j\n      left join aws_glue_security_configuration
+    as c on j.security_configuration = c.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

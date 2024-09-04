@@ -1,0 +1,23 @@
+ID: aws_vpc_in_more_than_one_region
+Title: VPCs should exist in multiple regions
+Description: This control checks whether there are VPCs present in multiple regions.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with vpc_region_list as (\n      select\n        distinct region,
+    account_id\n      from\n        aws_vpc\n    ), vpc_count_in_account as (\n        select\n
+    \       count(*) as num,\n        account_id\n      from\n        vpc_region_list\n
+    \       group by account_id\n    )\n    select\n      arn as resource,\n      case\n
+    \       when v.num > 1 then 'ok'\n        when v.num = 1 then 'alarm'\n        else
+    'alarm'\n      end as status,\n      case\n        when v.num > 1 then 'VPCs exist
+    in ' || v.num || ' regions.'\n        when v.num = 1 then 'VPCs exist only in
+    one region.'\n        else 'VPC does not exist.'\n      end as reason\n      \n
+    \   from\n      aws_account as a\n      left join vpc_count_in_account as v on
+    v.account_id = a.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,30 @@
+ID: aws_cis_v150_5_4
+Title: 5.4 Ensure the default security group of every VPC restricts all traffic
+Description: A VPC comes with a default security group whose initial settings deny
+  all inbound traffic, allow all outbound traffic, and allow all traffic between instances
+  assigned to the security group. If you don't specify a security group when you launch
+  an instance, the instance is automatically assigned to this default security group.
+  Security groups provide stateful filtering of ingress/egress network traffic to
+  AWS resources. It is recommended that the default security group restrict all traffic.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn resource,\n      case\n        when jsonb_array_length(ip_permissions)
+    = 0 and jsonb_array_length(ip_permissions_egress) = 0 then 'ok'\n        else
+    'alarm'\n      end status,\n      case\n        when jsonb_array_length(ip_permissions)
+    > 0 and jsonb_array_length(ip_permissions_egress) > 0\n          then 'Default
+    security group ' || group_id || ' has inbound and outbound rules.'\n        when
+    jsonb_array_length(ip_permissions) > 0 and jsonb_array_length(ip_permissions_egress)
+    = 0\n          then 'Default security group ' || group_id || ' has inbound rules.'\n
+    \       when jsonb_array_length(ip_permissions) = 0 and jsonb_array_length(ip_permissions_egress)
+    > 0\n          then 'Default security group ' || group_id || ' has outbound rules.'\n
+    \       else 'Default security group ' || group_id || ' has no inbound or outbound
+    rules.'\n      end reason\n      \n      \n    from\n      aws_vpc_security_group\n
+    \   where\n      group_name = 'default';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

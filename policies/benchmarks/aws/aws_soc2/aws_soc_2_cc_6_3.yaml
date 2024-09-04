@@ -1,0 +1,22 @@
+ID: aws_soc_2_cc_6_3
+Title: CC6.3 The entity authorizes, modifies, or removes access to data, software,
+  functions, and other protected information assets based on roles, responsibilities,
+  or the system design and changes, giving consideration to the concepts of least
+  privilege and segregation of duties, to meet the entity’s objectives
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_emr_cluster_kerberos_enabled
+- aws_iam_group_not_empty
+- aws_iam_group_user_role_no_inline_policies
+- aws_iam_managed_policy_attached_to_role
+- aws_iam_policy_no_star_star
+- aws_iam_root_user_no_access_keys
+- aws_iam_user_in_group
+- aws_iam_user_no_inline_attached_policies
+- aws_iam_user_unused_credentials_90
+- aws_s3_bucket_policy_restrict_public_access

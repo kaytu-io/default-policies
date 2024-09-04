@@ -1,0 +1,19 @@
+ID: aws_dms_replication_instance_not_publicly_accessible
+Title: DMS replication instances should not be publicly accessible
+Description: Manage access to the AWS Cloud by ensuring DMS replication instances
+  cannot be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when publicly_accessible
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    publicly_accessible then title || ' publicly accessible.'\n        else title
+    || ' not publicly accessible.'\n      end as reason\n      \n      \n    from\n
+    \     aws_dms_replication_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_emr_cluster_security_configuration_enabled
+Title: EMR clusters should have security configuration enabled
+Description: Ensure EMR cluster have security configuration enabled. This control
+  fails if security configuration is not enabled for EMR cluster.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    security_configuration is not null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when security_configuration is not null then title
+    || ' security configuration enabled.'\n        else title || ' security configuration
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_emr_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,22 @@
+ID: aws_autoscaling_group_with_lb_use_health_check
+Title: Auto Scaling groups with a load balancer should use health checks
+Description: The Elastic Load Balancer (ELB) health checks for AWS Elastic Compute
+  Cloud (AWS EC2) Auto Scaling groups support maintenance of adequate capacity and
+  availability.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      autoscaling_group_arn as resource,\n      case\n
+    \       when load_balancer_names is null and target_group_arns is null then 'alarm'\n
+    \       when health_check_type != 'ELB' then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when load_balancer_names is null and target_group_arns
+    is null then title || ' not associated with a load balancer.'\n        when health_check_type
+    != 'ELB' then title || ' does not use ELB health check.'\n        else title ||
+    ' uses ELB health check.'\n      end as reason\n      \n      \n    from\n      aws_ec2_autoscaling_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

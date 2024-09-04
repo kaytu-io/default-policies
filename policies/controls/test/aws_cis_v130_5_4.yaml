@@ -1,0 +1,21 @@
+ID: aws_cis_v130_5_4
+Title: 5.4 Ensure routing tables for VPC peering are 'least access'
+Description: A VPC comes with a default security group whose initial settings deny
+  all inbound traffic, allow all outbound traffic, and allow all traffic between instances
+  assigned to the security group. If you don't specify a security group when you launch
+  an instance, the instance is automatically assigned to this default security group.
+  Security groups provide stateful filtering of ingress/egress network traffic to
+  AWS resources. It is recommended that the default security group restrict all traffic.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

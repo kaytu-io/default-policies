@@ -1,0 +1,24 @@
+ID: aws_ebs_attached_volume_delete_on_termination_enabled
+Title: Attached EBS volumes should have delete on termination enabled
+Description: This rule ensures that AWS Elastic Block Store volumes that are attached
+  to AWS Elastic Compute Cloud (AWS EC2) instances are marked for deletion when an
+  instance is terminated.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when state
+    != 'in-use' then 'skip'\n        when attachment ->> 'DeleteOnTermination' = 'true'
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    state != 'in-use' then title || ' not attached to EC2 instance.'\n        when
+    attachment ->> 'DeleteOnTermination' = 'true' then title || ' attached to ' ||
+    (attachment ->> 'InstanceId') || ', delete on termination enabled.'\n        else
+    title || ' attached to ' || (attachment ->> 'InstanceId') || ', delete on termination
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_ebs_volume\n
+    \     left join jsonb_array_elements(attachments) as attachment on true;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,20 @@
+ID: aws_foundational_security_cloudtrail_2
+Title: 2 CloudTrail should have encryption at rest enabled
+Description: This control checks whether CloudTrail is configured to use the server-side
+  encryption (SSE) AWS Key Management Service customer master key (CMK) encryption.
+  The check passes if the KmsKeyId is defined.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when kms_key_id
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    kms_key_id is null then title || ' logs are not encrypted at rest.'\n        else
+    title || ' logs are encrypted at rest.'\n      end as reason\n      \n      \n
+    \   from\n      aws_cloudtrail_trail\n    where\n      region = home_region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

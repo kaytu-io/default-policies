@@ -1,0 +1,24 @@
+ID: aws_emr_cluster_encryption_in_transit_enabled
+Title: EMR clusters encryption in transit should be enabled
+Description: This control checks whether EMR clusters have encryption in transit enabled.
+  This control fails if an EMR cluster isn't encrypted in transit.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    s.name is null then 'alarm'\n        when s.name is not null and (encryption_configuration
+    -> 'EnableInTransitEncryption')::bool then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when s.name is null then c.title || ' security
+    configuration disabled.'\n        when s.name is not null and (encryption_configuration
+    -> 'EnableInTransitEncryption')::bool then c.title || ' encryption in transit
+    enabled.'\n        else c.title || ' encryption in transit disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_emr_cluster as c\n      left join
+    aws_emr_security_configuration as s on c.security_configuration = s.name and s.region
+    = s.region and s.account_id = c.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_guardduty_finding_archived
+Title: GuardDuty findings should be archived
+Description: 'AWS GuardDuty helps you understand the impact of an incident by classifying
+  findings by severity: low, medium, and high.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when service
+    ->> 'Archived' = 'false' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when service ->> 'Archived' = 'false' then title || ' not
+    archived.'\n        else title || ' archived.'\n      end as reason\n      \n
+    \   from\n      aws_guardduty_finding;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

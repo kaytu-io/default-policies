@@ -1,0 +1,23 @@
+ID: aws_cis_compute_service_v100_2_13
+Title: 2.13 Ensure Secrets and Sensitive Data are not stored directly in EC2 User
+  Data
+Description: User Data can be specified when launching an ec2 instance. Examples include
+  specifying parameters for configuring the instance or including a simple script.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when user_data
+    like any (array ['%pass%', '%secret%','%token%','%key%'])\n          or user_data
+    ~ '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]' then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when user_data like
+    any (array ['%pass%', '%secret%','%token%','%key%'])\n          or user_data ~
+    '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]' then instance_id
+    ||' potential secret found in user data.'\n        else instance_id ||  ' no secrets
+    found in user data.'\n      end as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

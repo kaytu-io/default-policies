@@ -1,0 +1,27 @@
+ID: aws_elb_application_classic_network_lb_prohibit_public_access
+Title: ELB load balancers should prohibit public access
+Description: An internet facing load balancer has a publicly resolvable DNS name,
+  so it can route requests from clients over the internet to the EC2 instances that
+  are registered with the load balancer.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with all_lb_details as (\n      select\n        arn,\n        scheme,\n
+    \       title,\n        region,\n        account_id,\n        tags,\n        _ctx\n
+    \     from\n        aws_ec2_application_load_balancer\n      union\n      select\n
+    \       arn,\n        scheme,\n        title,\n        region,\n        account_id,\n
+    \       tags,\n        _ctx\n      from\n        aws_ec2_network_load_balancer\n
+    \     union\n      select\n        arn,\n        scheme,\n        title,\n        region,\n
+    \       account_id,\n        tags,\n        _ctx\n      from\n      aws_ec2_classic_load_balancer\n
+    \   )\n    select\n      arn as resource,\n      case\n        when scheme = 'internet-facing'
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    scheme = 'internet-facing' then title || ' publicly accessible.'\n        else
+    title|| ' not publicly accessible.'\n      end as reason\n      \n      \n    from\n
+    \     all_lb_details;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,30 @@
+ID: aws_cis_v300_1_20
+Title: 1.20 Ensure that IAM Access analyzer is enabled for all regions
+Description: Enable IAM Access analyzer for IAM policies about all resources in each
+  region. IAM Access Analyzer is a technology introduced at AWS reinvent 2019. After
+  the Analyzer is enabled in IAM, scan results are displayed on the console showing
+  the accessible resources. Scans show resources that other accounts and federated
+  users can access, such as KMS keys and IAM roles. So the results allow you to determine
+  if an unintended user is allowed, making it easier for administrators to monitor
+  least privileges access. Access Analyzer analyzes only policies that are applied
+  to resources in the same AWS Region.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        -- Skip any regions that
+    are disabled in the account.\n        when r.opt_in_status = 'not-opted-in' then
+    'skip'\n        when aa.arn is not null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when r.opt_in_status = 'not-opted-in' then r.region
+    || ' region is disabled.'\n        when aa.arn is not null then aa.name ||  '
+    enabled in ' || r.region || '.'\n        else 'Access Analyzer not enabled in
+    ' || r.region || '.'\n      end as reason\n      \n    from\n      aws_region
+    as r\n      left join aws_accessanalyzer_analyzer as aa on r.account_id = aa.account_id
+    and r.region = aa.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

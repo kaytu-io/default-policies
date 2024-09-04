@@ -1,0 +1,25 @@
+ID: aws_redshift_cluster_encrypted_with_cmk
+Title: Redshift clusters should be encrypted with CMK
+Description: Ensure Redshift cluster is encrypted using CMK. The rule is non-compliant
+  if the Redshift clusters is not encrypted using CMK.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with redshift_clusters as (\n      select\n        arn,\n        region,\n
+    \       account_id,\n        kms_key_id,\n        encrypted,\n        title,\n
+    \       tags,\n        _ctx\n      from\n      aws_redshift_cluster\n    ), kms_keys
+    as (\n      select\n        k.arn,\n        k.key_manager\n      from\n        aws_kms_key
+    as k\n    )\n    select\n      r.arn as resource,\n      case\n        when not
+    encrypted then 'alarm'\n        when encrypted and c.key_manager = 'CUSTOMER'
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    not encrypted then title || ' not encrypted.'\n        when encrypted and c.key_manager
+    = 'CUSTOMER' then title || ' encrypted with CMK.'\n        else title || ' not
+    encrypted with CMK.'\n      end as reason\n      \n      \n    from\n      redshift_clusters
+    as r\n      left join kms_keys as c on r.kms_key_id = c.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

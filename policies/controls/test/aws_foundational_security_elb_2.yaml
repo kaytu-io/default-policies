@@ -1,0 +1,31 @@
+ID: aws_foundational_security_elb_2
+Title: 2 Classic Load Balancers with SSL/HTTPS listeners should use a certificate
+  provided by AWS Certificate Manager
+Description: This control checks whether the Classic Load Balancer uses HTTPS/SSL
+  certificates provided by AWS Certificate Manager (ACM). The control fails if the
+  Classic Load Balancer configured with HTTPS/SSL listener does not use a certificate
+  provided by ACM.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with detailed_classic_listeners as (\n      select\n        name\n
+    \     from\n        aws_ec2_classic_load_balancer,\n        jsonb_array_elements(listener_descriptions)
+    as listener_description\n      where\n        listener_description -> 'Listener'
+    ->> 'Protocol' in ('HTTPS', 'SSL', 'TLS')\n        and listener_description ->
+    'Listener' ->> 'SSLCertificateId' like 'arn:aws:acm%'\n    )\n    select\n      'arn:'
+    || a.partition || ':elasticloadbalancing:' || a.region || ':' || a.account_id
+    || ':loadbalancer/' || a.name as resource,\n      case\n        when a.listener_descriptions
+    is null then 'skip'\n        when b.name is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when a.listener_descriptions is
+    null then a.title || ' has no listener.'\n        when b.name is not null then
+    a.title || ' does not use certificates provided by ACM.'\n        else a.title
+    || ' uses certificates provided by ACM.'\n      end as reason\n      \n      \n
+    \   from\n      aws_ec2_classic_load_balancer as a\n      left join detailed_classic_listeners
+    as b on a.name = b.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

@@ -1,0 +1,20 @@
+ID: aws_vpc_not_in_use
+Title: VPCs should be in use
+Description: This control checks whether there are any unused VPCs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with vpc_without_subnet as (\n      select\n        distinct
+    vpc_id\n      from\n        aws_vpc\n      where\n        vpc_id not in (select
+    vpc_id from aws_vpc_subnet)\n    )\n    select\n      arn as resource,\n      case\n
+    \       when s.vpc_id is null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when s.vpc_id is null then title || ' in use.'\n        else
+    title || ' not in use.'\n      end as reason\n      \n      \n    from\n      aws_vpc
+    as v\n      left join vpc_without_subnet as s on s.vpc_id = v.vpc_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

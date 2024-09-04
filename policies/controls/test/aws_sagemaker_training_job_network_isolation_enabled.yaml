@@ -1,0 +1,19 @@
+ID: aws_sagemaker_training_job_network_isolation_enabled
+Title: SageMaker training jobs should have network isolation enabled
+Description: SageMaker training jobs are internet-enabled by default. Network isolation
+  should be enabled to avoid external network access to your training.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when enable_network_isolation
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    enable_network_isolation then title || ' network isolation enabled.'\n        else
+    title || ' network isolation disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_sagemaker_training_job;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

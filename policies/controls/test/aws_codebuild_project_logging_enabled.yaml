@@ -1,0 +1,22 @@
+ID: aws_codebuild_project_logging_enabled
+Title: CodeBuild projects should have logging enabled
+Description: This control checks if an AWS CodeBuild project environment has at least
+  one log option enabled. The rule is non-compliant if the status of all present log
+  configurations is set to 'DISABLED'.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when logs_config
+    -> 'CloudWatchLogs' ->> 'Status' = 'ENABLED' or logs_config -> 'S3Logs' ->> 'Status'
+    = 'ENABLED' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when logs_config -> 'CloudWatchLogs' ->> 'Status' = 'ENABLED' or logs_config
+    -> 'S3Logs' ->> 'Status' = 'ENABLED' then title || ' logging enabled.'\n        else
+    title || ' logging disabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_codebuild_project;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

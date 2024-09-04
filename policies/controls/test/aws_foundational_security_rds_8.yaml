@@ -1,0 +1,22 @@
+ID: aws_foundational_security_rds_8
+Title: 8 RDS DB instances should have deletion protection enabled
+Description: 'This control checks whether your RDS DB instances that use one of the
+  listed database engines have deletion protection enabled. DatabaseEngines: mariadb,mysql,oracle-ee,oracle-se2,oracle-se1,oracle-se,postgres,sqlserver-ee,sqlserver-se,sqlserver-ex,sqlserver-web.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when engine
+    like any(array['aurora%', 'docdb', 'neptune']) then 'skip'\n        when deletion_protection
+    then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when engine
+    like any(array['aurora%', 'docdb', 'neptune']) then title || ' has engine ' ||
+    engine || ' cluster, deletion protection is set at cluster level.'\n        when
+    deletion_protection then title || ' deletion protection enabled.'\n        else
+    title || ' deletion protection not enabled.'\n      end reason\n      \n      \n
+    \   from\n      aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

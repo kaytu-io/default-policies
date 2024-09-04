@@ -1,0 +1,20 @@
+ID: aws_lambda_function_dead_letter_queue_configured
+Title: Lambda functions should be configured with a dead-letter queue
+Description: Enable this rule to help notify the appropriate personnel through AWS
+  Simple Queue Service (AWS SQS) or AWS Simple Notification Service (AWS SNS) when
+  a function has failed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when dead_letter_config_target_arn
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    dead_letter_config_target_arn is null then title || ' configured with dead-letter
+    queue.'\n        else title || ' not configured with dead-letter queue.'\n      end
+    as reason\n      \n      \n    from\n      aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

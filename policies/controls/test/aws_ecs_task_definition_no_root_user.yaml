@@ -1,0 +1,22 @@
+ID: aws_ecs_task_definition_no_root_user
+Title: ECS task definitions should not use root user.
+Description: This control checks if ECS task definitions have root user. This control
+  fails if the ECS task definitions have root user.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with root_user_task_definition as (\n      select\n        distinct
+    task_definition_arn as arn\n      from\n        aws_ecs_task_definition,\n        jsonb_array_elements(container_definitions)
+    as c\n      where\n        c ->> 'User' = 'root'\n    )\n    select\n      a.task_definition_arn
+    as resource,\n      case\n        when b.arn is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when b.arn is not null then a.title
+    || ' have root user.'\n        else a.title || ' does not have root user.'\n      end
+    as reason\n      \n      \n    from\n      aws_ecs_task_definition as a\n      left
+    join root_user_task_definition as b on a.task_definition_arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

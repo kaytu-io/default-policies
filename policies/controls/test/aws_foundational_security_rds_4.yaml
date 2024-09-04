@@ -1,0 +1,25 @@
+ID: aws_foundational_security_rds_4
+Title: 4 RDS cluster snapshots and database snapshots should be encrypted at rest
+Description: This control checks whether RDS DB snapshots are encrypted. This control
+  is intended for RDS DB instances. However, it can also generate findings for snapshots
+  of Aurora DB instances, Neptune DB instances, and Amazon DocumentDB clusters. If
+  these findings are not useful, then you can suppress them.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    (\n    select\n      arn as resource,\n      case\n        when
+    storage_encrypted then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when storage_encrypted then title || ' encrypted at rest.'\n        else
+    title || ' not encrypted at rest.'\n      end as reason\n      \n      \n    from\n
+    \     aws_rds_db_cluster_snapshot\n    )\n    union\n    (\n    select\n      arn
+    as resource,\n      case\n        when encrypted then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when encrypted then title || ' encrypted
+    at rest.'\n        else title || ' not encrypted at rest.'\n      end as reason\n
+    \     \n      \n    from\n      aws_rds_db_snapshot\n    );\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

@@ -1,0 +1,25 @@
+ID: aws_foundational_security_networkfirewall_5
+Title: 5 The default stateless action for Network Firewall policies should be drop
+  or forward for fragmented packets
+Description: This control checks whether the default stateless action for fragmented
+  packets for a Network Firewall policy is drop or forward. The control passes if
+  Drop or Forward is selected, and fails if Pass is selected.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when (not
+    (firewall_policy -> 'StatelessFragmentDefaultActions') ? 'aws:drop'\n            and
+    not (firewall_policy -> 'StatelessFragmentDefaultActions') ? 'aws:forward_to_sfe')
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    (not (firewall_policy -> 'StatelessFragmentDefaultActions') ? 'aws:drop'\n            and
+    not (firewall_policy -> 'StatelessFragmentDefaultActions') ? 'aws:forward_to_sfe')
+    then title || ' stateless action is neither drop nor forward for fragmented packets.'\n
+    \       else title || ' stateless action is either drop or forward for fragmented
+    packets.'\n      end as reason\n      \n      \n    from\n      aws_networkfirewall_firewall_policy;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

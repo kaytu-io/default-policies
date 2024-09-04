@@ -1,0 +1,26 @@
+ID: aws_rds_db_cluster_encrypted_with_cmk
+Title: RDS DB clusters should be encrypted with CMK
+Description: Ensure RDS DB cluster is encrypted using CMK. The rule is non-compliant
+  if the RDS DB cluster is not encrypted using CMK.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with rds_clusters as (\n      select\n        arn,\n        region,\n
+    \       account_id,\n        kms_key_id,\n        storage_encrypted,\n        title,\n
+    \       tags,\n        _ctx\n      from\n        aws_rds_db_cluster\n    ), kms_keys
+    as (\n      select\n        k.arn,\n        k.key_manager,\n        k.enabled\n
+    \     from\n        aws_kms_key as k\n    )\n    select\n      r.arn as resource,\n
+    \     case\n        when not storage_encrypted then 'alarm'\n        when storage_encrypted
+    and c.key_manager = 'CUSTOMER' then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when not storage_encrypted then title || ' not encrypted.'\n
+    \       when storage_encrypted and c.key_manager = 'CUSTOMER' then title || '
+    encrypted with CMK.'\n        else title || ' not encrypted with CMK.'\n      end
+    as reason\n      \n      \n    from\n      rds_clusters as r\n      left join
+    kms_keys as c on r.kms_key_id = c.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

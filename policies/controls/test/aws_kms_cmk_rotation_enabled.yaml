@@ -1,0 +1,24 @@
+ID: aws_kms_cmk_rotation_enabled
+Title: KMS CMK rotation should be enabled
+Description: Enable key rotation to ensure that keys are rotated once they have reached
+  the end of their crypto period.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when origin
+    = 'EXTERNAL' then 'skip'\n        when key_state = 'PendingDeletion' then 'skip'\n
+    \       when key_state = 'Disabled' then 'skip'\n        when not key_rotation_enabled
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    origin = 'EXTERNAL' then title || ' has imported key material.'\n        when
+    key_state = 'PendingDeletion' then title || ' is pending deletion.'\n        when
+    key_state = 'Disabled' then title || ' is disabled.'\n        when not key_rotation_enabled
+    then title || ' key rotation disabled.'\n        else title || ' key rotation
+    enabled.'\n      end as reason\n      \n      \n    from\n      aws_kms_key\n
+    \   where\n      key_manager = 'CUSTOMER';\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

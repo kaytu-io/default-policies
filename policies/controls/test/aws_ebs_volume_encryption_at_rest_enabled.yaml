@@ -1,0 +1,18 @@
+ID: aws_ebs_volume_encryption_at_rest_enabled
+Title: EBS volume encryption at rest should be enabled
+Description: Because sensitive data can exist and to help protect data at rest, ensure
+  encryption is enabled for your AWS Elastic Block Store (AWS EBS) volumes.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when encrypted
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    encrypted then volume_id || ' encrypted.'\n        else volume_id || ' not encrypted.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ebs_volume;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

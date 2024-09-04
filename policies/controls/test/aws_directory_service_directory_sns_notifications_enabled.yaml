@@ -1,0 +1,19 @@
+ID: aws_directory_service_directory_sns_notifications_enabled
+Title: Directory Service directories should have SNS notification enabled
+Description: This control verifies whether SNS messaging has been set up to receive
+  email or text notifications for any changes in the directory's status.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(event_topics)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    jsonb_array_length(event_topics) > 0 then title || ' SNS notifications enabled.'\n
+    \       else title || ' SNS notifications disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_directory_service_directory;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,21 @@
+ID: aws_elb_application_lb_drop_http_headers
+Title: ELB application load balancers should be drop HTTP headers
+Description: Ensure that your Elastic Load Balancers (ELB) are configured to drop
+  http headers.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\": \"routing.http.drop_invalid_header_fields.enabled\", \"Value\":
+    \"true\"}]' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when load_balancer_attributes @> '[{\"Key\": \"routing.http.drop_invalid_header_fields.enabled\",
+    \"Value\": \"true\"}]' then title || ' configured to drop http headers.'\n        else
+    title || ' not configured to drop http headers.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ec2_application_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

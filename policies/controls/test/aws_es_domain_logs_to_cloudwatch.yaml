@@ -1,0 +1,35 @@
+ID: aws_es_domain_logs_to_cloudwatch
+Title: Elasticsearch domain should send logs to CloudWatch
+Description: Ensure that AWS OpenSearch Service (OpenSearch Service) domains are configured
+  to send logs to AWS CloudWatch Logs. The rule is compliant if a log is enabled for
+  an OpenSearch Service domain. This rule is non-compliant if logging is not configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when\n
+    \         ( log_publishing_options -> 'ES_APPLICATION_LOGS' -> 'Enabled' = 'true'\n
+    \           and log_publishing_options -> 'ES_APPLICATION_LOGS' -> 'CloudWatchLogsLogGroupArn'
+    is not null\n          )\n          and\n          ( log_publishing_options ->
+    'SEARCH_SLOW_LOGS' -> 'Enabled' = 'true'\n            and log_publishing_options
+    -> 'SEARCH_SLOW_LOGS' -> 'CloudWatchLogsLogGroupArn' is not null\n          )\n
+    \         and\n          ( log_publishing_options -> 'INDEX_SLOW_LOGS' -> 'Enabled'
+    = 'true'\n            and log_publishing_options -> 'INDEX_SLOW_LOGS' -> 'CloudWatchLogsLogGroupArn'
+    is not null\n          )\n          then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when\n          ( log_publishing_options -> 'ES_APPLICATION_LOGS'
+    -> 'Enabled' = 'true'\n            and log_publishing_options -> 'ES_APPLICATION_LOGS'
+    -> 'CloudWatchLogsLogGroupArn' is not null\n          )\n          and\n          (
+    log_publishing_options -> 'SEARCH_SLOW_LOGS' -> 'Enabled' = 'true'\n            and
+    log_publishing_options -> 'SEARCH_SLOW_LOGS' -> 'CloudWatchLogsLogGroupArn' is
+    not null\n          )\n          and\n          ( log_publishing_options -> 'INDEX_SLOW_LOGS'
+    -> 'Enabled' = 'true'\n            and log_publishing_options -> 'INDEX_SLOW_LOGS'
+    -> 'CloudWatchLogsLogGroupArn' is not null\n          ) then title || ' logging
+    enabled for search , index and error.'\n        else title || ' logging not enabled
+    for all search, index and error.'\n      end as reason\n      \n      \n    from\n
+    \     aws_elasticsearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

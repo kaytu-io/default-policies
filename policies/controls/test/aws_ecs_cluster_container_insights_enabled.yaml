@@ -1,0 +1,21 @@
+ID: aws_ecs_cluster_container_insights_enabled
+Title: ECS clusters should have container insights enabled
+Description: This control checks if ECS clusters use Container Insights. This control
+  fails if Container Insights are not set up for a cluster.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      cluster_arn as resource,\n      case\n        when
+    s ->> 'Name' = 'containerInsights' and s ->> 'Value' = 'enabled' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when s ->> 'Name' = 'containerInsights'
+    and s ->> 'Value' = 'enabled' then title || ' Container Insights enabled.'\n        else
+    title || ' Container Insights disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_ecs_cluster as c,\n      jsonb_array_elements(settings) as
+    s;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,32 @@
+ID: aws_vpc_security_group_remote_administration
+Title: Ensure no security groups allow ingress from 0.0.0.0/0 to remote server administration
+  ports
+Description: Security groups provide stateful filtering of ingress and egress network
+  traffic to AWS resources. It is recommended that no security group allows unrestricted
+  ingress access to remote server administration ports, such as SSH to port 22 and
+  RDP to port 3389.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with bad_rules as (\n      select\n        group_id,\n        count(*)
+    as num_bad_rules\n      from\n        aws_vpc_security_group_rule\n      where\n
+    \       type = 'ingress'\n        and (\n          cidr_ipv4 = '0.0.0.0/0'\n          or
+    cidr_ipv6 = '::/0'\n        )\n        and (\n            ( ip_protocol = '-1'
+    \     -- all traffic\n            and from_port is null\n            )\n            or
+    (\n                from_port >= 22\n                and to_port <= 22\n            )\n
+    \           or (\n                from_port >= 3389\n                and to_port
+    <= 3389\n            )\n        )\n      group by\n        group_id\n    )\n    select\n
+    \     arn as resource,\n      case\n        when bad_rules.group_id is null then
+    'ok'\n        else 'alarm'\n      end as status,\n      case\n        when bad_rules.group_id
+    is null then sg.group_id || ' does not allow ingress to port 22 or 3389 from 0.0.0.0/0
+    or ::/0.'\n        else  sg.group_id || ' contains ' || bad_rules.num_bad_rules
+    || ' rule(s) that allow ingress to port 22 or 3389 from 0.0.0.0/0 or ::/0.'\n
+    \     end as reason\n      \n      \n    from\n      aws_vpc_security_group as
+    sg\n      left join bad_rules on bad_rules.group_id = sg.group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

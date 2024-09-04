@@ -1,0 +1,30 @@
+ID: aws_ecs_task_definition_user_for_host_mode_check
+Title: ECS task definition container definitions should be checked for host mode
+Description: Check if AWS Elastic Container Service (AWS ECS) task definition with
+  host networking mode has 'privileged' or 'user' container definitions.The rule is
+  non-compliant for task definitions with host network mode and container definitions
+  of privileged
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with host_network_task_definition as (\n      select\n        distinct
+    task_definition_arn as arn\n      from\n        aws_ecs_task_definition,\n        jsonb_array_elements(container_definitions)
+    as c\n      where\n        network_mode = 'host'\n        and\n          (c ->>
+    'Privileged' is not null\n            and c ->> 'Privileged' <> 'false'\n          )\n
+    \       and\n          ( c ->> 'User' is not null\n          and c ->> 'User'
+    <> 'root'\n          )\n    )\n    select\n      a.task_definition_arn as resource,\n
+    \     case\n        when a.network_mode is null or a.network_mode <> 'host' then
+    'skip'\n        when b.arn is not null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when a.network_mode is null or a.network_mode
+    <> 'host' then a.title || ' not host network mode.'\n        when b.arn is not
+    null then a.title || ' have secure host network mode.'\n        else a.title ||
+    ' not have secure host network mode.'\n      end as reason\n      \n      \n    from\n
+    \     aws_ecs_task_definition as a\n      left join host_network_task_definition
+    as b on a.task_definition_arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

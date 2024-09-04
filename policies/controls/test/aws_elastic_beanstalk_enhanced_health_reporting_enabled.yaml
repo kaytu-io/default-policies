@@ -1,0 +1,23 @@
+ID: aws_elastic_beanstalk_enhanced_health_reporting_enabled
+Title: Elastic Beanstalk enhanced health reporting should be enabled
+Description: AWS Elastic Beanstalk enhanced health reporting enables a more rapid
+  response to changes in the health of the underlying infrastructure. These changes
+  could result in a lack of availability of the application. Elastic Beanstalk enhanced
+  health reporting provides a status descriptor to gauge the severity of the identified
+  issues and identify possible causes to investigate.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      application_name as resource,\n      case\n        when
+    health_status is not null and health is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when health_status is not null and health
+    is not null then application_name || ' enhanced health check enabled.'\n        else
+    application_name || ' enhanced health check disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_elastic_beanstalk_environment;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

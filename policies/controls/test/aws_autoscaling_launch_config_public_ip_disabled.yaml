@@ -1,0 +1,20 @@
+ID: aws_autoscaling_launch_config_public_ip_disabled
+Title: Auto Scaling launch config public IP should be disabled
+Description: Ensure that AWS EC2 Auto Scaling groups have public IP addresses enabled
+  through Launch Configurations. This rule is non-compliant if the Launch Configuration
+  for an Auto Scaling group has AssociatePublicIpAddress set to 'true'.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      launch_configuration_arn as resource,\n      case\n
+    \       when associate_public_ip_address then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when associate_public_ip_address then title ||
+    ' public IP enabled.'\n        else title || ' public IP disabled.'\n      end
+    as reason\n      \n    from\n      aws_ec2_launch_configuration;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

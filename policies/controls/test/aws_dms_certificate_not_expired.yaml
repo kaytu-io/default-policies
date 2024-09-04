@@ -1,0 +1,20 @@
+ID: aws_dms_certificate_not_expired
+Title: Ensure that all the expired DMS certificates are removed
+Description: This control ensures that all expired DMS certificates are removed from
+  AWS account.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when valid_to_date
+    < (current_date - interval '1' second) then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when valid_to_date < (current_date - interval
+    '1' second) then\n        title || ' expired ' || to_char(valid_to_date, 'DD-Mon-YYYY')
+    || '.'\n        else\n        title || ' valid until ' || to_char(valid_to_date,
+    'DD-Mon-YYYY')  || '.'\n      end as reason\n      \n      \n    from\n      aws_dms_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

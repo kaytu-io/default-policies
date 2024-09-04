@@ -1,0 +1,21 @@
+ID: aws_cis_compute_service_v100_2_10
+Title: 2.10 Ensure unused ENIs are removed
+Description: Identify and delete any unused Amazon AWS Elastic Network Interfaces
+  in order to adhere to best practices and to avoid reaching the service limit. An
+  AWS Elastic Network Interface (ENI) is pronounced unused when is not attached anymore
+  to an EC2 instance.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      network_interface_id as resource,\n      case\n
+    \       when status = 'available' and attached_instance_id is null then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when status = 'available'
+    and attached_instance_id is null then title || ' not in use.'\n        else title
+    || ' in use.'\n      end as reason\n      \n      \n    from\n      aws_ec2_network_interface;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

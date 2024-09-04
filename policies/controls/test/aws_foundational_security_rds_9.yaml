@@ -1,0 +1,38 @@
+ID: aws_foundational_security_rds_9
+Title: 9 RDS DB instances should publish logs to CloudWatch Logs
+Description: This control checks whether the logs of Amazon RDS are enabled and sent
+  to CloudWatch Logs. RDS databases should have relevant logs enabled. Database logging
+  provides detailed records of requests made to RDS. Database logs can assist with
+  security and access audits and can help to diagnose availability issues.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when engine
+    = 'docdb' then 'skip'\n        when engine like any (array ['mariadb', '%mysql'])
+    and enabled_cloudwatch_logs_exports ?& array ['audit','error','general','slowquery']
+    then 'ok'\n        when engine like any (array['%postgres%']) and enabled_cloudwatch_logs_exports
+    ?& array ['postgresql','upgrade'] then 'ok'\n        when engine like 'oracle%'
+    and enabled_cloudwatch_logs_exports ?& array ['alert','audit', 'trace','listener']
+    then 'ok'\n        when engine = 'sqlserver-ex' and enabled_cloudwatch_logs_exports
+    ?& array ['error'] then 'ok'\n        when engine like 'sqlserver%' and enabled_cloudwatch_logs_exports
+    ?& array ['error','agent'] then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when engine = 'docdb' then title || ' is docdb instance.'\n
+    \       when engine like any (array ['mariadb', '%mysql']) and enabled_cloudwatch_logs_exports
+    ?& array ['audit','error','general','slowquery']\n        then title || ' ' ||
+    engine || ' logging enabled.'\n        when engine like any (array['%postgres%'])
+    and enabled_cloudwatch_logs_exports ?& array ['postgresql','upgrade']\n        then
+    title || ' ' || engine || ' logging enabled.'\n        when engine like 'oracle%'
+    and enabled_cloudwatch_logs_exports ?& array ['alert','audit', 'trace','listener']\n
+    \       then title || ' ' || engine || ' logging enabled.'\n        when engine
+    = 'sqlserver-ex' and enabled_cloudwatch_logs_exports ?& array ['error']\n        then
+    title || ' ' || engine || ' logging enabled.'\n        when engine like 'sqlserver%'
+    and enabled_cloudwatch_logs_exports ?& array ['error','agent']\n        then title
+    || ' ' || engine || ' logging enabled.'\n        else title || ' logging not enabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

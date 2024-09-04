@@ -1,0 +1,22 @@
+ID: aws_kinesis_firehose_delivery_stream_server_side_encryption_enabled
+Title: Kinesis firehose delivery streams should have server side encryption enabled
+Description: Enable server side encryption (SSE) of your Kinesis firehose delivery
+  stream, in order to protect your data and metadata from breaches or unauthorized
+  access, and fulfill compliance requirements for data-at-rest encryption within your
+  organization.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when delivery_stream_encryption_configuration
+    ->> 'Status' = 'ENABLED' then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when delivery_stream_encryption_configuration ->> 'Status'
+    = 'ENABLED' then title || ' server side encryption enabled.'\n        else title
+    || ' server side encryption disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_kinesis_firehose_delivery_stream;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

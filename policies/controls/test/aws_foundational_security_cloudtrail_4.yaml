@@ -1,0 +1,22 @@
+ID: aws_foundational_security_cloudtrail_4
+Title: 4 Ensure CloudTrail log file validation is enabled
+Description: This control checks whether log file integrity validation is enabled
+  on a CloudTrail trail. CloudTrail log file validation creates a digitally signed
+  digest file that contains a hash of each log that CloudTrail writes to Amazon S3.
+  You can use these digest files to determine whether a log file was changed, deleted,
+  or unchanged after CloudTrail delivered the log.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when log_file_validation_enabled
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    log_file_validation_enabled then title || ' log file validation enabled.'\n        else
+    title || ' log file validation disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_cloudtrail_trail\n    where\n      region = home_region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

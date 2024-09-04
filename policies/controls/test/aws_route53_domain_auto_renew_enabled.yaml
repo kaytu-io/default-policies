@@ -1,0 +1,18 @@
+ID: aws_route53_domain_auto_renew_enabled
+Title: Route 53 domains auto renew should be enabled
+Description: This control ensures that AWS Route 53 Auto Renew feature is enabled
+  to automatically renew your domain names as the expiration date approaches.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when auto_renew
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    auto_renew then title || ' auto renew enabled.'\n        else title || ' auto
+    renew disabled.'\n      end as reason\n      \n      \n    from\n      aws_route53_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,23 @@
+ID: aws_foundational_security_cloudfront_7
+Title: 7 CloudFront distributions should use custom SSL/TLS certificates
+Description: This control checks whether CloudFront distributions are using the default
+  SSL/TLS certificate CloudFront provides. This control passes if the CloudFront distribution
+  uses a custom SSL/TLS certificate. This control fails if the CloudFront distribution
+  uses the default SSL/TLS certificate.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when viewer_certificate
+    ->> 'ACMCertificateArn' is not null and viewer_certificate ->> 'Certificate' is
+    not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    viewer_certificate ->> 'ACMCertificateArn' is not null and viewer_certificate
+    ->> 'Certificate' is not null then title || ' uses custom SSL certificate.'\n
+    \       else title || ' does not use custom SSL certificate.'\n      end as reason\n
+    \     \n      \n    from\n      aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

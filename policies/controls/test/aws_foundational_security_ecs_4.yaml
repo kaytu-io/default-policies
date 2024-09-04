@@ -1,0 +1,24 @@
+ID: aws_foundational_security_ecs_4
+Title: 4 ECS containers should run as non-privileged
+Description: This control checks if the privileged parameter in the container definition
+  of Amazon ECS Task Definitions is set to true. The control fails if this parameter
+  is equal to true.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with privileged_container_definition as (\n      select\n        distinct
+    task_definition_arn as arn\n      from\n        aws_ecs_task_definition,\n        jsonb_array_elements(container_definitions)
+    as c\n      where\n        c ->> 'Privileged' = 'true'\n    )\n    select\n      d.task_definition_arn
+    as resource,\n      case\n        when c.arn is null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when c.arn is null then d.title || '
+    does not have elevated privileges.'\n        else d.title || ' has elevated privileges.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ecs_task_definition as
+    d\n      left join privileged_container_definition as c on d.task_definition_arn
+    = c.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

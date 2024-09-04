@@ -1,0 +1,20 @@
+ID: aws_rds_db_cluster_automatic_minor_version_upgrade_enabled
+Title: RDS DB clusters should have automatic minor version upgrade enabled
+Description: This control checks if automatic minor version upgrade is enabled for
+  an Amazon RDS database cluster. The control fails if automatic minor version upgrade
+  isn't enabled for an RDS cluster.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when auto_minor_version_upgrade
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    auto_minor_version_upgrade then title || ' automatic minor version upgrades enabled.'\n
+    \       else title || ' automatic minor version upgrades disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_rds_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

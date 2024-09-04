@@ -1,0 +1,13 @@
+ID: aws_soc_2_cc_2
+Title: CC2 Common Criteria Related to Communication and Information
+SectionCode: ""
+Description: The criteria relevant to how the entity (i) uses relevant information,
+  (ii) communicates internally, and (iii) communicates externally.
+Children:
+- aws_soc_2_cc_2_1
+Tags:
+  tags:
+  - soc_2_cc_2_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

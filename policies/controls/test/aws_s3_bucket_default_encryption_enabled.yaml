@@ -1,0 +1,19 @@
+ID: aws_s3_bucket_default_encryption_enabled
+Title: S3 bucket default encryption should be enabled
+Description: To help protect data at rest, ensure encryption is enabled for your AWS
+  Simple Storage Service (AWS S3) buckets.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when server_side_encryption_configuration
+    is not null then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when
+    server_side_encryption_configuration is not null then name || ' default encryption
+    enabled.'\n        else name || ' default encryption disabled.'\n      end reason\n
+    \     \n      \n    from\n      aws_s3_bucket;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,18 @@
+ID: aws_ebs_volume_unused
+Title: EBS volumes should be attached to EC2 instances
+Description: Checks if EBS volumes are attached to EC2 instances.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when state
+    = 'in-use' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when state = 'in-use' then title || ' attached to EC2 instance.'\n        else
+    title || ' not attached to EC2 instance.'\n      end as reason\n      \n      \n
+    \   from\n      aws_ebs_volume;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

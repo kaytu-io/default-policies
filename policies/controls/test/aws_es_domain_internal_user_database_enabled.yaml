@@ -1,0 +1,20 @@
+ID: aws_es_domain_internal_user_database_enabled
+Title: Elasticsearch domains should have internal user database enabled
+Description: Ensure Elasticsearch domains have internal user database enabled. This
+  control is non-compliant if a domain's internal user database is not enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when advanced_security_options
+    ->> 'InternalUserDatabaseEnabled' = 'true' then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when advanced_security_options ->> 'InternalUserDatabaseEnabled'
+    = 'true' then title || ' internal user database enabled.'\n        else title
+    || ' internal user database disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_elasticsearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

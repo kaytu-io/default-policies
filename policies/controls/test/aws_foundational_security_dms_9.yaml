@@ -1,0 +1,18 @@
+ID: aws_foundational_security_dms_9
+Title: 9 DMS endpoints should use SSL
+Description: This control checks whether an AWS DMS endpoint uses an SSL connection.
+  The control fails if the endpoint doesn't use SSL.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when ssl_mode
+    = 'none' then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    ssl_mode = 'none' then title || ' SSL not configured.'\n        else title ||
+    ' SSL configured.'\n      end as reason\n      \n      \n    from\n      aws_dms_endpoint;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

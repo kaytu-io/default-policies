@@ -1,0 +1,21 @@
+ID: aws_foundational_security_eks_1
+Title: 1 EKS cluster endpoints should not be publicly accessible
+Description: This control checks whether an Amazon EKS cluster endpoint is publicly
+  accessible. The control fails if an EKS cluster has an endpoint that is publicly
+  accessible.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when resources_vpc_config
+    ->> 'EndpointPublicAccess' = 'true' then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when resources_vpc_config ->> 'EndpointPublicAccess'
+    = 'true' then title || ' endpoint publicly accessible.'\n        else title ||
+    ' endpoint not publicly accessible.'\n      end as reason\n      \n      \n    from\n
+    \     aws_eks_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

@@ -1,0 +1,18 @@
+ID: aws_cis_compute_service_v100_10_1
+Title: 10.1 Ensure you are using VPC Endpoints for source code access
+Description: App Runner needs access to your application source, so it can't be encrypted.
+  Therefore, be sure to secure the connection between your development or deployment
+  environment and App Runner.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

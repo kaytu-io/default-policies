@@ -1,0 +1,20 @@
+ID: aws_foundational_security_apigateway_9
+Title: 9 Access logging should be configured for API Gateway V2 Stages
+Description: This control checks if Amazon API Gateway V2 stages have access logging
+  configured. This control fails if access log settings aren't defined.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':apigateway:' || region
+    || '::/apis/' || api_id || '/stages/' || stage_name as resource,\n      case\n
+    \       when access_log_settings is null then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when access_log_settings is null then title ||
+    ' access logging disabled.'\n        else title || ' access logging enabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_api_gatewayv2_stage;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

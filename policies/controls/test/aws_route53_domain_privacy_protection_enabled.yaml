@@ -1,0 +1,22 @@
+ID: aws_route53_domain_privacy_protection_enabled
+Title: Route53 domains privacy protection should be enabled
+Description: Ensure that your AWS Route 53 domains have Privacy Protection feature
+  enabled in order to hide all their contact information from WHOIS queries and reduce
+  the amount of spam received. The feature allows you to conceal your personal phone
+  number, email and physical address for the domain names registered and/or transferred
+  to AWS Route 53 service.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when admin_privacy
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    admin_privacy then title || ' privacy protection enabled.'\n        else title
+    || ' privacy protection disabled.'\n        end as reason\n      \n      \n    from\n
+    \     aws_route53_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

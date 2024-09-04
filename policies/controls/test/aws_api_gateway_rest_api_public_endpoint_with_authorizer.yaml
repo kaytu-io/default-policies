@@ -1,0 +1,28 @@
+ID: aws_api_gateway_rest_api_public_endpoint_with_authorizer
+Title: API Gateway REST API public endpoints should be configured with authorizer
+Description: Ensure API Gateway REST API public endpoint is configured with authorizer.
+  This rule is non-compliant if API Gateway REST API public endpoint has no authorizer
+  configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || p.partition || ':apigateway:' || p.region
+    || '::/apis/' || p.api_id as resource,\n      case\n        when not (endpoint_configuration_types
+    ? 'PRIVATE') and (a.provider_arns is not null and jsonb_array_length(a.provider_arns)
+    > 0 ) then 'ok'\n        when not (endpoint_configuration_types ? 'PRIVATE') and
+    ( a.provider_arns is null or jsonb_array_length(a.provider_arns) = 0 ) then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when not (endpoint_configuration_types
+    ? 'PRIVATE') and (a.provider_arns is not null and jsonb_array_length(a.provider_arns)
+    > 0 ) then p.name || ' has public endpoint with authorizer.'\n        when not
+    (endpoint_configuration_types ? 'PRIVATE') and ( a.provider_arns is null or jsonb_array_length(a.provider_arns)
+    = 0 ) then p.name || ' has public endpoint without authorizer.'\n        else
+    p.name || ' has private endpoint.'\n      end as reason\n      \n      \n    from\n
+    \     aws_api_gateway_rest_api as p\n      left join aws_api_gateway_authorizer
+    as a on p.api_id = a.rest_api_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

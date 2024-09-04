@@ -1,0 +1,21 @@
+ID: aws_foundational_security_autoscaling_9
+Title: 9 EC2 Auto Scaling groups should use EC2 launch templates
+Description: This control checks whether an Amazon EC2 Auto Scaling group is created
+  from an EC2 launch template. This control fails if an Amazon EC2 Auto Scaling group
+  is not created with a launch template or if a launch template is not specified in
+  a mixed instances policy.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      autoscaling_group_arn as resource,\n      case\n
+    \       when launch_template_id is not null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when launch_template_id is not null
+    then title || ' using an EC2 launch template.'\n        else title || ' not using
+    an EC2 launch template.'\n      end as reason\n      \n      \n    from\n      aws_ec2_autoscaling_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

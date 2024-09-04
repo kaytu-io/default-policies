@@ -1,0 +1,23 @@
+ID: aws_s3_bucket_not_accessible_to_all_authenticated_user
+Title: S3 bucket ACLs should not be accessible to all authenticated user
+Description: This control checks whether AWS S3 bucket ACL allow access to all authenticated
+  users.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with public_acl as (\n      select\n        distinct name\n
+    \     from\n        aws_s3_bucket,\n        jsonb_array_elements(acl -> 'Grants')
+    as grants\n      where\n        grants -> 'Grantee' ->> 'URI' = 'http://acs.amazonaws.com/groups/global/AuthenticatedUsers'\n
+    \   )\n    select\n      b.arn as resource,\n      case\n        when p.name is
+    null then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when
+    p.name is null then b.title || ' not accessible to all authenticated user.'\n
+    \       else b.title || ' accessible to all authenticated user.'\n      end as
+    reason\n      \n      \n    from\n      aws_s3_bucket as b\n      left join public_acl
+    as p on b.name = p.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

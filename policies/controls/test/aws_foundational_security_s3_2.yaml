@@ -1,0 +1,42 @@
+ID: aws_foundational_security_s3_2
+Title: 2 S3 buckets should prohibit public read access
+Description: This control checks whether your S3 buckets allow public read access.
+  It evaluates the Block Public Access settings, the bucket policy, and the bucket
+  access control list (ACL).
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with public_acl as (\n      select\n        distinct name\n
+    \     from\n        aws_s3_bucket,\n        jsonb_array_elements(acl -> 'Grants')
+    as grants\n      where\n        (grants -> 'Grantee' ->> 'URI' = 'http://acs.amazonaws.com/groups/global/AllUsers'\n
+    \       or grants -> 'Grantee' ->> 'URI' = 'http://acs.amazonaws.com/groups/global/AuthenticatedUsers')\n
+    \       and (\n          grants ->> 'Permission' = 'FULL_CONTROL'\n          or
+    grants ->> 'Permission' = 'READ_ACP'\n          or grants ->> 'Permission' = 'READ'\n
+    \       )\n      ),read_access_policy as (\n        select\n          distinct
+    name\n        from\n          aws_s3_bucket,\n          jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n          jsonb_array_elements_text(s -> 'Action') as action\n
+    \       where\n          s ->> 'Effect' = 'Allow'\n          and (\n            s
+    -> 'Principal' -> 'AWS' = '[\"*\"]'\n            or s ->> 'Principal' = '*'\n
+    \         )\n          and (\n            action = '*'\n            or action
+    = '*:*'\n            or action = 's3:*'\n            or action ilike 's3:get%'\n
+    \           or action ilike 's3:list%'\n          )\n    )\n    select\n      b.arn
+    as resource,\n      case\n        when (block_public_acls or a.name is null) and
+    not bucket_policy_is_public then 'ok'\n        when (block_public_acls or a.name
+    is null) and (bucket_policy_is_public and block_public_policy) then 'ok'\n        when
+    (block_public_acls or a.name is null) and (bucket_policy_is_public and p.name
+    is null) then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    (block_public_acls or a.name is null) and not bucket_policy_is_public then b.title
+    || ' not publicly readable.'\n        when (block_public_acls or a.name is null)
+    and (bucket_policy_is_public and block_public_policy) then b.title || ' not publicly
+    readable.'\n        when (block_public_acls or a.name is null) and (bucket_policy_is_public
+    and p.name is null) then  b.title || ' not publicly readable.'\n        else b.title
+    || ' publicly readable.'\n      end as reason\n      \n      \n    from\n      aws_s3_bucket
+    as b\n      left join public_acl as a on b.name = a.name\n      left join read_access_policy
+    as p on b.name = p.name;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

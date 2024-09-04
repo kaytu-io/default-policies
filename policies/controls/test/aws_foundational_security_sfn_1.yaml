@@ -1,0 +1,21 @@
+ID: aws_foundational_security_sfn_1
+Title: 1 Step Functions state machines should have logging turned on
+Description: This controls checks whether an AWS Step Functions state machine has
+  logging turned on. The control fails if a state machine doesn't have logging turned
+  on. If you provide a custom value for the logLevel parameter, the control passes
+  only if the state machine has the specified logging level turned on.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when logging_configuration
+    ->> 'Level' = 'OFF' then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when logging_configuration ->> 'Level' = 'OFF' then title || ' loggging
+    disabled.'\n        else title || ' loggging enabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_sfn_state_machine;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

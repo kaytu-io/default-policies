@@ -1,0 +1,21 @@
+ID: aws_ec2_client_vpn_endpoint_client_connection_logging_enabled
+Title: EC2 Client VPN endpoints should have client connection logging enabled
+Description: This control checks whether an AWS Client VPN endpoint has client connection
+  logging enabled. The control fails if the endpoint doesn't have client connection
+  logging enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      client_vpn_endpoint_id as resource,\n      case\n
+    \       when (connection_log_options ->> 'Enabled')::bool then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when (connection_log_options
+    ->> 'Enabled')::bool then title || ' client connection logging enabled.'\n        else
+    title || ' client connection logging disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ec2_client_vpn_endpoint;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

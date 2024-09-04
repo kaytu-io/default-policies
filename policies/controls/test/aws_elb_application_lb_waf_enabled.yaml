@@ -1,0 +1,20 @@
+ID: aws_elb_application_lb_waf_enabled
+Title: ELB application load balancers should have Web Application Firewall (WAF) enabled
+Description: Ensure AWS WAF is enabled on Elastic Load Balancers (ELB) to help protect
+  web applications.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\":\"waf.fail_open.enabled\",\"Value\":\"true\"}]' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\":\"waf.fail_open.enabled\",\"Value\":\"true\"}]' then title || '
+    WAF enabled.'\n        else title || ' WAF disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ec2_application_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

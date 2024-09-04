@@ -1,0 +1,21 @@
+ID: aws_cloudtrail_multi_region_trail_integrated_with_logs
+Title: CloudTrail multi region trails should be integrated with CloudWatch logs
+Description: Ensure that CloudTrail multi region trail is itegrated with CloudWatch
+  logs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when log_group_arn
+    != 'null' and ((latest_delivery_time) > current_date - 1) then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when log_group_arn != 'null'
+    and ((latest_delivery_time) > current_date - 1) then title || ' multi region trail
+    integrated with CloudWatch logs.'\n        else title || ' multi region trail
+    not integrated with CloudWatch logs.'\n      end as reason\n      \n      \n    from\n
+    \     aws_cloudtrail_trail\n    where\n      region = home_region\n      and is_multi_region_trail;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_foundational_security_ec2_24
+Title: 24 Paravirtual EC2 instance types should not be used
+Description: This control checks whether the virtualization type of an EC2 instance
+  is paravirtual. The control fails if the virtualizationType of the EC2 instance
+  is set to paravirtual.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when virtualization_type
+    = 'paravirtual' then 'alarm'\n        else 'ok'\n      end as status,\n      title
+    || ' virtualization type is ' || virtualization_type || '.' as reason\n      \n
+    \     \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

@@ -1,0 +1,19 @@
+ID: aws_rds_db_cluster_copy_tags_to_snapshot_enabled
+Title: RDS DB clusters should be configured to copy tags to snapshots
+Description: This control checks whether RDS DB clusters are configured to copy all
+  tags to snapshots when the snapshots are created.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when copy_tags_to_snapshot
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    copy_tags_to_snapshot then title || ' copy tags to snapshot enabled.'\n        else
+    title || ' copy tags to snapshot disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_rds_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

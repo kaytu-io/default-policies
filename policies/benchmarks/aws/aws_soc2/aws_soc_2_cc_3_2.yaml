@@ -1,0 +1,17 @@
+ID: aws_soc_2_cc_3_2
+Title: 'CC3.2 COSO Principle 7: The entity identifies risks to the achievement of
+  its objectives across the entity and analyzes risks as a basis for determining how
+  the risks should be managed'
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_ec2_instance_ssm_managed
+- aws_guardduty_enabled
+- aws_guardduty_finding_archived
+- aws_iam_user_console_access_mfa_enabled
+- aws_ssm_managed_instance_compliance_association_compliant
+- aws_ssm_managed_instance_compliance_patch_compliant

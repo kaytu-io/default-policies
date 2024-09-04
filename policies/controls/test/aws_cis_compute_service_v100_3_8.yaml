@@ -1,0 +1,17 @@
+ID: aws_cis_compute_service_v100_3_8
+Title: 3.8 Ensure Lightsail instances are attached to the buckets
+Description: Attaching an Amazon Lightsail instance to a Lightsail storage bucket
+  gives it full programmatic access to the bucket and its objects.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

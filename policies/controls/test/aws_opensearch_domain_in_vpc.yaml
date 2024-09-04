@@ -1,0 +1,29 @@
+ID: aws_opensearch_domain_in_vpc
+Title: OpenSearch domains should be in a VPC
+Description: This control checks whether AWS OpenSearch domains are in a VPC. It does
+  not evaluate the VPC subnet routing configuration to determine public access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with public_subnets as (\n      select\n        distinct a
+    -> 'SubnetId' as SubnetId\n      from\n        aws_vpc_route_table as t,\n        jsonb_array_elements(associations)
+    as a,\n        jsonb_array_elements(routes) as r\n      where\n        r ->> 'DestinationCidrBlock'
+    = '0.0.0.0/0'\n        and  r ->>  'GatewayId' like 'igw-%'\n    ), opensearch_domain_with_public_subnet
+    as (\n      select\n        arn\n      from\n        aws_opensearch_domain ,\n
+    \       jsonb_array_elements(vpc_options -> 'SubnetIds') as s\n      where\n        s
+    in (select SubnetId from public_subnets)\n    )\n    select\n      d.arn as resource,\n
+    \     case\n        when d.vpc_options ->> 'VPCId' is null then 'alarm'\n        when
+    d.vpc_options ->> 'VPCId' is not null and p.arn is not null then 'alarm'\n        else
+    'ok'\n      end status,\n      case\n        when vpc_options ->> 'VPCId' is null
+    then title || ' not in VPC.'\n        when d.vpc_options ->> 'VPCId' is not null
+    and p.arn is not null then title || ' attached to public subnet.'\n        else
+    title || ' in VPC ' || (vpc_options ->> 'VPCId') || '.'\n      end reason\n      \n
+    \     \n    from\n      aws_opensearch_domain as d\n      left join opensearch_domain_with_public_subnet
+    as p on d.arn = p.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

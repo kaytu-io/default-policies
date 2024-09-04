@@ -1,0 +1,20 @@
+ID: aws_cis_v120_1_16
+Title: 1.16 Ensure IAM policies are attached only to groups or roles
+Description: By default, IAM users, groups, and roles have no access to AWS resources.
+  IAM policies are the means by which privileges are granted to users, groups, or
+  roles. It is recommended that IAM policies be applied directly to groups and roles
+  but not users.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when attached_policy_arns
+    is null then 'ok'\n        else 'alarm'\n      end status,\n      name || ' has
+    ' || coalesce(jsonb_array_length(attached_policy_arns),0) || ' attached policies.'
+    as reason\n      \n      \n    from\n      aws_iam_user;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

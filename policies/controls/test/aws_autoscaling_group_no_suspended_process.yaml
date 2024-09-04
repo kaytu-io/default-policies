@@ -1,0 +1,19 @@
+ID: aws_autoscaling_group_no_suspended_process
+Title: Auto Scaling groups should not have any suspended processes
+Description: Ensure that there are no Auto Scaling Groups (ASGs) with suspended processes
+  provisioned in your AWS account in order to avoid disrupting the auto scaling workflow.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      autoscaling_group_arn as resource,\n      case\n
+    \       when suspended_processes is null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when suspended_processes is null then title ||
+    ' has no suspended process.'\n        else title || ' has suspended process.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ec2_autoscaling_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

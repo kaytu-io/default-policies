@@ -1,0 +1,25 @@
+ID: aws_redshift_cluster_encryption_in_transit_enabled
+Title: Redshift cluster encryption in transit should be enabled
+Description: Ensure that your AWS Redshift clusters require TLS/SSL encryption to
+  connect to SQL clients.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with pg_with_ssl as (\n    select\n      name as pg_name,\n
+    \     p ->> 'ParameterName' as parameter_name,\n      p ->> 'ParameterValue' as
+    parameter_value\n    from\n      aws_redshift_parameter_group,\n      jsonb_array_elements(parameters)
+    as p\n    where\n      p ->> 'ParameterName' = 'require_ssl'\n      and p ->>
+    'ParameterValue' = 'true'\n    )\n    select\n      arn as resource,\n      case\n
+    \       when cpg ->> 'ParameterGroupName' in (select pg_name from pg_with_ssl
+    ) then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    cpg ->> 'ParameterGroupName' in (select pg_name from pg_with_ssl ) then title
+    || ' encryption in transit enabled.'\n        else title || ' encryption in transit
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_redshift_cluster,\n
+    \     jsonb_array_elements(cluster_parameter_groups) as cpg;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

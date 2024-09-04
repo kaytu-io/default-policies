@@ -1,0 +1,22 @@
+ID: aws_foundational_security_docdb_4
+Title: 4 Amazon DocumentDB clusters should publish audit logs to CloudWatch Logs
+Description: This control checks whether an Amazon DocumentDB cluster publishes audit
+  logs to Amazon CloudWatch Logs. The control fails if the cluster doesn't publish
+  audit logs to CloudWatch Logs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      db_instance_arn as resource,\n      engine,\n
+    \     case\n        when engine like 'docdb' and enabled_cloudwatch_logs_exports
+    ?& array ['error', 'slowquery'] then 'ok'\n        else 'alarm'\n      end as
+    status,\n      case\n        when engine like 'docdb' and enabled_cloudwatch_logs_exports
+    ?& array ['error', 'slowquery']\n        then title || ' ' || engine || ' logging
+    enabled.'\n        else title || ' logging not enabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_docdb_cluster_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

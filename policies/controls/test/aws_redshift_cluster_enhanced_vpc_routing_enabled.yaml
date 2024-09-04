@@ -1,0 +1,20 @@
+ID: aws_redshift_cluster_enhanced_vpc_routing_enabled
+Title: AWS Redshift enhanced VPC routing should be enabled
+Description: Ensure that AWS Redshift cluster has 'enhancedVpcRouting' enabled. The
+  rule is non-compliant if 'enhancedVpcRouting' is not enabled or if the configuration.enhancedVpcRouting
+  field is 'false'.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when enhanced_vpc_routing
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    enhanced_vpc_routing then title || ' enhanced VPC routing enabled.'\n        else
+    title || ' enhanced VPC routing disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

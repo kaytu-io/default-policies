@@ -1,0 +1,33 @@
+ID: aws_foundational_security_kms_1
+Title: 1 IAM customer managed policies should not allow decryption actions on all
+  KMS keys
+Description: Checks whether the default version of IAM customer managed policies allow
+  principals to use the AWS KMS decryption actions on all resources. This control
+  uses Zelkova, an automated reasoning engine, to validate and warn you about policies
+  that may grant broad access to your secrets across AWS accounts. This control fails
+  if the kms:Decrypt or kms:ReEncryptFrom actions are allowed on all KMS keys. The
+  control evaluates both attached and unattached customer managed policies. It does
+  not check inline policies or AWS managed policies.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with policy_with_decrypt_grant as (\n      select\n        distinct
+    arn\n      from\n        aws_iam_policy,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as statement\n      where\n        not is_aws_managed\n        and
+    statement ->> 'Effect' = 'Allow'\n        and statement -> 'Resource' ?| array['*',
+    'arn:aws:kms:*:' || account_id || ':key/*', 'arn:aws:kms:*:' || account_id ||
+    ':alias/*']\n        and statement -> 'Action' ?| array['*', 'kms:*', 'kms:decrypt',
+    'kms:reencryptfrom', 'kms:reencrypt*']\n    )\n    select\n      i.arn as resource,\n
+    \     case\n        when d.arn is null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when d.arn is null then i.title || ' doesn''t
+    allow decryption actions on all keys.'\n        else i.title || ' allows decryption
+    actions on all keys.'\n      end as reason\n      \n      \n    from\n      aws_iam_policy
+    i\n    left join policy_with_decrypt_grant d on i.arn = d.arn\n    where\n      not
+    is_aws_managed;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

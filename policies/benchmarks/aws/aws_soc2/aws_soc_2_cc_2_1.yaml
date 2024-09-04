@@ -1,0 +1,13 @@
+ID: aws_soc_2_cc_2_1
+Title: 'CC2.1 COSO Principle 13: The entity obtains or generates and uses relevant,
+  quality information to support the functioning of internal control'
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_cloudtrail_s3_data_events_enabled
+- aws_cloudtrail_security_trail_enabled
+- aws_config_enabled_all_regions

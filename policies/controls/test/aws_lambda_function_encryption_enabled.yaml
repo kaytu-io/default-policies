@@ -1,0 +1,19 @@
+ID: aws_lambda_function_encryption_enabled
+Title: Ensure encryption in transit is enabled for Lambda environment variables
+Description: As you can set your own environmental variables for Lambda it is important
+  to also encrypt them for in transit protection.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when kms_key_arn
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    kms_key_arn is null then title || ' encryption is disabled.'\n        else title
+    || ' encryption is enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

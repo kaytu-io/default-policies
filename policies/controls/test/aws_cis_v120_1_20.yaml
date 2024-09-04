@@ -1,0 +1,28 @@
+ID: aws_cis_v120_1_20
+Title: 1.20 Ensure a support role has been created to manage incidents with AWS Support
+Description: AWS provides a support center that can be used for incident notification
+  and response, as well as technical support and customer services. Create an IAM
+  Role to allow authorized users to manage incidents with AWS Support.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    -- pgFormatter-ignore\n    with support_role_count as\n    (\n
+    \     select\n        'arn:' || a.partition || ':::' || a.account_id as resource,\n
+    \       count(policy_arn),\n        a.account_id,\n        a._ctx\n      from\n
+    \       aws_account as a\n        left join aws_iam_role as r on r.account_id
+    = a.account_id\n        left join jsonb_array_elements_text(attached_policy_arns)
+    as policy_arn  on true\n      where\n        split_part(policy_arn, '/', 2) =
+    'AWSSupportAccess'\n        or policy_arn is null\n      group by\n        a.account_id,\n
+    \       a.partition,\n        a._ctx\n    )\n    select\n      resource,\n      case\n
+    \       when count > 0 then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when count = 1 then 'AWSSupportAccess policy attached to 1
+    role.'\n        when count > 1 then 'AWSSupportAccess policy attached to ' ||
+    count || ' roles.'\n        else 'AWSSupportAccess policy not attached to any
+    role.'\n      end  as reason\n      \n    from\n      support_role_count;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

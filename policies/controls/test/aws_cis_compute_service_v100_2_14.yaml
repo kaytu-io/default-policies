@@ -1,0 +1,26 @@
+ID: aws_cis_compute_service_v100_2_14
+Title: 2.14 Ensure EC2 Auto Scaling Groups Propagate Tags to EC2 Instances that it
+  launches
+Description: Tags can help with managing, identifying, organizing, searching for,
+  and filtering resources. Additionally, tags can help with security and compliance.
+  Tags can be propagated from an Auto Scaling group to the EC2 instances that it launches.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with propagate_tags_to_ec2_instance as (\n      select\n        autoscaling_group_arn,\n
+    \       count(*) as count\n      from\n        aws_ec2_autoscaling_group,\n        jsonb_array_elements(tags_src)
+    as t\n      where\n        (t ->> 'PropagateAtLaunch' = 'false')\n      group
+    by\n        autoscaling_group_arn\n    )\n    select\n      p.autoscaling_group_arn
+    as resource,\n      case\n        when count > 0 then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      case\n        when count > 0 then title || ' does
+    not propagate all tags to the EC2 instance'\n        else title || ' propagate
+    all tags to the EC2 instance.'\n      end as reason\n      \n      \n    from\n
+    \     aws_ec2_autoscaling_group as p\n      left join propagate_tags_to_ec2_instance
+    as i on  i.autoscaling_group_arn = p.autoscaling_group_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

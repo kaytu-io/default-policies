@@ -1,0 +1,21 @@
+ID: aws_foundational_security_ec2_23
+Title: 23 EC2 Transit Gateways should not automatically accept VPC attachment requests
+Description: This control checks if EC2 Transit Gateways are automatically accepting
+  shared VPC attachments. This control fails for a Transit Gateway that automatically
+  accepts shared VPC attachment requests.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      transit_gateway_arn as resource,\n      case\n
+    \       when auto_accept_shared_attachments = 'enable' then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when auto_accept_shared_attachments
+    = 'enable' then title || ' automatic shared account attachment enabled.'\n        else
+    title || ' automatic shared account attachment disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_ec2_transit_gateway;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

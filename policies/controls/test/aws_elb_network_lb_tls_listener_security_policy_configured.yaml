@@ -1,0 +1,33 @@
+ID: aws_elb_network_lb_tls_listener_security_policy_configured
+Title: ELB network load balancers should have TLS listener security policy configured
+Description: Ensure that your Network Load Balancers (NLBs) are configured with a
+  TLS listener security policy. Using insecure ciphers for your NLB Predefined or
+  Custom Security Policy could make the TLS connection between the client and the
+  load balancer vulnerable to exploits.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with tls_listeners as (\n      select\n        distinct load_balancer_arn\n
+    \     from\n        aws_ec2_load_balancer_listener\n      where\n        protocol
+    = 'TLS'\n        and ssl_policy not in ('ELBSecurityPolicy-2016-08', 'ELBSecurityPolicy-FS-2018-0',
+    'ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06', 'ELBSecurityPolicy-TLS13-1-2-2021-06')\n
+    \     group by\n        load_balancer_arn\n    ), nwl_without_tls_listener as
+    (\n        select\n          load_balancer_arn,\n          count(*)\n        from\n
+    \         aws_ec2_load_balancer_listener\n        where\n          protocol =
+    'TLS'\n        group by\n          load_balancer_arn\n    )\n    select\n      lb.arn
+    as resource,\n      case\n        when l.load_balancer_arn is not null and lb.arn
+    in (select load_balancer_arn from tls_listeners) then 'alarm'\n        when l.load_balancer_arn
+    is not null then 'ok'\n        else 'info'\n      end as status,\n      case\n
+    \       when l.load_balancer_arn is not null and lb.arn in (select load_balancer_arn
+    from tls_listeners) then lb.title || ' TLS listener security policy not updated.'\n
+    \       when l.load_balancer_arn is not null then lb.title || ' TLS listener security
+    policy updated.'\n        else lb.title || ' does not use TLS listener.'\n      end
+    as reason\n      \n      \n    from\n      aws_ec2_network_load_balancer as lb\n
+    \     left join nwl_without_tls_listener as l on l.load_balancer_arn = lb.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

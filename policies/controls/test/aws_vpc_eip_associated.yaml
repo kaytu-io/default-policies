@@ -1,0 +1,21 @@
+ID: aws_vpc_eip_associated
+Title: VPC EIPs should be associated with an EC2 instance or ENI
+Description: This rule ensures Elastic IPs allocated to a AWS Virtual Private Cloud
+  (AWS VPC) are attached to AWS Elastic Compute Cloud (AWS EC2) instances or in-use
+  Elastic Network Interfaces.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':ec2:' || region || ':'
+    || account_id || ':eip/' || allocation_id as resource,\n      case\n        when
+    association_id is null then 'alarm'\n        else 'ok'\n      end status,\n      case\n
+    \       when association_id is null then title || ' is not associated with any
+    resource.'\n        else title || ' is associated with a resource.'\n      end
+    reason\n      \n      \n    from\n      aws_vpc_eip;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

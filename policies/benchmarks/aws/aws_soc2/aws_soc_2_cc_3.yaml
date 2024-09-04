@@ -1,0 +1,15 @@
+ID: aws_soc_2_cc_3
+Title: CC3 Common Criteria Related to Risk Assessment
+SectionCode: ""
+Description: The criteria relevant to how the entity (i) specifies suitable objectives,
+  (ii) identifies and analyzes risk, and (iii) assess fraud risk.
+Children:
+- aws_soc_2_cc_3_1
+- aws_soc_2_cc_3_2
+- aws_soc_2_cc_3_4
+Tags:
+  tags:
+  - soc_2_cc_3_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

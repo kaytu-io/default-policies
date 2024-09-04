@@ -1,0 +1,22 @@
+ID: aws_ec2_transit_gateway_auto_cross_account_attachment_disabled
+Title: EC2 transit gateways should have auto accept shared attachments disabled
+Description: Ensure transit gateways have auto accept shared attachments feature disabled.
+  If this setting is disabled, then any VPC that attempts to attach to a transit gateway
+  will need to request authorization, and the account that owns the transit gateway
+  will need to accept the authorization.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      transit_gateway_arn as resource,\n      case\n
+    \       when auto_accept_shared_attachments = 'enable' then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when auto_accept_shared_attachments
+    = 'enable' then title || ' automatic shared account attachment enabled.'\n        else
+    title || ' automatic shared account attachment disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_ec2_transit_gateway;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

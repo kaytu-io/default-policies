@@ -1,0 +1,20 @@
+ID: aws_foundational_security_kinesis_1
+Title: 1 Kinesis Data Streams should be encrypted at rest
+Description: This control checks if Kinesis Data Streams are encrypted at rest with
+  server-side encryption. This control fails if a Kinesis stream is not encrypted
+  at rest with server-side encryption.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      stream_arn as resource,\n      case\n        when
+    encryption_type = 'KMS' then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when encryption_type = 'KMS' then title || ' server side encryption
+    enabled.'\n        else title || ' server side encryption disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_kinesis_stream;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

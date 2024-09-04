@@ -1,0 +1,20 @@
+ID: aws_foundational_security_redshift_10
+Title: 10 Redshift clusters should be encrypted at rest
+Description: This control checks if Amazon Redshift clusters are encrypted at rest.
+  The control fails if a Redshift cluster isn't encrypted at rest or if the encryption
+  key is different from the provided key in the rule parameter.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when encrypted
+    and kms_key_id is not null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when encrypted and kms_key_id is not null then title || '
+    encrypted with KMS.'\n        else title || ' not encrypted with KMS'\n      end
+    as reason\n      \n      \n    from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

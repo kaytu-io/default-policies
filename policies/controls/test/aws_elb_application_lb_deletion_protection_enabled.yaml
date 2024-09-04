@@ -1,0 +1,20 @@
+ID: aws_elb_application_lb_deletion_protection_enabled
+Title: ELB application load balancer deletion protection should be enabled
+Description: This rule ensures that Elastic Load Balancing has deletion protection
+  enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\": \"deletion_protection.enabled\", \"Value\": \"true\"}]' then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when load_balancer_attributes
+    @> '[{\"Key\": \"deletion_protection.enabled\", \"Value\": \"true\"}]' then title
+    || ' deletion protection enabled.'\n        else title || ' deletion protection
+    disabled.'\n      end as reason\n      \n      \n    from\n      aws_ec2_application_load_balancer;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,22 @@
+ID: aws_msk_cluster_encryption_in_transit_with_tls_enabled
+Title: MSK clusters should be encrypted in transit among broker nodes
+Description: This controls checks if an Amazon MSK cluster is encrypted in transit
+  with HTTPS (TLS) among the broker nodes of the cluster. The control fails if plain
+  text communication is enabled for a cluster broker node connection.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when provisioned
+    -> 'EncryptionInfo' -> 'EncryptionInTransit' ->> 'ClientBroker' = 'TLS' then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when provisioned
+    -> 'EncryptionInfo' -> 'EncryptionInTransit' ->> 'ClientBroker' = 'TLS' then title
+    || ' encryption in transit enabled with TLS.'\n        else title || ' encryption
+    in transit enabled with plaintext.'\n      end as reason\n      \n      \n    from\n
+    \     aws_msk_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

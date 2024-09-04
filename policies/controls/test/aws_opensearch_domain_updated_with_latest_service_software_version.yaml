@@ -1,0 +1,20 @@
+ID: aws_opensearch_domain_updated_with_latest_service_software_version
+Title: OpenSearch domains should be updated to the latest service software version
+Description: This control checks whether AWS OpenSearch domain has any updates available.
+  This control is non-compliant if the OpenSearch domain has any updates available.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when service_software_options
+    ->> 'UpdateAvailable' = 'false' then 'ok'\n        else 'alarm'\n      end status,\n
+    \     case\n        when service_software_options ->> 'UpdateAvailable' = 'false'
+    then title || ' updated with latest service software version.'\n        else title
+    || ' not updated with latest service software version.'\n      end reason\n      \n
+    \     \n    from\n      aws_opensearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

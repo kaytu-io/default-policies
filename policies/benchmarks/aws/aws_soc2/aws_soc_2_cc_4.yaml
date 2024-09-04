@@ -1,0 +1,13 @@
+ID: aws_soc_2_cc_4
+Title: CC4 Monitoring Activities
+SectionCode: ""
+Description: The criteria relevant to how the entity (i) conducts ongoing and/or separate
+  evaluations, and (ii) evaluates and communicates deficiencies.
+Children:
+- aws_soc_2_cc_4_2
+Tags:
+  tags:
+  - soc_2_cc_4_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

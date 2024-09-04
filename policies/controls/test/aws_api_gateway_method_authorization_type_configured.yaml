@@ -1,0 +1,19 @@
+ID: aws_api_gateway_method_authorization_type_configured
+Title: API Gateway methods authorizer should be configured
+Description: This control checks whether API Gateway method has an authorizer configured.
+  This rule is non-compliant if API Gateway method has no authorizers configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      resource_id as resource,\n      case\n        when
+    authorization_type = 'NONE' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when authorization_type = 'NONE' then title || ' authorization
+    type not configured.'\n        else title || ' authorization type ' || authorization_type
+    || ' configured.'\n      end as reason\n      \n    from\n      aws_api_gateway_method;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

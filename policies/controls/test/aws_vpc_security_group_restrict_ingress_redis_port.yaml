@@ -1,0 +1,28 @@
+ID: aws_vpc_security_group_restrict_ingress_redis_port
+Title: VPC security groups should restrict ingress redis access from 0.0.0.0/0
+Description: AWS VPC security groups can help in managing network access by providing
+  stateful filtering of ingress and egress network traffic to AWS resources.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with ingress_redis_port as (\n      select\n        group_id,\n
+    \       count(*) as num_redis_rules\n      from\n        aws_vpc_security_group_rule\n
+    \     where\n        type = 'ingress'\n        and\n          (cidr_ipv4 = '0.0.0.0/0'\n
+    \         or cidr_ipv6 = '::/0')\n        and\n        (\n          ( ip_protocol
+    = '-1'\n          and from_port is null\n          )\n          or (\n            from_port
+    >= 6379\n            and to_port <= 6379\n          )\n        )\n      group
+    by\n        group_id\n    )\n    select\n      arn as resource,\n      case\n
+    \       when ingress_redis_port.group_id is null then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when ingress_redis_port.group_id is
+    null then sg.group_id || ' restricted ingress from 0.0.0.0/0 or ::/0 to Redis
+    port 6379.'\n        else sg.group_id || ' contains ' || ingress_redis_port.num_redis_rules
+    || ' ingress rule(s) from 0.0.0.0/0 or ::/0 to Redis port 6379.'\n      end as
+    reason\n      \n      \n    from\n      aws_vpc_security_group as sg\n      left
+    join ingress_redis_port on ingress_redis_port.group_id = sg.group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

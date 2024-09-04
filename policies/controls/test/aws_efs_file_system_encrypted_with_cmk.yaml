@@ -1,0 +1,30 @@
+ID: aws_efs_file_system_encrypted_with_cmk
+Title: EFS file systems should be encrypted with CMK
+Description: Ensure AWS Elastic File Systems (AWS EFS) are encrypted using CMK. The
+  rule is non-compliant if the EFS File System is not encrypted using CMK.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with aws_efs_file_systems as (\n      select\n        arn,\n
+    \       encrypted,\n        kms_key_id,\n        title,\n        region,\n        account_id,\n
+    \       tags,\n        _ctx\n      from\n        aws_efs_file_system as fs\n      order
+    by\n        arn,\n        kms_key_id,\n        title,\n        region,\n        account_id,\n
+    \       tags,\n        _ctx\n      ),\n    kms_keys as (\n      select\n        k.key_manager,\n
+    \       k.arn,\n        k.region,\n        k.account_id,\n        k.enabled\n
+    \     from\n        aws_kms_key as k\n    ),\n    encrypted_fs as (\n      select\n
+    \       fs.arn as arn,\n        key_manager\n      from\n        aws_efs_file_systems
+    as fs\n        left join kms_keys as k on fs.kms_key_id = k.arn\n      where\n
+    \       enabled\n    )\n    select\n      f.arn as resource,\n      case\n        when
+    not encrypted then 'alarm'\n        when encrypted and e.key_manager = 'CUSTOMER'
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    not encrypted then title || ' not encrypted.'\n        when encrypted and e.key_manager
+    = 'CUSTOMER' then title || ' encrypted with CMK.'\n        else title || ' not
+    encrypted with CMK.'\n      end as reason\n      \n      \n    from\n      aws_efs_file_systems
+    as f\n      left join encrypted_fs as e on f.arn = e.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,23 @@
+ID: aws_apigateway_stage_cache_encryption_at_rest_enabled
+Title: API Gateway stage cache encryption at rest should be enabled
+Description: To help protect data at rest, ensure encryption is enabled for your API
+  Gateway stage's cache.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':apigateway:' || region
+    || '::/apis/' || rest_api_id || '/stages/' || name as resource,\n      case\n
+    \       when method_settings -> '*/*' ->> 'CachingEnabled' = 'true'\n        and
+    method_settings -> '*/*' ->> 'CacheDataEncrypted' = 'true' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when method_settings -> '*/*'
+    ->> 'CachingEnabled' = 'true'\n        and method_settings -> '*/*' ->> 'CacheDataEncrypted'
+    = 'true'\n          then title || ' API cache and encryption enabled.'\n        else
+    title || ' API cache and encryption not enabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_api_gateway_stage;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

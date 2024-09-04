@@ -1,0 +1,30 @@
+ID: aws_elasticache_replication_group_redis_auth_enabled
+Title: ElastiCache for Redis replication groups before version 6.0 should use Redis
+  Auth
+Description: This control checks if ElastiCache for Redis replication groups has Redis
+  Auth enabled. The control fails for an ElastiCache for Redis replication group if
+  the Redis version of its nodes is below 6.0 and AuthToken isn't in use.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with elasticache_cluster_node_version as (\n      select\n
+    \       distinct replication_group_id,\n        engine_version\n      from\n        aws_elasticache_cluster\n
+    \   )\n    select\n      arn as resource,\n      case\n        when regexp_split_to_array(v.engine_version,
+    '\\.')::int[] >= regexp_split_to_array('6.0', '\\.')::int[] then 'skip'\n        when
+    regexp_split_to_array(v.engine_version, '\\.')::int[] < regexp_split_to_array('6.0',
+    '\\.')::int[] and eg.auth_token_enabled then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when regexp_split_to_array(v.engine_version, '\\.')::int[]
+    >= regexp_split_to_array('6.0', '\\.')::int[] then eg.title || ' node version
+    is ' || engine_version || '.'\n        when regexp_split_to_array(v.engine_version,
+    '\\.')::int[] < regexp_split_to_array('6.0', '\\.')::int[] and eg.auth_token_enabled
+    then eg.title || ' has Redis AUTH enabled.'\n        else eg.title || ' has Redis
+    AUTH disabled.'\n      end as reason\n      \n    from\n      aws_elasticache_replication_group
+    as eg\n      left join elasticache_cluster_node_version as v on eg.replication_group_id
+    = v.replication_group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

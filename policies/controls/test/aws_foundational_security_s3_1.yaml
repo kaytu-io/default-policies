@@ -1,0 +1,26 @@
+ID: aws_foundational_security_s3_1
+Title: 1 S3 Block Public Access setting should be enabled
+Description: This control checks whether the following Amazon S3 public access block
+  settings are configured at the account level
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn' || ':' || 'aws' || ':::' || account_id
+    as resource,\n      case\n        when block_public_acls\n          and block_public_policy\n
+    \         and ignore_public_acls\n          and restrict_public_buckets\n          then
+    'ok'\n        else 'alarm'\n      end as status,\n      case\n        when block_public_acls\n
+    \         and block_public_policy\n          and ignore_public_acls\n          and
+    restrict_public_buckets\n          then 'Account level public access blocks enabled.'\n
+    \       else 'Account level public access blocks not enabled for: ' ||\n          concat_ws(',
+    ',\n            case when not (block_public_acls ) then 'block_public_acls' end,\n
+    \           case when not (block_public_policy) then 'block_public_policy' end,\n
+    \           case when not (ignore_public_acls ) then 'ignore_public_acls' end,\n
+    \           case when not (restrict_public_buckets) then 'restrict_public_buckets'
+    end\n          ) || '.'\n      end as reason\n      \n    from\n      aws_s3_account_settings;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

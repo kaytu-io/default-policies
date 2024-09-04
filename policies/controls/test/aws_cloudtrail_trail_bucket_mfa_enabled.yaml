@@ -1,0 +1,24 @@
+ID: aws_cloudtrail_trail_bucket_mfa_enabled
+Title: CloudTrail trail S3 buckets MFA delete should be enabled
+Description: Ensure that CloudTrail trail S3 buckets should have MFA delete enabled.
+  MFA delete helps prevent accidental bucket deletions by requiring the user who initiates
+  the delete action to prove physical possession of an MFA device with an MFA code
+  and adding an extra layer of friction and security to the delete action.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      t.arn as resource,\n      case\n        when
+    t.s3_bucket_name is null then 'alarm'\n        when b.versioning_mfa_delete then
+    'ok'\n        else 'alarm'\n      end as status,\n      case\n        when t.s3_bucket_name
+    is null then t.title || ' logging disabled.'\n        when b.versioning_mfa_delete
+    then t.title || t.s3_bucket_name || ' MFA enabled.'\n        else t.title || t.s3_bucket_name
+    || ' MFA disabled.'\n      end as reason\n      \n      \n    from\n      aws_cloudtrail_trail
+    t\n      left join aws_s3_bucket b on t.s3_bucket_name = b.name\n    where\n      t.region
+    = t.home_region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

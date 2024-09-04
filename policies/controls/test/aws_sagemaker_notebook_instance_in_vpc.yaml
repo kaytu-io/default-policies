@@ -1,0 +1,18 @@
+ID: aws_sagemaker_notebook_instance_in_vpc
+Title: SageMaker notebook instances should be in a VPC
+Description: Manage access to the AWS Cloud by ensuring SageMaker notebook instances
+  are within an AWS Virtual Private Cloud (AWS VPC).
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when subnet_id
+    is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when subnet_id is not null then title || ' in VPC.'\n        else title
+    || ' not in VPC.'\n      end as reason\n      \n      \n    from\n      aws_sagemaker_notebook_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

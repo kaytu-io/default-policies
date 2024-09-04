@@ -1,0 +1,29 @@
+ID: aws_ec2_instance_no_high_level_finding_in_inspector_scan
+Title: EC2 instances high level findings should not be there in inspector scans
+Description: AWS Inspector scans operating system packages installed on your AWS EC2
+  instances for vulnerabilities and network reachability issues. Each finding has
+  the name of the detected vulnerability and provides a severity rating, information
+  about the affected resource, and details such as how to remediate the reported vulnerability.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with severity_list as (\n      select\n        distinct title
+    ,\n        a ->> 'Value' as instance_id\n      from\n        aws_inspector_finding,\n
+    \       jsonb_array_elements(attributes) as a\n      where\n        severity =
+    'High'\n        and asset_type = 'ec2-instance'\n        and a ->> 'Key' = 'INSTANCE_ID'\n
+    \     group by\n        a ->> 'Value',\n        title\n    ), ec2_istance_list
+    as (\n      select\n        distinct instance_id\n      from\n        severity_list\n
+    \   )\n    select\n      arn as resource,\n      case\n        when l.instance_id
+    is null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    l.instance_id is null then i.title || ' has no high level finding in inspector
+    scans.'\n        else i.title || ' has ' || (select count(*) from severity_list
+    where instance_id = i.instance_id) || ' high level findings in inspector scans.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ec2_instance as i\n      left
+    join ec2_istance_list as l on i.instance_id = l.instance_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_waf_web_acl_logging_enabled
+Title: WAF web ACL logging should be enabled
+Description: To help with logging and monitoring within your environment, enable AWS
+  WAF logging on regional and global web ACLs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when logging_configuration
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    logging_configuration is null then title || ' logging disabled.'\n        else
+    title || ' logging enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_waf_web_acl;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_backup_recovery_point_encryption_enabled
+Title: Backup recovery points should be encrypted
+Description: Ensure that a recovery point is encrypted. The rule is non-compliant
+  if the recovery point is not encrypted.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      recovery_point_arn as resource,\n      case\n
+    \       when is_encrypted then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when is_encrypted then recovery_point_arn || ' encryption
+    enabled.'\n        else recovery_point_arn || ' encryption disabled.'\n      end
+    as reason\n      \n    from\n      aws_backup_recovery_point;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

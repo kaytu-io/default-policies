@@ -1,0 +1,23 @@
+ID: aws_backup_vault_region_configured
+Title: Backup vaults should exist in a region
+Description: Ensure that there exists at least one backup vault in a region. The rule
+  is non-compliant if there are no backup vaults in a region.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with count_vaults as (\n      select\n        region,\n        account_id,\n
+    \       count(*) as count\n      from\n        aws_backup_vault\n      group by\n
+    \       region,\n        account_id\n    )\n    select\n      'arn:' || r.partition
+    || '::' || r.region || ':' || r.account_id as resource,\n      case\n        when
+    v.count > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when v.count > 0 then v.count || ' backup vault(s) exist in region ' ||
+    r.region || '.'\n        else 'No backup vault exists in region ' || r.region
+    || '.'\n      end as reason\n      \n    from\n      aws_region as r\n      left
+    join count_vaults as v on r.account_id = v.account_id and r.region = v.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

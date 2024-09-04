@@ -1,0 +1,22 @@
+ID: aws_cis_compute_service_v100_4_2
+Title: 4.2 Ensure Cloudwatch Lambda insights is enabled
+Description: Ensure that Amazon CloudWatch Lambda Insights is enabled for your Amazon
+  Lambda functions for enhanced monitoring.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when exists
+    (\n          select 1\n          from jsonb_array_elements(layers) as l\n          where
+    l ->> 'Arn' like '%:layer:LambdaInsightsExtension:%'\n        ) then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when exists (\n          select
+    1\n          from jsonb_array_elements(layers) as l\n          where l ->> 'Arn'
+    like '%:layer:LambdaInsightsExtension:%'\n        ) then title || ' CloudWatch
+    Insights enabled.'\n        else title || ' CloudWatch Insights disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

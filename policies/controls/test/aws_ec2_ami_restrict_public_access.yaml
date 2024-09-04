@@ -1,0 +1,19 @@
+ID: aws_ec2_ami_restrict_public_access
+Title: EC2 AMIs should restrict public access
+Description: This control checks whether EC2 AMIs are set as private or not. The control
+  fails if the EC2 AMIs are set as public.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':ec2:' || region || ':'
+    || account_id || ':image/' || image_id as resource,\n      case\n        when
+    public then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when
+    public then title || ' publicly accessible.'\n        else title || ' not publicly
+    accessible.'\n      end reason\n      \n      \n    from\n      aws_ec2_ami;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,34 @@
+ID: aws_ec2_instance_no_iam_role_with_privilege_escalation_risk_access
+Title: EC2 instance IAM role should not allow privilege escalation risk access
+Description: This control ensures that EC2 instance IAM role does not allow privilege
+  escalation risk access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with iam_roles as (\n      select\n        r.arn as role_arn,\n
+    \       i.arn as intance_arn\n      from\n        aws_iam_role as r,\n        jsonb_array_elements_text(instance_profile_arns)
+    as p\n        left join aws_ec2_instance as i on p = i.iam_instance_profile_arn\n
+    \     where\n        i.arn is not null\n    ), iam_role_with_permission as (\n
+    \     select\n        arn\n      from\n        aws_iam_role,\n        jsonb_array_elements(assume_role_policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Principal' -> 'Service')
+    as service,\n        jsonb_array_elements_text(s -> 'Action') as action\n      where\n
+    \       arn in (select role_arn from iam_roles)\n        and  s ->> 'Effect' =
+    'Allow'\n        and service = 'ec2.amazonaws.com'\n        and (\n          (action
+    in ('iam:createpolicy', 'iam:createpolicyversion', 'iam:SetDefaultpolicyversion',
+    'iam:passrole', 'iam:createaccessKey', 'iam:createloginprofile', 'iam:updateloginprofile',
+    'iam:attachuserpolicy', 'iam:attachgrouppolicy', 'iam:attachrolepolicy', 'iam:putuserpolicy',
+    'iam:putgrouppolicy', 'iam:putrolepolicy', 'iam:addusertogroup', 'iam:updateassumerolepolicy',
+    '*:*')\n          )\n        )\n    )\n    select\n      i.arn as resource,\n
+    \     case\n        when p.arn is null then 'ok'\n        else 'alarm'\n      end
+    status,\n      case\n        when p.arn is null then title || ' has no privilege
+    escalation access.'\n        else title || ' has privilege escalation access.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ec2_instance as i\n      left
+    join iam_roles as r on r.intance_arn = i.arn\n      left join iam_role_with_permission
+    as p on p.arn = r.role_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,22 @@
+ID: aws_rds_db_instance_deletion_protection_enabled
+Title: RDS DB instances should have deletion protection enabled
+Description: Ensure AWS Relational Database Service (AWS RDS) instances have deletion
+  protection enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when engine
+    like any(array['aurora%', 'docdb', 'neptune']) then 'skip'\n        when deletion_protection
+    then 'ok'\n        else 'alarm'\n      end status,\n      case\n        when engine
+    like any(array['aurora%', 'docdb', 'neptune']) then title || ' has engine ' ||
+    engine || ' cluster, deletion protection is set at cluster level.'\n        when
+    deletion_protection then title || ' deletion protection enabled.'\n        else
+    title || ' deletion protection not enabled.'\n      end reason\n      \n      \n
+    \   from\n      aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

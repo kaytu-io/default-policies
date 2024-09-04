@@ -1,0 +1,36 @@
+ID: aws_foundational_security_cloudtrail_1
+Title: 1 CloudTrail should be enabled and configured with at least one multi-Region
+  trail
+Description: This control checks that there is at least one multi-Region CloudTrail
+  trail.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with multi_region_trails as (\n      select\n        account_id,\n
+    \       count(account_id) as num_multregion_trails\n      from\n        aws_cloudtrail_trail\n
+    \     where\n        is_multi_region_trail and region = home_region\n        and
+    is_logging\n      group by\n        account_id,\n        is_multi_region_trail\n
+    \   ), organization_trails as (\n      select\n        is_organization_trail,\n
+    \       is_logging,\n        is_multi_region_trail,\n        account_id\n      from\n
+    \       aws_cloudtrail_trail\n      where\n        is_organization_trail\n    )\n
+    \   select\n      distinct a.arn as resource,\n      case\n        when coalesce(num_multregion_trails,
+    0) >= 1 then 'ok'\n        when o.is_organization_trail and o.is_logging and o.is_multi_region_trail
+    then 'ok'\n        when o.is_organization_trail and o.is_multi_region_trail and
+    o.is_logging is null then 'info'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when coalesce(num_multregion_trails, 0) >= 1 then a.title
+    || ' has ' || coalesce(num_multregion_trails, 0) || ' multi-region trail(s).'\n
+    \       when o.is_organization_trail and o.is_logging and o.is_multi_region_trail
+    then a.title || ' has multi-region trail(s).'\n        when o.is_organization_trail
+    and o.is_multi_region_trail and o.is_logging is null then a.title || ' has organization
+    trail, check organization account for cloudtrail logging status.'\n        else
+    a.title || ' does not have multi-region trail(s).'\n      end as reason\n\n      \n
+    \   from\n      aws_account as a\n      left join multi_region_trails as b on
+    a.account_id = b.account_id\n      left join organization_trails as o on a.account_id
+    = o.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

@@ -1,0 +1,35 @@
+ID: aws_dms_replication_task_target_database_logging_enabled
+Title: DMS replication tasks for the target database should have logging enabled
+Description: This control checks whether logging is enabled with the minimum severity
+  level of LOGGER_SEVERITY_DEFAULT for DMS replication tasks TARGET_APPLY and TARGET_LOAD.
+  The control fails if logging isn't enabled for these tasks or if the minimum severity
+  level is less than LOGGER_SEVERITY_DEFAULT.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with replication_task_target_apply as (\n      select\n        arn\n
+    \     from\n        aws_dms_replication_task,\n        jsonb_array_elements(replication_task_settings
+    -> 'Logging' -> 'LogComponents') as o\n      where\n        o ->> 'Id' = 'TARGET_APPLY'\n
+    \       and o ->> 'Severity' in ('LOGGER_SEVERITY_DEFAULT', 'LOGGER_SEVERITY_DEBUG',
+    'LOGGER_SEVERITY_DETAILED_DEBUG')\n    ), replication_task_target_load as (\n
+    \     select\n        arn\n      from\n        aws_dms_replication_task,\n        jsonb_array_elements(replication_task_settings
+    -> 'Logging' -> 'LogComponents') as o\n      where\n        o ->> 'Id' = 'TARGET_LOAD'\n
+    \       and o ->> 'Severity' in ('LOGGER_SEVERITY_DEFAULT', 'LOGGER_SEVERITY_DEBUG',
+    'LOGGER_SEVERITY_DETAILED_DEBUG')\n    )\n    select\n      t.arn as resource,\n
+    \     (replication_task_settings -> 'Logging' ->> 'EnableLogging')::bool,\n      case\n
+    \       when (replication_task_settings -> 'Logging' ->> 'EnableLogging')::bool\n
+    \         and a.arn is not null\n          and l.arn is not null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when (replication_task_settings
+    -> 'Logging' ->> 'EnableLogging')::bool\n          and a.arn is not null\n          and
+    l.arn is not null then title || ' target database logging enabled.'\n        else
+    title || 'target database logging disabled.'\n      end as reason\n      \n      \n
+    \   from\n      aws_dms_replication_task as t\n      left join replication_task_target_apply
+    as a on a.arn = t.arn\n      left join replication_task_target_load as l on l.arn
+    = t.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_cloudformation_stack_notifications_enabled
+Title: CloudFormation stacks should have notifications enabled
+Description: Ensure CloudFormation stacks are associated with an SNS topic to receive
+  notifications when an event occurs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when jsonb_array_length(notification_arns)
+    > 0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    jsonb_array_length(notification_arns) > 0 then title || ' notifications enabled.'\n
+    \       else title || ' notifications disabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_cloudformation_stack;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

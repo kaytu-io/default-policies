@@ -1,0 +1,24 @@
+ID: aws_foundational_security_apigateway_5
+Title: 5 API Gateway REST API cache data should be encrypted at rest
+Description: This control checks whether all methods in API Gateway REST API stages
+  that have cache enabled are encrypted. The control fails if any method in an API
+  Gateway REST API stage is configured to cache and the cache is not encrypted.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':apigateway:' || region
+    || '::/apis/' || rest_api_id || '/stages/' || name as resource,\n      case\n
+    \       when method_settings -> '*/*' ->> 'CachingEnabled' = 'true'\n        and
+    method_settings -> '*/*' ->> 'CacheDataEncrypted' = 'true' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when method_settings -> '*/*'
+    ->> 'CachingEnabled' = 'true'\n        and method_settings -> '*/*' ->> 'CacheDataEncrypted'
+    = 'true'\n          then title || ' API cache and encryption enabled.'\n        else
+    title || ' API cache and encryption not enabled.'\n      end as reason\n      \n
+    \     \n    from\n      aws_api_gateway_stage;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

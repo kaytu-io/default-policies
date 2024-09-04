@@ -1,0 +1,28 @@
+ID: aws_ecs_cluster_encryption_at_rest_enabled
+Title: ECS clusters encryption at rest should be enabled
+Description: This control checks whether ECS Clustes have encryption at rest enabled.
+  The check fails if encryption at rest is not enabled as sensitive data should be
+  protected.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with unencrypted_volumes as (\n      select\n        distinct
+    cluster_arn\n      from\n        aws_ecs_container_instance as i,\n        aws_ec2_instance
+    as e,\n        jsonb_array_elements(block_device_mappings) as b,\n        aws_ebs_volume
+    as v\n      where\n        i.ec2_instance_id = e.instance_id\n        and b ->
+    'Ebs' ->> 'VolumeId' = v.volume_id\n        and not v.encrypted\n    )\n    select\n
+    \     c.cluster_arn as resource,\n      case\n        when c.registered_container_instances_count
+    = 0 then 'skip'\n        when v.cluster_arn is not null then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when c.registered_container_instances_count
+    = 0 then title || ' has no container instance registered.'\n        when v.cluster_arn
+    is not null then c.title || ' encryption at rest disabled.'\n        else c.title
+    || ' encryption at rest enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_ecs_cluster as c\n      left join unencrypted_volumes as v on v.cluster_arn
+    = c.cluster_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

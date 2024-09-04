@@ -1,0 +1,22 @@
+ID: aws_acm_certificate_transparency_logging_enabled
+Title: ACM certificates should have transparency logging enabled
+Description: Ensure ACM certificates transparency logging is enabled as certificate
+  transparency logging guards against SSL/TLS certificates issued by mistake or by
+  a compromised certificate authority.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    type = 'IMPORTED' then 'skip'\n        when certificate_transparency_logging_preference
+    = 'ENABLED' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when type = 'IMPORTED' then title || ' is imported.'\n        when certificate_transparency_logging_preference
+    = 'ENABLED' then title || ' transparency logging enabled.'\n        else title
+    || ' transparency logging disabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

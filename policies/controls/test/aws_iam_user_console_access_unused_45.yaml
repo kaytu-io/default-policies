@@ -1,0 +1,24 @@
+ID: aws_iam_user_console_access_unused_45
+Title: Ensure IAM users with console access unused for 45 days or greater are disabled
+Description: AWS IAM users can access AWS resources using console access. It is recommended
+  that console access that have been unused in 45 or greater days be deactivated or
+  removed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        when
+    not password_enabled then 'ok'\n        when password_enabled and password_last_used
+    is null then 'alarm'\n        when password_enabled and password_last_used < (current_date
+    - interval '45' day) then 'alarm'\n        else 'ok'\n      end status,\n      user_name
+    ||\n        case\n          when not password_enabled then ' password not enabled.'\n
+    \         when password_enabled and password_last_used is null then ' password
+    created ' || to_char(password_last_changed, 'DD-Mon-YYYY') || ' never used.'\n
+    \         else ' password used ' || to_char(password_last_used, 'DD-Mon-YYYY')
+    || '.'\n        end as reason\n      \n    from\n      aws_iam_credential_report;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

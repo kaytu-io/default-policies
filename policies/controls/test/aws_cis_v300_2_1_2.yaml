@@ -1,0 +1,18 @@
+ID: aws_cis_v300_2_1_2
+Title: 2.1.2 Ensure MFA Delete is enabled on S3 buckets
+Description: Once MFA Delete is enabled on your sensitive and classified S3 bucket
+  it requires the user to have two forms of authentication.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when versioning_mfa_delete
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    versioning_mfa_delete then name || ' MFA delete enabled.'\n        else name ||
+    ' MFA delete disabled.'\n      end as reason\n      \n      \n    from\n      aws_s3_bucket;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

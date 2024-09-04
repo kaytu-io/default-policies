@@ -1,0 +1,18 @@
+ID: aws_glue_connection_ssl_enabled
+Title: Glue connection SSL should be enabled
+Description: Ensure Glue connection encryption SSL is enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when connection_properties
+    ->> 'JDBC_ENFORCE_SSL' = 'true' then 'ok'\n        else 'alarm'\n      end as
+    status,\n      case\n        when connection_properties ->> 'JDBC_ENFORCE_SSL'
+    = 'true' then name || ' SSL enabled.'\n        else name || ' SSL disabled.'\n
+    \     end as reason\n      \n    from\n      aws_glue_connection;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

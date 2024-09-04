@@ -1,0 +1,21 @@
+ID: aws_foundational_security_docdb_3
+Title: 3 Amazon DocumentDB manual cluster snapshots should not be public
+Description: This control checks whether an Amazon DocumentDB manual cluster snapshot
+  is public. The control fails if the manual cluster snapshot is public.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when (cluster_snapshot
+    ->> 'AttributeName' = 'restore') and cluster_snapshot -> 'AttributeValues' = '[\"all\"]'
+    then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when (cluster_snapshot
+    ->> 'AttributeName' = 'restore') and cluster_snapshot -> 'AttributeValues' = '[\"all\"]'
+    then title || ' does not restrict public access.'\n        else title || ' restrict
+    public access.'\n      end reason\n      \n      \n    from\n      aws_docdb_cluster_snapshot,\n
+    \     jsonb_array_elements(db_cluster_snapshot_attributes) as cluster_snapshot;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: critical

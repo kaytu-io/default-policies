@@ -1,0 +1,20 @@
+ID: aws_rds_db_cluster_no_default_admin_name
+Title: RDS database clusters should use a custom administrator username
+Description: This control checks whether an AWS RDS database cluster has changed the
+  admin username from its default value. This rule will fail if the admin username
+  is set to the default value.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when master_user_name
+    in ('admin', 'postgres') then 'alarm'\n        else 'ok'\n      end status,\n
+    \     case\n        when master_user_name in ('admin', 'postgres') then title
+    || ' using default master user name.'\n        else title || ' not using default
+    master user name.'\n      end reason\n      \n      \n    from\n      aws_rds_db_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,19 @@
+ID: aws_acm_certificate_no_pending_validation_certificate
+Title: Ensure that ACM certificates are not in pending validation state
+Description: This control ensures that ACM certificates are not in pending validation
+  state. When certificates are not validated within 72 hours after the request is
+  made, those certificates become invalid.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    status = 'PENDING_VALIDATION' then 'info'\n        else 'ok'\n      end as status,\n
+    \     title || ' status is ' || status || '.'  as reason\n      \n      \n    from\n
+    \     aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

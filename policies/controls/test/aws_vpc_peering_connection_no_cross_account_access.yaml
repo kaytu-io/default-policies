@@ -1,0 +1,21 @@
+ID: aws_vpc_peering_connection_no_cross_account_access
+Title: VPCs peering connection should not be allowed in cross account
+Description: Ensure that all VPCs peering connection are not having cross account
+  access.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when status_code
+    <> 'active' then 'alarm'\n        when requester_owner_id <> accepter_owner_id
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    status_code <> 'active' then title || ' is not in active state.'\n        when
+    requester_owner_id <> accepter_owner_id then title || ' have cross account access.'\n
+    \       else title || ' does not have cross account access.'\n      end as reason\n
+    \     \n      \n    from\n      aws_vpc_peering_connection;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

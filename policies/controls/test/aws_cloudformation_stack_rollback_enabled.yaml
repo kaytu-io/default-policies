@@ -1,0 +1,21 @@
+ID: aws_cloudformation_stack_rollback_enabled
+Title: CloudFormation stacks should have rollback enabled
+Description: Ensure CloudFormation stacks have the rollback feature enabled. Rollback
+  triggers enable you to have AWS CloudFormation monitor the state of your application
+  during stack creation and updating, and to rollback that operation if the application
+  breaches the threshold of any of the alarms you've specified.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when not
+    disable_rollback then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when not disable_rollback then title || ' rollback enabled.'\n        else
+    title || ' rollback disabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_cloudformation_stack;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

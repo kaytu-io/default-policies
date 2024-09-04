@@ -1,0 +1,17 @@
+ID: aws_acm_certificate_no_failed_certificate
+Title: Ensure that ACM certificates are not in failed state
+Description: This control ensures that ACM certificates are not in failed state.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    status in ('VALIDATION_TIMED_OUT', 'FAILED') then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      title || ' status is ' || status || '.'  as reason\n
+    \     \n      \n    from\n      aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

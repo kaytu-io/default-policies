@@ -1,0 +1,20 @@
+ID: aws_foundational_security_ec2_17
+Title: 17 EC2 instances should not use multiple ENIs
+Description: This control checks whether an EC2 instance uses multiple Elastic Network
+  Interfaces (ENIs) or Elastic Fabric Adapters (EFAs). This control passes if a single
+  network adapter is used. The control includes an optional parameter list to identify
+  the allowed ENIs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when jsonb_array_length(network_interfaces)
+    = 1 then 'ok'\n        else 'alarm'\n      end status,\n      title || ' has '
+    || jsonb_array_length(network_interfaces) || ' ENI(s) attached.'\n      as reason\n
+    \     \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

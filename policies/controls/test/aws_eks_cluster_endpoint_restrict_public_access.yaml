@@ -1,0 +1,20 @@
+ID: aws_eks_cluster_endpoint_restrict_public_access
+Title: EKS clusters endpoint should restrict public access
+Description: Ensure whether AWS Elastic Kubernetes Service (AWS EKS) endpoint is not
+  publicly accessible. The rule is compliant if the endpoint is publicly accessible.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when resources_vpc_config
+    ->> 'EndpointPublicAccess' = 'true' then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when resources_vpc_config ->> 'EndpointPublicAccess'
+    = 'true' then title || ' endpoint publicly accessible.'\n        else title ||
+    ' endpoint not publicly accessible.'\n      end as reason\n      \n      \n    from\n
+    \     aws_eks_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

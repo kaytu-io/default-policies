@@ -1,0 +1,14 @@
+ID: aws_soc_2_c_1
+Title: C1 Additional Criterial for Confidentiality
+SectionCode: ""
+Description: The Confidentiality category refers that all confidential material and
+  information should be sufficiently protected—this includes private customer data.
+Children:
+- aws_soc_2_c_1_1
+- aws_soc_2_c_1_2
+Tags:
+  tags:
+  - soc_2_c_1_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

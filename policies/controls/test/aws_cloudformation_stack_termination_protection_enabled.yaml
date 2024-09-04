@@ -1,0 +1,21 @@
+ID: aws_cloudformation_stack_termination_protection_enabled
+Title: Cloudformation stacks termination protection should be enabled
+Description: Ensure that AWS CloudFormation stacks have termination protection feature
+  enabled in order to protect them from being accidentally deleted. The safety feature
+  can be enabled when you create the CloudFormation stack or for existing stacks using
+  the AWS API (UpdateTerminationProtection command).
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      id as resource,\n      case\n        when enable_termination_protection
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    enable_termination_protection then title || ' termination protection enabled.'\n
+    \       else title || ' termination protection disabled.'\n      end as reason\n
+    \     \n      \n    from\n      aws_cloudformation_stack;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

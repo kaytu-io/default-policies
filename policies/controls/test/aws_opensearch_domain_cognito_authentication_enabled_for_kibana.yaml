@@ -1,0 +1,20 @@
+ID: aws_opensearch_domain_cognito_authentication_enabled_for_kibana
+Title: OpenSearch domains cognito authentication should be enabled for kibana
+Description: This control checks whether AWS OpenSearch domain has AWS Cognito authentication
+  for Kibana enabled. AWS Cognito lets you easily add user sign-up and authentication
+  to your mobile and web apps.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when cognito_options
+    ->> 'Enabled' = 'true' then 'ok'\n        else 'alarm'\n      end status,\n      case\n
+    \       when cognito_options ->> 'Enabled' = 'true' then title || ' cognito authentication
+    enabled for kibana.'\n        else title || ' cognito authentication disabled
+    for kibana.'\n      end reason\n      \n      \n    from\n      aws_opensearch_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

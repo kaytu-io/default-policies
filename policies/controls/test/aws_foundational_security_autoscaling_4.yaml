@@ -1,0 +1,24 @@
+ID: aws_foundational_security_autoscaling_4
+Title: 4 Auto Scaling group launch configuration should not have metadata response
+  hop limit greater than 1
+Description: This control checks the number of network hops that a metadata token
+  can travel. The control fails if the metadata response hop limit is greater than
+  1.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      launch_configuration_arn as resource,\n      case\n
+    \       when metadata_options_put_response_hop_limit is null then 'ok'\n        when
+    metadata_options_put_response_hop_limit > 1 then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      case\n        --If you do not specify a value, the
+    hop limit default is 1.\n        when metadata_options_put_response_hop_limit
+    is null then title || ' metadata response hop limit set to default.'\n        else
+    title || ' has a metadata response hop limit of ' || metadata_options_put_response_hop_limit
+    || '.'\n      end as reason\n      \n    from\n      aws_ec2_launch_configuration;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: high

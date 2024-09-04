@@ -1,0 +1,31 @@
+ID: aws_iam_policy_custom_attached_no_star_star
+Title: IAM policies should not allow full '*' administrative privileges
+Description: 'This control checks whether the default version of IAM policies (also
+  known as customer managed policies) has administrator access that includes a statement
+  with ''Effect'': ''Allow'' with ''Action'': ''*'' over ''Resource'': ''*''. The
+  control only checks the customer managed policies that you create. It does not check
+  inline and AWS managed policies.'
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    -- This query checks the customer managed policies having *
+    access and attached to IAM resource(s)\n    with star_access_policies as (\n      select\n
+    \       arn,\n        count(*) as num_bad_statements\n      from\n        aws_iam_policy,\n
+    \       jsonb_array_elements(policy_std -> 'Statement') as s,\n        jsonb_array_elements_text(s
+    -> 'Resource') as resource,\n        jsonb_array_elements_text(s -> 'Action')
+    as action\n      where\n        not is_aws_managed\n        and s ->> 'Effect'
+    = 'Allow'\n        and resource = '*'\n        and (\n          (action = '*'\n
+    \         or action = '*:*'\n          )\n        )\n        and is_attached\n
+    \     group by arn\n    )\n    select\n      p.arn as resource,\n      case\n
+    \       when s.arn is null then 'ok'\n        else 'alarm'\n      end status,\n
+    \     p.name || ' contains ' || coalesce(s.num_bad_statements,0)  || ' statements
+    that allow action \"*\" on resource \"*\".' as reason\n      \n      \n    from\n
+    \     aws_iam_policy as p\n      left join star_access_policies as s on p.arn
+    = s.arn\n    where\n      not p.is_aws_managed;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

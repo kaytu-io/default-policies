@@ -1,0 +1,27 @@
+ID: aws_dlm_ebs_snapshot_lifecycle_policy_enabled
+Title: DLM EBS snapshot lifecycle policy should be enabled
+Description: Ensure DLM EBS snapshot lifecycle policy is enabled in all the regions
+  with EBS snapshots.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with region_with_ebs_snapshots as(\n      select\n        distinct
+    region,\n        partition,\n        account_id,\n        _ctx\n      from\n        aws_ebs_snapshot\n
+    \   ), dlm_ebs_lifecycle_policy as (\n      select\n        region,\n        account_id,\n
+    \       count(*)\n      from\n        aws_dlm_lifecycle_policy\n      where\n
+    \       policy_details ->> 'PolicyType' like 'EBS_SNAPSHOT%'\n      group by\n
+    \       region,\n        account_id\n    )\n    select\n      'arn:' || r.partition
+    || '::' || r.region || ':' || r.account_id as resource,\n      case\n        when
+    p.region is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when p.region is not null then 'EBS snapshot DLM policy exist in region
+    ' || r.region || '.'\n        else 'EBS snapshots DLM policy does not exist in
+    region ' || r.region || '.'\n      end as reason\n      \n    from\n      region_with_ebs_snapshots
+    as r\n      left join dlm_ebs_lifecycle_policy as p on p.region = r.region and
+    r.account_id = p.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

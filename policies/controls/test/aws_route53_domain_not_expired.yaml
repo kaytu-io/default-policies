@@ -1,0 +1,22 @@
+ID: aws_route53_domain_not_expired
+Title: Route 53 domains should not be expired
+Description: This control identifes any expired domain names registered with AWS Route
+  53. When the expired domain names are not restored promptly, they will become available
+  for others to register. Restoring on time your Route 53 expired domains will allow
+  you to reestablish full control over their registration.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when expiration_date
+    < (current_date - interval '1' minute) then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when expiration_date < (current_date - interval
+    '1' minute) then title || ' expired on ' || to_char(expiration_date, 'DD-Mon-YYYY')
+    || '.'\n        else title || ' set to expire in ' || extract(day from expiration_date
+    - current_date) || ' days.'\n      end as reason\n      \n      \n    from\n      aws_route53_domain;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

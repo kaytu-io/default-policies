@@ -1,0 +1,44 @@
+ID: aws_lambda_function_cloudtrail_logging_enabled
+Title: Lambda functions CloudTrail logging should be enabled
+Description: Lambda functions logging is essential because once lambdas are triggered,
+  all of the underlying compute resources are automatically managed for you. This
+  control is compliant if CloudTrail logging is enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with function_logging_cloudtrails as (\n      select\n        distinct
+    replace(replace(v::text,'\"',''),'/','') as lambda_arn,\n        d ->> 'Type'
+    as type\n      from\n        aws_cloudtrail_trail,\n        jsonb_array_elements(event_selectors)
+    e,\n        jsonb_array_elements(e -> 'DataResources') as d,\n        jsonb_array_elements(d
+    -> 'Values') v\n      where\n        d ->> 'Type' = 'AWS::Lambda::Function'\n
+    \       and replace(replace(v::text,'\"',''),'/','') <> 'arn:aws:lambda'\n    ),
+    function_logging_region as (\n        select\n          region as cloudtrail_region,\n
+    \         replace(replace(v::text,'\"',''),'/','') as lambda_arn\n        from\n
+    \         aws_cloudtrail_trail,\n          jsonb_array_elements(event_selectors)
+    e,\n          jsonb_array_elements(e -> 'DataResources') as d,\n          jsonb_array_elements(d
+    -> 'Values') v\n        where\n          d ->> 'Type' = 'AWS::Lambda::Function'\n
+    \         and replace(replace(v::text,'\"',''),'/','') = 'arn:aws:lambda'\n        group
+    by\n          region,\n          lambda_arn\n    ),\n    function_logging_region_advance_es
+    as (\n      select\n        region as cloudtrail_region\n      from\n        aws_cloudtrail_trail,\n
+    \       jsonb_array_elements(advanced_event_selectors) a,\n        jsonb_array_elements(a
+    -> 'FieldSelectors') as f,\n        jsonb_array_elements_text(f -> 'Equals') e\n
+    \     where\n        e = 'AWS::Lambda::Function'\n        and f ->> 'Field' !=
+    'eventCategory'\n      group by\n        region\n    )\n    select\n      distinct
+    l.arn as resource,\n      case\n        when (l.arn = c.lambda_arn)\n          or
+    (r.lambda_arn = 'arn:aws:lambda' and r.cloudtrail_region = l.region )\n          or
+    a.cloudtrail_region = l.region then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when (l.arn = c.lambda_arn)\n          or (r.lambda_arn =
+    'arn:aws:s3' and r.cloudtrail_region = l.region )\n          or a.cloudtrail_region
+    = l.region then l.name || ' logging enabled.'\n        else l.name || ' logging
+    not enabled.'\n      end as reason\n      \n      \n    from\n      aws_lambda_function
+    as l\n      left join function_logging_cloudtrails as c on l.arn = c.lambda_arn\n
+    \     left join function_logging_region as r on r.cloudtrail_region = l.region\n
+    \     left join function_logging_region_advance_es as a on a.cloudtrail_region
+    = l.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

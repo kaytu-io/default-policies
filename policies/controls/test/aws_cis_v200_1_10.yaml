@@ -1,0 +1,25 @@
+ID: aws_cis_v200_1_10
+Title: 1.10 Ensure multi-factor authentication (MFA) is enabled for all IAM users
+  that have a console password
+Description: Multi-Factor Authentication (MFA) adds an extra layer of authentication
+  assurance beyond traditional credentials. With MFA enabled, when a user signs in
+  to the AWS Console, they will be prompted for their user name and password as well
+  as for an authentication code from their physical or virtual MFA token. It is recommended
+  that MFA be enabled for all accounts that have a console password.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        when
+    password_enabled and not mfa_active then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when not password_enabled then user_name || '
+    password login disabled.'\n        when password_enabled and not mfa_active then
+    user_name || ' password login enabled but no MFA device configured.'\n        else
+    user_name || ' password login enabled and MFA device configured.'\n      end as
+    reason\n      \n    from\n      aws_iam_credential_report;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

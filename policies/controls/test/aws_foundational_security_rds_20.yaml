@@ -1,0 +1,25 @@
+ID: aws_foundational_security_rds_20
+Title: 20 Existing RDS event notification subscriptions should be configured for critical
+  database instance events
+Description: This control checks whether an Amazon RDS event subscription exists with
+  notifications enabled for the following source type, event category key-value pairs.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when source_type
+    <> 'db-instance' then 'skip'\n        when source_type = 'db-instance' and enabled
+    and event_categories_list @> '[\"failure\", \"maintenance\", \"configuration change\"]'
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    source_type <> 'db-instance' then cust_subscription_id || ' event subscription
+    of ' || source_type || ' type.'\n        when source_type like 'db-instance' and
+    enabled and event_categories_list @> '[\"failure\", \"maintenance\", \"configuration
+    change\"]' then cust_subscription_id || ' event subscription enabled for critical
+    instance events.'\n        else cust_subscription_id || ' event subscription missing
+    critical instance events.'\n      end as reason\n      \n    from\n      aws_rds_db_event_subscription;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

@@ -1,0 +1,33 @@
+ID: aws_dms_replication_task_source_database_logging_enabled
+Title: DMS replication tasks for the source database should have logging enabled
+Description: This control checks whether logging is enabled with the minimum severity
+  level of LOGGER_SEVERITY_DEFAULT for DMS replication tasks SOURCE_CAPTURE and SOURCE_UNLOAD.
+  The control fails if logging isn't enabled for these tasks or if the minimum severity
+  level is less than LOGGER_SEVERITY_DEFAULT.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "      with replication_task_logging as (\n        select\n          arn,\n
+    \         bool_or(o ->> 'Id' = 'SOURCE_CAPTURE' and o ->> 'Severity' in ('LOGGER_SEVERITY_DEFAULT',
+    'LOGGER_SEVERITY_DEBUG', 'LOGGER_SEVERITY_DETAILED_DEBUG')) as capture_logging_enabled,\n
+    \         bool_or(o ->> 'Id' = 'SOURCE_UNLOAD' and o ->> 'Severity' in ('LOGGER_SEVERITY_DEFAULT',
+    'LOGGER_SEVERITY_DEBUG', 'LOGGER_SEVERITY_DETAILED_DEBUG')) as unload_logging_enabled\n
+    \       from\n          aws_dms_replication_task,\n          jsonb_array_elements(replication_task_settings
+    -> 'Logging' -> 'LogComponents') as o\n        group by\n          arn\n      )\n
+    \     select\n        t.arn as resource,\n        (replication_task_settings ->
+    'Logging' ->> 'EnableLogging')::bool as logging_enabled,\n        case\n          when
+    (replication_task_settings -> 'Logging' ->> 'EnableLogging')::bool and l.capture_logging_enabled
+    and l.unload_logging_enabled then 'ok'\n          else 'alarm'\n          end
+    as status,\n        case\n          when (replication_task_settings -> 'Logging'
+    ->> 'EnableLogging')::bool and l.capture_logging_enabled and l.unload_logging_enabled
+    then title || ' source database logging enabled.'\n          else title || ' source
+    database logging disabled.'\n          end as reason\n      \n            \n      from\n
+    \       aws_dms_replication_task as t\n        left join replication_task_logging
+    as l on l.arn = t.arn;    \n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

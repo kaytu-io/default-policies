@@ -1,0 +1,20 @@
+ID: aws_apigateway_rest_api_endpoint_restrict_public_access
+Title: API Gateway REST API endpoint type should be configured to private
+Description: This control checks whether API Gateway endpoint is public or private.
+  This rule is non-compliant if API Gateway endpoint is public.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':apigateway:' || region
+    || '::/apis/' || api_id as resource,\n      case\n        when endpoint_configuration_types
+    ? 'PRIVATE' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when endpoint_configuration_types ? 'PRIVATE' then name || ' not publicly
+    accessible.'\n        else name || ' publicly accessible.'\n      end as reason\n
+    \     \n      \n    from\n      aws_api_gateway_rest_api;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

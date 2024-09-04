@@ -1,0 +1,14 @@
+ID: aws_soc_2_a_1
+Title: A1 Additional Criterial for Availability
+SectionCode: ""
+Description: The availability category refers to the accessibility of information
+  used by the entity’s systems, as well as the products or services provided to its
+  customers.
+Children:
+- aws_soc_2_a_1_2
+Tags:
+  tags:
+  - soc_2_a_1_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

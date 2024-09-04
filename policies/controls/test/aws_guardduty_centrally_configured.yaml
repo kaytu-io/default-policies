@@ -1,0 +1,34 @@
+ID: aws_guardduty_centrally_configured
+Title: GuardDuty Detector should be centrally configured
+Description: Ensure that GuardDuty is centrally configured, if GuardDuty is not under
+  central management, it becomes impossible to centrally manage GuardDuty findings,
+  settings, and member accounts.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || r.partition || '::' || r.region ||
+    ':' || r.account_id as resource,\n      case\n        when r.region = any(array['af-south-1',
+    'ap-northeast-3', 'ap-southeast-3', 'eu-south-1', 'cn-north-1', 'cn-northwest-1',
+    'me-south-1', 'us-gov-east-1']) then 'skip'\n        -- Skip any regions that
+    are disabled in the account.\n        when r.opt_in_status = 'not-opted-in' then
+    'skip'\n        when status is null then 'info'\n        when status = 'DISABLED'
+    then 'alarm'\n        when status = 'ENABLED' and master_account ->> 'AccountId'
+    is not null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when r.region = any(array['af-south-1', 'ap-northeast-3', 'ap-southeast-3',
+    'eu-south-1', 'cn-north-1', 'cn-northwest-1', 'me-south-1', 'us-gov-east-1'])
+    then r.region || ' region not supported.'\n        when r.opt_in_status = 'not-opted-in'
+    then r.region || ' region is disabled.'\n        when status is null then 'No
+    GuardDuty detector found in ' || r.region || '.'\n        when status = 'DISABLED'
+    then r.region || ' detector ' || d.title || ' disabled.'\n        when status
+    = 'ENABLED' and master_account ->> 'AccountId' is not null then r.region || '
+    detector ' || d.title || ' centrally configured.'\n        else r.region || '
+    detector ' || d.title || ' not centrally configured..'\n      end as reason\n
+    \   \n    from\n      aws_region as r\n      left join aws_guardduty_detector
+    d on r.account_id = d.account_id and r.name = d.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

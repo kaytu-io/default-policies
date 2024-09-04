@@ -1,0 +1,18 @@
+ID: aws_cis_compute_service_v100_2_6
+Title: 2.6 Ensure detailed monitoring is enable for production EC2 Instances
+Description: Ensure that detailed monitoring is enabled for your Amazon EC2 instances.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when monitoring_state
+    = 'enabled' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when monitoring_state = 'enabled' then instance_id || ' detailed monitoring
+    enabled.'\n        else instance_id || ' detailed monitoring disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

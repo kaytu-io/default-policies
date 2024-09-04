@@ -1,0 +1,20 @@
+ID: aws_foundational_security_elasticache_5
+Title: 5 ElastiCache for Redis replication groups should be encrypted in transit
+Description: This control checks if ElastiCache for Redis replication groups are encrypted
+  in transit. This control fails if an ElastiCache for Redis replication group isn't
+  encrypted in transit.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when transit_encryption_enabled
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    transit_encryption_enabled then title || ' encryption in transit enabled.'\n        else
+    title || ' encryption in transit disabled.'\n      end as reason\n      \n    from\n
+    \     aws_elasticache_replication_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

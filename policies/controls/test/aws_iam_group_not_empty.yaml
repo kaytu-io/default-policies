@@ -1,0 +1,20 @@
+ID: aws_iam_group_not_empty
+Title: IAM groups should have at least one user
+Description: AWS Identity and Access Management (IAM) can help you incorporate the
+  principles of least privilege and separation of duties with access permissions and
+  authorizations, by ensuring that IAM groups have at least one IAM user.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when users
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    users is null then title || ' not associated with any IAM user.'\n        else
+    title || ' associated with IAM user.'\n      end as reason\n      \n    from\n
+    \     aws_iam_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

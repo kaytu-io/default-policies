@@ -1,0 +1,27 @@
+ID: aws_s3_access_point_restrict_public_access
+Title: S3 access points should have block public access settings enabled
+Description: This control checks whether an Amazon S3 access point has block public
+  access settings enabled. The control fails if block public access settings aren't
+  enabled for the access point.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      access_point_arn as resource,\n      case\n        when
+    block_public_acls\n          and block_public_policy\n          and ignore_public_acls\n
+    \         and restrict_public_buckets\n          then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when block_public_acls\n          and
+    block_public_policy\n          and ignore_public_acls\n          and restrict_public_buckets\n
+    \         then name || ' all public access blocks enabled.'\n        else name
+    || ' not enabled for: ' ||\n          concat_ws(', ',\n            case when not
+    block_public_acls then 'block_public_acls' end,\n            case when not block_public_policy
+    then 'block_public_policy' end,\n            case when not ignore_public_acls
+    then 'ignore_public_acls' end,\n            case when not restrict_public_buckets
+    then 'restrict_public_buckets' end\n          ) || '.'\n      end as reason\n
+    \     \n    from\n      aws_s3_access_point;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,22 @@
+ID: aws_cis_v300_1_8
+Title: 1.8 Ensure IAM password policy requires minimum length of 14 or greater
+Description: Password policies are, in part, used to enforce password complexity requirements.
+  IAM password policies can be used to ensure password are at least a given length.
+  It is recommended that the password policy require a minimum password length 14.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || a.partition || ':::' || a.account_id
+    as resource,\n      case\n        when minimum_password_length >= 14 then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when minimum_password_length
+    is null then 'No password policy set.'\n        else 'Minimum password length
+    set to ' || minimum_password_length || '.'\n      end as reason\n      \n    from\n
+    \     aws_account as a\n      left join aws_iam_account_password_policy as pol
+    on a.account_id = pol.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

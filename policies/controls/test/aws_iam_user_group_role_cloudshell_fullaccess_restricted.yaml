@@ -1,0 +1,33 @@
+ID: aws_iam_user_group_role_cloudshell_fullaccess_restricted
+Title: Ensure access to AWSCloudShellFullAccess is restricted
+Description: This control checks whether the AWSCloudShellFullAccess policy is attached
+  to any IAM user, group, or role. The control fails if the policy is attached to
+  any IAM user, group, or role.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when attached_policy_arns
+    @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]' then 'alarm'\n        else
+    'ok'\n      end status,\n      case\n        when attached_policy_arns @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]'
+    then  'User ' || title || ' has access to AWSCloudShellFullAccess.'\n        else
+    'User ' || title || ' access to AWSCloudShellFullAccess is restricted.'\n      end
+    as reason\n      \n    from\n      aws_iam_user\n    union\n    select\n      arn
+    as resource,\n      case\n        when attached_policy_arns @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]'
+    then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when attached_policy_arns
+    @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]' then  'Role ' || title
+    || ' has access to AWSCloudShellFullAccess.'\n        else 'Role ' || title ||
+    ' access to AWSCloudShellFullAccess is restricted.'\n      end as reason\n      \n
+    \   from\n      aws_iam_role\n    union\n    select\n      arn as resource,\n
+    \     case\n        when attached_policy_arns @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]'
+    then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when attached_policy_arns
+    @> '[\"arn:aws:iam::aws:policy/AWSCloudShellFullAccess\"]' then  'Group ' || title
+    || ' has access to AWSCloudShellFullAccess.'\n        else 'Group ' || title ||
+    ' access to AWSCloudShellFullAccess is restricted.'\n      end as reason\n      \n
+    \   from\n      aws_iam_group;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

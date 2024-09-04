@@ -1,0 +1,36 @@
+ID: aws_iam_policy_inline_no_blocked_kms_actions
+Title: Ensure inline policies attached to IAM users, roles, and groups should not
+  allow blocked actions on KMS keys
+Description: Checks if the inline policies attached to IAM users, roles, and groups
+  do not allow blocked actions on all AWS Key Management Service (KMS) keys. The rule
+  is non - compliant if any blocked action is allowed on all KMS keys in an inline
+  policy.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with iam_resource_types as (\n      select\n        arn,\n
+    \       inline_policies_std,\n        name,\n        account_id,\n        region,\n
+    \       _ctx\n      from\n        aws_iam_user\n      union\n      select\n        arn,\n
+    \       inline_policies_std,\n        name,\n        account_id,\n        region,\n
+    \       _ctx\n      from\n        aws_iam_role\n      union\n      select\n        arn,\n
+    \       inline_policies_std,\n        name,\n        account_id,\n        region,\n
+    \       _ctx\n      from\n        aws_iam_group\n    ),\n    kms_blocked_actions
+    as (\n      select\n        arn,\n        count(*) as statements_num\n      from\n
+    \       iam_resource_types,\n        jsonb_array_elements(inline_policies_std)
+    as policy_std,\n        jsonb_array_elements(policy_std -> 'PolicyDocument' ->
+    'Statement') as s,\n        jsonb_array_elements_text(s -> 'Resource') as resource,\n
+    \       jsonb_array_elements_text(s -> 'Action') as action\n      where\n        s
+    ->> 'Effect' = 'Allow'\n        and action like any(array['kms:decrypt','kms:decrypt*',
+    'kms:reencryptfrom', 'kms:*', 'kms:reencrypt*'])\n      group by\n        arn\n
+    \   )\n    select\n      u.arn as resource,\n      case\n        when w.arn is
+    null then 'ok'\n        else 'alarm'\n      end status,\n      u.name || ' contains
+    ' || coalesce(w.statements_num,0)  || ' inline policy statement(s) that allow
+    blocked actions on AWS KMS keys.' as reason\n      \n    from\n      iam_resource_types
+    as u\n      left join kms_blocked_actions as w on u.arn = w.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

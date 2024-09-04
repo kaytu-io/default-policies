@@ -1,0 +1,19 @@
+ID: aws_cis_v140_2_2_1
+Title: 2.2.1 Ensure EBS volume encryption is enabled
+Description: Elastic Compute Cloud (EC2) supports encryption at rest when using the
+  Elastic Block Store (EBS) service. While disabled by default, forcing encryption
+  at EBS volume creation is supported.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when encrypted
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    encrypted then volume_id || ' encrypted.'\n        else volume_id || ' not encrypted.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ebs_volume;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

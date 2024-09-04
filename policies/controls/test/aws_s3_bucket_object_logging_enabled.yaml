@@ -1,0 +1,43 @@
+ID: aws_s3_bucket_object_logging_enabled
+Title: S3 buckets object logging should be enabled
+Description: Object-Level logging saves events in JSON format in CloudTrail. This
+  is recommended from a security best practice perspective for buckets that contain
+  sensitive data.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with object_logging_cloudtrails as (\n      select\n        d
+    ->> 'Type' as type,\n        replace(replace(v::text,'\"',''),'/','') as bucket_arn\n
+    \     from\n        aws_cloudtrail_trail,\n        jsonb_array_elements(event_selectors)
+    e,\n        jsonb_array_elements(e -> 'DataResources') as d,\n        jsonb_array_elements(d
+    -> 'Values') v\n      where\n        d ->> 'Type' = 'AWS::S3::Object'\n    ),
+    object_logging_region as (\n        select\n          region as  cloudtrail_region,\n
+    \         replace(replace(v::text,'\"',''),'/','') as bucket_arn\n        from\n
+    \         aws_cloudtrail_trail,\n          jsonb_array_elements(event_selectors)
+    e,\n          jsonb_array_elements(e -> 'DataResources') as d,\n          jsonb_array_elements(d
+    -> 'Values') v\n        where\n          d ->> 'Type' = 'AWS::S3::Object'\n          and
+    replace(replace(v::text,'\"',''),'/','') = 'arn:aws:s3'\n        group by\n          region,\n
+    \         bucket_arn\n    ),\n    object_logging_region_advance_es as (\n      select\n
+    \       region as  cloudtrail_region\n      from\n        aws_cloudtrail_trail,\n
+    \       jsonb_array_elements(advanced_event_selectors) a,\n        jsonb_array_elements(a
+    -> 'FieldSelectors') as f,\n        jsonb_array_elements_text(f -> 'Equals') e\n
+    \     where\n        e = 'AWS::S3::Object'\n        and f ->> 'Field' != 'eventCategory'\n
+    \     group by\n        region\n    )\n    select\n      distinct s.arn as resource,\n
+    \     case\n        when (s.arn = c.bucket_arn)\n          or (r.bucket_arn =
+    'arn:aws:s3' and r. cloudtrail_region = s.region )\n          or a. cloudtrail_region
+    =  s.region then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when (s.arn = c.bucket_arn)\n          or (r.bucket_arn = 'arn:aws:s3'
+    and r. cloudtrail_region = s.region )\n          or a. cloudtrail_region =  s.region
+    then s.name || ' object logging enabled.'\n        else s.name || ' object logging
+    not enabled.'\n      end as reason\n      \n      \n    from\n      aws_s3_bucket
+    as s\n      left join object_logging_cloudtrails as c on s.arn = c.bucket_arn\n
+    \     left join object_logging_region as r on r. cloudtrail_region = s.region\n
+    \     left join object_logging_region_advance_es as a on a. cloudtrail_region
+    = s.region;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

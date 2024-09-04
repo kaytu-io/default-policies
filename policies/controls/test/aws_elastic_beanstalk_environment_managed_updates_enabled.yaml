@@ -1,0 +1,27 @@
+ID: aws_elastic_beanstalk_environment_managed_updates_enabled
+Title: Elastic Beanstalk environment should have managed updates enabled
+Description: This control checks whether managed platform updates in an AWS Elastic
+  Beanstalk environment is enabled. The rule is COMPLIANT if the value for ManagedActionsEnabled
+  is set to true. The rule is NON_COMPLIANT if the value for ManagedActionsEnabled
+  is set to false, or if a parameter is provided and its value does not match the
+  existing configurations.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with beanstalk_environment_logs_enabled as (\n      select\n
+    \       distinct e.arn\n      from\n        aws_elastic_beanstalk_environment
+    as e,\n        jsonb_array_elements(e.configuration_settings) as c,\n        jsonb_array_elements(c
+    -> 'OptionSettings') as s\n      where\n        s ->> 'OptionName' = 'ManagedActionsEnabled'\n
+    \       and s ->> 'Value' = 'true'\n      group by\n        arn\n    )\n    select\n
+    \     e.arn as resource,\n      case\n        when l.arn is not null then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when l.arn is
+    not null then title || ' managed actions Enabled.'\n        else title || ' managed
+    actions disabled.'\n      end as reason\n      \n    \n    from\n      aws_elastic_beanstalk_environment
+    as e\n      left join beanstalk_environment_logs_enabled as l on e.arn = l.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

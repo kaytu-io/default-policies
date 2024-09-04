@@ -1,0 +1,39 @@
+ID: aws_soc_2_cc_6_6
+Title: CC6.6 The entity implements logical access security measures to protect against
+  threats from sources outside its system boundaries
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_dms_replication_instance_not_publicly_accessible
+- aws_ebs_snapshot_not_publicly_restorable
+- aws_ec2_instance_in_vpc
+- aws_ec2_instance_not_publicly_accessible
+- aws_elb_application_lb_waf_enabled
+- aws_emr_cluster_master_nodes_no_public_ip
+- aws_es_domain_in_vpc
+- aws_guardduty_enabled
+- aws_iam_root_user_hardware_mfa_enabled
+- aws_iam_root_user_mfa_enabled
+- aws_iam_user_console_access_mfa_enabled
+- aws_iam_user_mfa_enabled
+- aws_lambda_function_in_vpc
+- aws_lambda_function_restrict_public_access
+- aws_rds_db_instance_prohibit_public_access
+- aws_rds_db_snapshot_prohibit_public_access
+- aws_redshift_cluster_prohibit_public_access
+- aws_s3_bucket_policy_restrict_public_access
+- aws_s3_bucket_restrict_public_read_access
+- aws_s3_bucket_restrict_public_write_access
+- aws_s3_public_access_block_account
+- aws_sagemaker_notebook_instance_direct_internet_access_disabled
+- aws_securityhub_enabled
+- aws_vpc_default_security_group_restricts_all_traffic
+- aws_vpc_flow_logs_enabled
+- aws_vpc_igw_attached_to_authorized_vpc
+- aws_vpc_security_group_restrict_ingress_common_ports_all
+- aws_vpc_security_group_restrict_ingress_ssh_all
+- aws_vpc_security_group_restrict_ingress_tcp_udp_all

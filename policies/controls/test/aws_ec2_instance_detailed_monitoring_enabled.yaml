@@ -1,0 +1,20 @@
+ID: aws_ec2_instance_detailed_monitoring_enabled
+Title: EC2 instance detailed monitoring should be enabled
+Description: Enable this rule to help improve AWS Elastic Compute Cloud (AWS EC2)
+  instance monitoring on the AWS EC2 console, which displays monitoring graphs with
+  a 1-minute period for the instance.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when monitoring_state
+    = 'enabled' then 'ok'\n        else 'alarm'\n      end as status,\n      case\n
+    \       when monitoring_state = 'enabled' then instance_id || ' detailed monitoring
+    enabled.'\n        else instance_id || ' detailed monitoring disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_ec2_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

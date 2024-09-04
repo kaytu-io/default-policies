@@ -1,0 +1,19 @@
+ID: aws_cis_v120_4_4
+Title: 4.4 Ensure routing tables for VPC peering are \"least access\
+Description: Once a VPC peering connection is established, routing tables must be
+  updated to establish any connections between the peered VPCs. These routes can be
+  as specific as desired - even peering a VPC to only a single host on the other side
+  of the connection.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

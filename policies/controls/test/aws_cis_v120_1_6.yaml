@@ -1,0 +1,23 @@
+ID: aws_cis_v120_1_6
+Title: 1.6 Ensure IAM password policy require at least one lowercase letter
+Description: Password policies are, in part, used to enforce password complexity requirements.
+  IAM password policies can be used to ensure password are comprised of different
+  character sets. It is recommended that the password policy require at least one
+  lowercase letter.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || a.partition || ':::' || a.account_id
+    as resource,\n      case\n        when require_lowercase_characters then 'ok'\n
+    \       else 'alarm'\n      end as status,\n      case\n        when minimum_password_length
+    is null then 'No password policy set.'\n        when require_lowercase_characters
+    then 'Lowercase character required.'\n        else 'Lowercase character not required.'\n
+    \     end as reason\n      \n    from\n      aws_account as a\n      left join
+    aws_iam_account_password_policy as pol on a.account_id = pol.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

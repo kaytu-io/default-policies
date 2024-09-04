@@ -1,0 +1,32 @@
+ID: aws_iam_role_cross_account_read_only_access_policy
+Title: IAM roles should not have read only access for external AWS accounts
+Description: Ensure IAM Roles do not have ReadOnlyAccess access for external AWS account.
+  The AWS-managed ReadOnlyAccess policy carries a high risk of potential data leakage,
+  posing a significant threat to customer security and privacy.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with read_only_access_roles as (\n      select\n        *\n
+    \     from\n        aws_iam_role,\n        jsonb_array_elements_text(attached_policy_arns)
+    as a\n      where\n        a = 'arn:aws:iam::aws:policy/ReadOnlyAccess'\n    ),
+    read_only_access_roles_with_cross_account_access as (\n      select\n        arn\n
+    \     from\n        read_only_access_roles,\n        jsonb_array_elements(assume_role_policy_std
+    -> 'Statement') as stmt,\n        jsonb_array_elements_text( stmt -> 'Principal'
+    -> 'AWS' ) as p\n      where\n        stmt ->> 'Effect' = 'Allow'\n        and
+    (\n          p = '*'\n          or not (p like '%' || account_id || '%')\n        )\n
+    \   )\n    select\n      r.arn as resource,\n      case\n        when ar.arn is
+    null then 'skip'\n        when c.arn is not null then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      case\n        when ar.arn is null then r.title ||
+    ' not associated with ReadOnlyAccess policy.'\n        when c.arn is not null
+    then r.title || ' associated with ReadOnlyAccess cross account access.'\n        else
+    r.title || ' associated ReadOnlyAccess without cross account access.'\n      end
+    as reason\n      \n    from\n      aws_iam_role as r\n      left join read_only_access_roles
+    as ar on r.arn = ar.arn\n      left join read_only_access_roles_with_cross_account_access
+    as c on c.arn = r.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

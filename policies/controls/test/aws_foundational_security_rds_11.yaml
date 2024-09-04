@@ -1,0 +1,21 @@
+ID: aws_foundational_security_rds_11
+Title: 11 RDS instances should have automatic backups enabled
+Description: This control checks whether Amazon Relational Database Service instances
+  have automated backups enabled and the backup retention period is greater than or
+  equal to seven days. The control fails if backups are not enabled, and if the retention
+  period is less than 7 days.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when backup_retention_period
+    < 1 then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    backup_retention_period < 1 then title || ' backups not enabled.'\n        else
+    title || ' backups enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_rds_db_instance;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

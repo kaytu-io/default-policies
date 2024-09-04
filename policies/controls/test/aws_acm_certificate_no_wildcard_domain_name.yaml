@@ -1,0 +1,20 @@
+ID: aws_acm_certificate_no_wildcard_domain_name
+Title: ACM certificates should not use wildcard certificates
+Description: Ensure that ACM single domain name certificates are used instead of wildcard
+  certificates within your AWS account in order to follow security best practices
+  and protect each domain/subdomain with its own unique private key.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      certificate_arn as resource,\n      case\n        when
+    domain_name like '*%' then 'alarm'\n        else 'ok'\n      end as status,\n
+    \     case\n        when domain_name like '*%' then title || ' uses wildcard domain
+    name.'\n        else title || ' does not use wildcard domain name.'\n      end
+    as reason\n      \n      \n    from\n      aws_acm_certificate;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

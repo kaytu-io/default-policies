@@ -1,0 +1,34 @@
+ID: aws_soc_2_cc_7_2
+Title: CC7.2 The entity monitors system components and the operation of those components
+  for anomalies that are indicative of malicious acts, natural disasters, and errors
+  affecting the entity's ability to meet its objectives; anomalies are analyzed to
+  determine whether they represent security events
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_apigateway_stage_logging_enabled
+- aws_cloudtrail_multi_region_trail_enabled
+- aws_cloudtrail_s3_data_events_enabled
+- aws_cloudtrail_trail_enabled
+- aws_cloudtrail_trail_integrated_with_logs
+- aws_cloudwatch_alarm_action_enabled
+- aws_cloudwatch_log_group_retention_period_365
+- aws_codebuild_project_plaintext_env_variables_no_sensitive_aws_values
+- aws_codebuild_project_source_repo_oauth_configured
+- aws_ec2_instance_detailed_monitoring_enabled
+- aws_elb_application_classic_lb_logging_enabled
+- aws_guardduty_enabled
+- aws_lambda_function_concurrent_execution_limit_configured
+- aws_lambda_function_dead_letter_queue_configured
+- aws_rds_db_instance_logging_enabled
+- aws_redshift_cluster_encryption_logging_enabled
+- aws_s3_bucket_logging_enabled
+- aws_securityhub_enabled
+- aws_vpc_flow_logs_enabled
+- aws_vpc_security_group_restrict_ingress_ssh_all
+- aws_waf_web_acl_logging_enabled
+- aws_wafv2_web_acl_logging_enabled

@@ -1,0 +1,17 @@
+ID: aws_cis_compute_service_v100_3_7
+Title: 3.7 Ensure you are using an IAM policy to manage access to buckets in Lightsail
+Description: The following policy grants a user access to manage a specific bucket
+  in the Amazon Lightsail object storage service.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

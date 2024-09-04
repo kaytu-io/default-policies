@@ -1,0 +1,23 @@
+ID: aws_emr_cluster_master_nodes_no_public_ip
+Title: EMR cluster master nodes should not have public IP addresses
+Description: Manage access to the AWS Cloud by ensuring AWS EMR cluster master nodes
+  cannot be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      c.cluster_arn as resource,\n      case\n        when
+    c.status ->> 'State' not in ('RUNNING', 'WAITING') then 'skip'\n        when s.map_public_ip_on_launch
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    c.status ->> 'State' not in ('RUNNING', 'WAITING') then c.title || ' is in ' ||
+    (c.status ->> 'State') || ' state.'\n        when s.map_public_ip_on_launch then
+    c.title || ' master nodes assigned with public IP.'\n        else c.title || '
+    master nodes not assigned with public IP.'\n      end as reason\n      \n      \n
+    \   from\n      aws_emr_cluster as c\n      left join aws_vpc_subnet as s on c.ec2_instance_attributes
+    ->> 'Ec2SubnetId' = s.subnet_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

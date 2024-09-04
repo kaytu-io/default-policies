@@ -1,0 +1,20 @@
+ID: aws_cis_compute_service_v100_2_2_2
+Title: 2.2.2 Ensure public access to EBS Snapshots is disabled
+Description: To protect your data disable the public mode of EBS snapshots.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':ec2:' || region || ':'
+    || account_id || ':snapshot/' || snapshot_id as resource,\n      case\n        when
+    create_volume_permissions @> '[{\"Group\": \"all\", \"UserId\": null}]' then 'alarm'\n
+    \       else 'ok'\n      end as status,\n      case\n        when create_volume_permissions
+    @> '[{\"Group\": \"all\", \"UserId\": null}]' then title || ' is publicly restorable.'\n
+    \       else title || ' is not publicly restorable.'\n      end as reason\n      \n
+    \     \n    from\n      aws_ebs_snapshot;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

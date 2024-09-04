@@ -1,0 +1,20 @@
+ID: aws_foundational_security_ecr_3
+Title: 3 ECR repositories should have at least one lifecycle policy configured
+Description: This control checks whether an Amazon ECR repository has at least one
+  lifecycle policy configured. This control fails if an ECR repository does not have
+  any lifecycle policies configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when lifecycle_policy
+    -> 'rules' is not null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when lifecycle_policy -> 'rules' is not null then title ||
+    ' lifecycle policy configured.'\n        else title || ' lifecycle policy not
+    configured.'\n      end as reason\n      \n      \n    from\n      aws_ecr_repository;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

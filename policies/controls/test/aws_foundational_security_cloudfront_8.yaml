@@ -1,0 +1,21 @@
+ID: aws_foundational_security_cloudfront_8
+Title: 8 CloudFront distributions should use SNI to serve HTTPS requests
+Description: This control checks if Amazon CloudFront distributions are using a custom
+  SSL/TLS certificate and are configured to use SNI to serve HTTPS requests. This
+  control fails if a custom SSL/TLS certificate is associated but the SSL/TLS support
+  method is a dedicated IP address.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when viewer_certificate
+    ->> 'SSLSupportMethod' = 'sni-only' then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when viewer_certificate ->> 'SSLSupportMethod'
+    = 'sni-only' then title || ' SNI enabled.'\n        else title || ' SNI disabled.'\n
+    \     end as reason\n      \n      \n    from\n      aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: low

@@ -1,0 +1,21 @@
+ID: aws_iam_role_unused_60
+Title: IAM roles that have not been used in 60 days should be removed
+Description: This control checks whether the IAM role has been used in 60 days. Unused
+  accounts and roles increase the attack surface area.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when role_last_used_date
+    <= (current_date - interval '60' day) or role_last_used_date is null\n          then
+    'alarm'\n        else 'ok'\n      end as status,\n      case\n        when role_last_used_date
+    is null\n          then name || ' was never used.'\n        else\n          name
+    || ' was last used ' || to_char(role_last_used_date , 'DD-Mon-YYYY') || ' (' ||
+    extract(day from current_date - role_last_used_date) || ' days ago).'\n      end
+    as reason\n      \n    from\n      aws_iam_role;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

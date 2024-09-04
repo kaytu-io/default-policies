@@ -1,0 +1,21 @@
+ID: aws_elb_application_lb_listener_certificate_expire_7_days
+Title: ELB application load balancers secured listener certificate should not expire
+  within next 7 days
+Description: This control ensures that SSL/TLS certificates used in application load
+  balancers are renewed 7 days before their expiration date.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      load_balancer_arn as resource,\n      case\n
+    \       when date(not_after) - date(current_date) >= 7 then 'ok'\n        else
+    'alarm'\n      end as status,\n      l.title || ' certificate set to expire in
+    ' || extract(day from not_after - current_date) || ' days.' as reason\n      \n
+    \   from\n      aws_ec2_load_balancer_listener as l,\n      jsonb_array_elements(certificates)
+    as c\n      left join aws_acm_certificate as a on c ->> 'CertificateArn' = a.certificate_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

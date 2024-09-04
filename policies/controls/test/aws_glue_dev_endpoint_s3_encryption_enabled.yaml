@@ -1,0 +1,22 @@
+ID: aws_glue_dev_endpoint_s3_encryption_enabled
+Title: Glue dev endpoints S3 encryption should be enabled
+Description: Ensure Glue dev endpoints have S3 encryption enabled to protect sensitive
+  information at rest.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      d.arn as resource,\n      case\n        when
+    e is not null and e ->> 'S3EncryptionMode' != 'DISABLED' then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when e is not null and e ->>
+    'S3EncryptionMode' != 'DISABLED' then d.title || ' S3 encryption enabled.'\n        else
+    d.title || ' S3 encryption disabled.'\n      end as reason\n      \n    from\n
+    \     aws_glue_dev_endpoint as d\n      left join aws_glue_security_configuration
+    s on d.security_configuration = s.name,\n      jsonb_array_elements(s.s3_encryption)
+    e;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

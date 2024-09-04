@@ -1,0 +1,21 @@
+ID: aws_foundational_security_apigateway_2
+Title: 2 API Gateway REST API stages should be configured to use SSL certificates
+  for backend authentication
+Description: This control checks whether Amazon API Gateway REST API stages have SSL
+  certificates configured. Backend systems use these certificates to authenticate
+  that incoming requests are from API Gateway.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when client_certificate_id
+    is null then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    client_certificate_id is null then title || ' does not use SSL certificate.'\n
+    \       else title || ' uses SSL certificate.'\n      end as reason\n      \n
+    \     \n    from\n      aws_api_gateway_stage;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

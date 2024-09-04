@@ -1,0 +1,25 @@
+ID: aws_ecr_repository_prohibit_public_access
+Title: ECR repositories should prohibit public access
+Description: Ensure there are no ECR repositories set as public.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with open_access_ecr_repo as(\n      select\n        distinct
+    arn\n      from\n        aws_ecr_repository,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Principal' -> 'AWS')
+    as p,\n        string_to_array(p, ':') as pa,\n        jsonb_array_elements_text(s
+    -> 'Action') as a\n      where\n        s ->> 'Effect' = 'Allow'\n        and
+    (\n          p = '*'\n        )\n    )\n    select\n      r.arn as resource,\n
+    \     case\n        when o.arn is not null then 'alarm'\n        else 'ok'\n      end
+    as status,\n      case\n        when o.arn is not null then r.title || ' allows
+    public access.'\n        else r.title || ' does not allow public access.'\n      end
+    as reason\n      \n      \n    from\n      aws_ecr_repository as r\n      left
+    join open_access_ecr_repo as o on r.arn = o.arn\n    group by\n      resource,
+    status, reason, r.region, r.account_id, r.tags, r._ctx;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

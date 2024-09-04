@@ -1,0 +1,23 @@
+ID: aws_s3_bucket_lifecycle_policy_enabled
+Title: S3 buckets should have lifecycle policies configured
+Description: This control checks if AWS Simple Storage Service (AWS S3) buckets have
+  lifecycle policy configured. This rule fails if AWS S3 lifecycle policy is not enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with lifecycle_rules_enabled as (\n      select\n        arn\n
+    \     from\n        aws_s3_bucket,\n        jsonb_array_elements(lifecycle_rules)
+    as r\n      where\n        r ->> 'Status' = 'Enabled'\n    )\n    select\n      b.arn
+    as resource,\n      case\n        when r.arn is not null then 'ok'\n        else
+    'alarm'\n      end status,\n      case\n        when r.arn is not null then name
+    || ' lifecycle policy or rules configured.'\n        else name || ' lifecycle
+    policy or rules not configured.'\n      end reason\n      \n      \n    from\n
+    \     aws_s3_bucket as b\n      left join lifecycle_rules_enabled as r on r.arn
+    = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

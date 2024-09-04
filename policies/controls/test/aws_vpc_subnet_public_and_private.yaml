@@ -1,0 +1,54 @@
+ID: aws_vpc_subnet_public_and_private
+Title: VPCs should have both public and private subnets configured
+Description: Ensure that all VPCs have both public and private subnets configured.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with subnets_with_explicit_route as (\n      select\n        distinct
+    ( a ->> 'SubnetId') as all_sub\n      from\n        aws_vpc_route_table as t,\n
+    \       jsonb_array_elements(associations) as a\n      where\n        a ->> 'SubnetId'
+    is not null\n    ), public_subnets_with_explicit_route as (\n      select\n        distinct
+    a ->> 'SubnetId' as SubnetId\n      from\n        aws_vpc_route_table as t,\n
+    \       jsonb_array_elements(associations) as a,\n        jsonb_array_elements(routes)
+    as r\n      where\n        r ->> 'DestinationCidrBlock' = '0.0.0.0/0'\n        and\n
+    \         (\n            r ->> 'GatewayId' like 'igw-%'\n            or r ->>
+    'NatGatewayId' like 'nat-%'\n          )\n        and a ->> 'SubnetId' is not
+    null\n    ), public_subnets_with_implicit_route as (\n        select\n        distinct
+    route_table_id,\n        vpc_id,\n        region\n      from\n        aws_vpc_route_table
+    as t,\n        jsonb_array_elements(associations) as a,\n        jsonb_array_elements(routes)
+    as r\n      where\n        a ->> 'Main' = 'true'\n        and r ->> 'DestinationCidrBlock'
+    = '0.0.0.0/0'\n        and (\n            r ->> 'GatewayId' like 'igw-%'\n            or
+    r ->> 'NatGatewayId' like 'nat-%'\n          )\n    ), subnet_accessibility as
+    (\n    select\n      subnet_id,\n      vpc_id,\n      case\n        when s.subnet_id
+    in (select all_sub from subnets_with_explicit_route where all_sub not in (select
+    SubnetId from public_subnets_with_explicit_route )) then 'private'\n        when
+    p.SubnetId is not null or s.vpc_id in ( select vpc_id from public_subnets_with_implicit_route)
+    then 'public'\n        else 'private'\n      end as access\n    from\n    aws_vpc_subnet
+    as s\n    left join public_subnets_with_explicit_route as p on p.SubnetId = s.subnet_id\n
+    \   )\n    select\n      arn as resource,\n      case\n        when v.vpc_id not
+    in (select vpc_id from subnet_accessibility) then 'alarm'\n        when 'public'
+    in (select access from subnet_accessibility where vpc_id = v.vpc_id) and 'private'
+    in (select access from subnet_accessibility where vpc_id = v.vpc_id) then 'ok'\n
+    \       when 'public' in (select access from subnet_accessibility where vpc_id
+    = v.vpc_id) and not 'private' in (select access from subnet_accessibility where
+    vpc_id = v.vpc_id) then 'alarm'\n        when 'private' in (select access from
+    subnet_accessibility where vpc_id = v.vpc_id) and not 'public' in (select access
+    from subnet_accessibility where vpc_id = v.vpc_id) then 'alarm'\n        end as
+    status,\n      case\n        when v.vpc_id not in (select vpc_id from subnet_accessibility)
+    then v.title || ' has no subnet.'\n        when 'public' in (select access from
+    subnet_accessibility where vpc_id = v.vpc_id) and 'private' in (select access
+    from subnet_accessibility where vpc_id = v.vpc_id) then v.title || ' having both
+    private and public subnet(s).'\n        when 'public' in (select access from subnet_accessibility
+    where vpc_id = v.vpc_id) and not 'private' in (select access from subnet_accessibility
+    where vpc_id = v.vpc_id) then v.title || ' having only public subnet(s).'\n        when
+    'private' in (select access from subnet_accessibility where vpc_id = v.vpc_id)
+    and not 'public' in (select access from subnet_accessibility where vpc_id = v.vpc_id)
+    then v.title || ' having only private subnet(s).'\n        end as reason\n      \n
+    \     \n    from\n      aws_vpc as v;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

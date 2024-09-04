@@ -1,0 +1,31 @@
+ID: aws_cloudtrail_s3_object_read_events_audit_enabled
+Title: Ensure that Object-level logging for read events is enabled for S3 bucket
+Description: This rule enables object-level logging for read events for S3 buckets.
+  Object-level logging for read events helps in identifying the requestor who performed
+  the read operation on the S3 bucket objects.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with s3_selectors as\n    (\n      select\n        name as
+    trail_name,\n        is_multi_region_trail,\n        bucket_selector\n      from\n
+    \       aws_cloudtrail_trail,\n        jsonb_array_elements(event_selectors) as
+    event_selector,\n        jsonb_array_elements(event_selector -> 'DataResources')
+    as data_resource,\n        jsonb_array_elements_text(data_resource -> 'Values')
+    as bucket_selector\n      where\n        is_multi_region_trail\n        and data_resource
+    ->> 'Type' = 'AWS::S3::Object'\n        and event_selector ->> 'ReadWriteType'
+    in\n        (\n          'ReadOnly',\n          'All'\n        )\n    )\n    select\n
+    \     b.arn as resource,\n      case\n        when count(bucket_selector) > 0
+    then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    count(bucket_selector) > 0 then b.name || ' object-level read events logging enabled.'\n
+    \       else b.name || ' object-level read events logging disabled.'\n      end
+    as reason\n      \n      \n    from\n      aws_s3_bucket as b\n      left join\n
+    \       s3_selectors\n        on bucket_selector like (b.arn || '%')\n        or
+    bucket_selector = 'arn:aws:s3'\n    group by\n      b.account_id, b.region, b.arn,
+    b.name, b.tags, b._ctx;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

@@ -1,0 +1,21 @@
+ID: aws_cloudtrail_trail_enabled_account
+Title: At least one CloudTrail trail should be enabled in the AWS account
+Description: Ensure that at least one CloudTrail trail is enabled in the AWS account.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with trails_enabled_account as (\n      select\n        account_id,\n
+    \       count(*) as num\n      from\n        aws_cloudtrail_trail\n      where\n
+    \       home_region = region\n        and is_logging\n      group by\n        account_id\n
+    \   )\n    select\n      a.arn as resource,\n      case\n        when b.num >
+    0 then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    b.num > 0 then a.title || ' has ' || b.num || ' trails enabled.'\n        else
+    a.title || ' has no trail enabled.'\n      end as reason\n      \n    from\n      aws_account
+    as a\n      left join trails_enabled_account b on a.account_id = b.account_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

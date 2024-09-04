@@ -1,0 +1,25 @@
+ID: aws_ecs_cluster_container_instance_agent_connected
+Title: ECS cluster container instances should have connected agent
+Description: This control checks if ECS cluster container instances have connected
+  agent. This control fails if the agent is not connected.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with unconnected_agent_instance as (\n      select\n        distinct
+    cluster_arn\n      from\n        aws_ecs_container_instance\n      where\n        agent_connected
+    = false and status = 'ACTIVE'\n    )\n    select\n      c.cluster_arn as resource,\n
+    \     case\n        when c.registered_container_instances_count = 0 then 'skip'\n
+    \       when i.cluster_arn is null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when c.registered_container_instances_count =
+    0 then title || ' has no container instance registered.'\n        when i.cluster_arn
+    is null then title || ' container instance has connected agent.'\n        else
+    title || ' container instance is either draining or has unconnected agents.'\n
+    \     end as reason\n      \n      \n    from\n      aws_ecs_cluster as c\n      left
+    join unconnected_agent_instance as i on c.cluster_arn = i.cluster_arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

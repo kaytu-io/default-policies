@@ -1,0 +1,17 @@
+ID: aws_cis_compute_service_v100_4_8
+Title: 4.8 Ensure that Code Signing is enabled for Lambda functions
+Description: Ensure that all your Amazon Lambda functions are configured to use the
+  Code Signing feature in order to restrict the deployment of unverified code.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':::' || account_id as
+    resource,\n      'info' as status,\n      'Manual verification required.' as reason\n
+    \     \n    from\n      aws_account;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

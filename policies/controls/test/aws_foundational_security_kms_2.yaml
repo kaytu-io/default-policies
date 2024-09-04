@@ -1,0 +1,58 @@
+ID: aws_foundational_security_kms_2
+Title: 2 IAM principals should not have IAM inline policies that allow decryption
+  actions on all KMS keys
+Description: Checks whether the inline policies that are embedded in your IAM identities
+  (role, user, or group) allow the AWS KMS decryption actions on all KMS keys. This
+  control uses Zelkova, an automated reasoning engine, to validate and warn you about
+  policies that may grant broad access to your secrets across AWS accounts. This control
+  fails if kms:Decrypt or kms:ReEncryptFrom actions are allowed on all KMS keys in
+  an inline policy.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with user_with_decrypt_grant as (\n      select\n        distinct
+    arn\n      from\n        aws_iam_user,\n        jsonb_array_elements(inline_policies_std)
+    as inline_policy,\n        jsonb_array_elements(inline_policy -> 'PolicyDocument'
+    -> 'Statement') as statement\n      where\n        statement ->> 'Effect' = 'Allow'\n
+    \       and statement -> 'Resource' ?| array['*', 'arn:aws:kms:*:' || account_id
+    || ':key/*', 'arn:aws:kms:*:' || account_id || ':alias/*']\n        and statement
+    -> 'Action' ?| array['*', 'kms:*', 'kms:decrypt', 'kms:deencrypt*', 'kms:reencryptfrom']\n
+    \   ),\n    role_with_decrypt_grant as (\n      select\n        distinct arn\n
+    \     from\n        aws_iam_role,\n        jsonb_array_elements(inline_policies_std)
+    as inline_policy,\n        jsonb_array_elements(inline_policy -> 'PolicyDocument'
+    -> 'Statement') as statement\n      where\n        statement ->> 'Effect' = 'Allow'\n
+    \       and statement -> 'Resource' ?| array['*', 'arn:aws:kms:*:' || account_id
+    || ':key/*', 'arn:aws:kms:*:' || account_id || ':alias/*']\n        and statement
+    -> 'Action' ?| array['*', 'kms:*', 'kms:decrypt', 'kms:deencrypt*', 'kms:reencryptfrom']\n
+    \   ),\n    group_with_decrypt_grant as (\n      select\n        distinct arn\n
+    \     from\n        aws_iam_group,\n        jsonb_array_elements(inline_policies_std)
+    as inline_policy,\n        jsonb_array_elements(inline_policy -> 'PolicyDocument'
+    -> 'Statement') as statement\n      where\n        statement ->> 'Effect' = 'Allow'\n
+    \       and statement -> 'Resource' ?| array['*', 'arn:aws:kms:*:' || account_id
+    || ':key/*', 'arn:aws:kms:*:' || account_id || ':alias/*']\n        and statement
+    -> 'Action' ?| array['*', 'kms:*', 'kms:decrypt', 'kms:deencrypt*', 'kms:reencryptfrom']\n
+    \   )\n    select\n      i.arn as resource,\n      case\n        when d.arn is
+    null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    d.arn is null then 'User ' || i.title || ' not allowed to perform decryption actions
+    on all keys.'\n        else 'User ' || i.title || ' allowed to perform decryption
+    actions on all keys.'\n      end as reason\n\n      \n    from\n      aws_iam_user
+    i\n      left join user_with_decrypt_grant d on i.arn = d.arn\n    union\n    select\n
+    \     r.arn as resource,\n      case\n        when d.arn is null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when d.arn is null then 'Role
+    ' || r.title || ' not allowed to perform decryption actions on all keys.'\n        else
+    'Role ' || r.title || ' allowed to perform decryption actions on all keys.'\n
+    \     end as reason\n\n      \n    from\n      aws_iam_role r\n      left join
+    role_with_decrypt_grant d on r.arn = d.arn\n    where\n      r.arn not like '%service-role/%'\n
+    \   union\n    select\n      g.arn as resource,\n      case\n        when d.arn
+    is null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    d.arn is null then 'Role ' || g.title || ' not allowed to perform decryption actions
+    on all keys.'\n        else 'Group ' || g.title || ' allowed to perform decryption
+    actions on all keys.'\n      end as reason\n      \n    from\n      aws_iam_group
+    g\n      left join group_with_decrypt_grant d on g.arn = d.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: medium

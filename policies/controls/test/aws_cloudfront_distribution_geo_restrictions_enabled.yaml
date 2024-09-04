@@ -1,0 +1,20 @@
+ID: aws_cloudfront_distribution_geo_restrictions_enabled
+Title: CloudFront distributions should have geo restriction enabled
+Description: Geographic restriction is used to restrict access to all of the files
+  that are associated with a distribution at the country level.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when restrictions
+    -> 'GeoRestriction' ->> 'RestrictionType' = 'none' then 'alarm'\n        else
+    'ok'\n      end as status,\n      case\n        when restrictions -> 'GeoRestriction'
+    ->> 'RestrictionType' = 'none' then title || ' Geo Restriction disabled.'\n        else
+    title || ' Geo Restriction enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

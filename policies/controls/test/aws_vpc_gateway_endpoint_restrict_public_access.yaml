@@ -1,0 +1,28 @@
+ID: aws_vpc_gateway_endpoint_restrict_public_access
+Title: VPC gateway endpoints should restrict public access
+Description: Manage access to resources in the AWS Cloud by ensuring VPC gateway endpoints
+  cannot be publicly accessed.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with wildcard_action_policies as (\n      select\n        vpc_endpoint_id,\n
+    \       count(*) as statements_num\n      from\n        aws_vpc_endpoint,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s\n      where\n        s ->> 'Effect' = 'Allow'\n        and
+    s -> 'Condition' is null\n        and (\n          (s -> 'Principal' -> 'AWS')
+    = '[\"*\"]'\n          or s ->> 'Principal' = '*'\n        )\n        and s ->>
+    'Action' = '[\"*\"]'\n      group by\n        vpc_endpoint_id\n    )\n    select\n
+    \     e.vpc_endpoint_id as resource,\n      case\n        when e.vpc_endpoint_type
+    <> 'Gateway' then 'skip'\n        when p.vpc_endpoint_id is null then 'ok'\n        else
+    'alarm'\n      end as status,\n      case\n        when vpc_endpoint_type <> 'Gateway'
+    then e.title || ' is of ' || e.vpc_endpoint_type || ' endpoint type.'\n        when
+    p.vpc_endpoint_id is null then e.title || ' does not allow public access.'\n        else
+    title || ' contains ' || coalesce(p.statements_num, 0) ||\n        ' statements
+    that allows public access.'\n      end as reason\n      \n      \n    from\n      aws_vpc_endpoint
+    as e\n      left join wildcard_action_policies as p on p.vpc_endpoint_id = e.vpc_endpoint_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

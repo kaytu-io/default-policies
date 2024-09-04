@@ -1,0 +1,21 @@
+ID: aws_lambda_function_cors_configuration
+Title: Lambda functions CORS configuration should not allow all origins
+Description: Enable this rule to ensure that the CORS configuration for your Lambda
+  functions does not allow all origins.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when url_config
+    is null then 'info'\n        when url_config -> 'Cors' ->> 'AllowOrigins' = '[\"*\"]'
+    then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    url_config is null then title || ' does not has a URL config.'\n        when url_config
+    -> 'Cors' ->> 'AllowOrigins' = '[\"*\"]' then title || ' CORS configuration allows
+    all origins.'\n        else title || ' CORS configuration does not allow all origins.'\n
+    \     end as reason\n      \n      \n    from\n      aws_lambda_function;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

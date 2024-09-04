@@ -1,0 +1,31 @@
+ID: aws_vpc_security_group_allows_ingress_to_memcached_port
+Title: VPC security groups should restrict ingress from 0.0.0.0/0 or ::/0 to memcached
+  port 11211
+Description: This control checks whether the VPC security groups that are in use allow
+  allow ingress from 0.0.0.0/0 or ::/0 to memcached port 11211. Optionally the rule
+  checks whether the port numbers are listed in the authorizedTcpPorts parameter.
+  This control passes when none of the rules in a security group allow ingress traffic
+  from 0.0.0.0/0 from port 11211.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with ingress_ssh_rules as (\n      select\n        group_id,\n
+    \       count(*) as num_ssh_rules\n      from\n        aws_vpc_security_group_rule\n
+    \     where\n        type = 'ingress'\n        and cidr_ipv4 = '0.0.0.0/0'\n        and
+    (\n            ( ip_protocol = '-1'\n            and from_port is null\n            )\n
+    \           or (\n                from_port >= 11211\n                and to_port
+    <= 11211\n            )\n        )\n      group by\n        group_id\n    )\n
+    \   select\n      arn as resource,\n      case\n        when ingress_ssh_rules.group_id
+    is null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    ingress_ssh_rules.group_id is null then sg.group_id || ' ingress restricted for
+    memcached port from 0.0.0.0/0.'\n        else sg.group_id || ' contains ' || ingress_ssh_rules.num_ssh_rules
+    || ' ingress rule(s) allowing access for memcached port from 0.0.0.0/0.'\n      end
+    as reason\n      \n      \n    from\n      aws_vpc_security_group as sg\n      left
+    join ingress_ssh_rules on ingress_ssh_rules.group_id = sg.group_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

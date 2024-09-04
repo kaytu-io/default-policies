@@ -1,0 +1,23 @@
+ID: aws_vpc_vpn_tunnel_up
+Title: Both VPN tunnels provided by AWS Site-to-Site VPN should be in UP status
+Description: Redundant Site-to-Site VPN tunnels can be implemented to achieve resilience
+  requirements.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with filter_data as (\n      select\n        arn,\n        count(t
+    ->> 'Status')\n      from\n        aws_vpc_vpn_connection,\n        jsonb_array_elements(vgw_telemetry)
+    as t\n      where t ->> 'Status' = 'UP'\n      group by arn\n    )\n    select\n
+    \     a.arn as resource,\n      case\n        when b.count is null or b.count
+    < 2 then 'alarm'\n        else 'ok'\n      end as status,\n      case\n        when
+    b.count is null then a.title || ' has both tunnels offline.'\n        when b.count
+    = 1 then a.title || ' has one tunnel offline.'\n        else a.title || ' has
+    both tunnels online.'\n      end as reason\n      \n      \n    from\n      aws_vpc_vpn_connection
+    as a\n      left join filter_data as b on a.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

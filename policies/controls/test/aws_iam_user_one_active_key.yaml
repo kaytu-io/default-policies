@@ -1,0 +1,22 @@
+ID: aws_iam_user_one_active_key
+Title: Ensure there is only one active access key available for any single IAM user
+Description: Access keys are long-term credentials for an IAM user or the AWS account
+  root user. You can use access keys to sign programmatic requests to the AWS CLI
+  or AWS API (directly or using the AWS SDK).
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      u.arn as resource,\n      case\n        when
+    count(k.*) > 1 then 'alarm'\n        else 'ok'\n      end as status,\n      u.name
+    || ' has ' || count(k.*) || ' active access key(s).' as reason\n      \n      \n
+    \   from\n      aws_iam_user as u\n      left join aws_iam_access_key as k on
+    u.name = k.user_name and u.account_id = k.account_id\n    where\n      k.status
+    = 'Active' or k.status is null\n    group by\n      u.arn,\n      u.name,\n      u.account_id,\n
+    \     u.tags,\n      u._ctx;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

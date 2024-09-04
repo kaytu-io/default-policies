@@ -1,0 +1,22 @@
+ID: aws_redshift_cluster_kms_enabled
+Title: AWS Redshift clusters should be encrypted with KMS
+Description: Ensure that AWS Redshift clusters are using a specified AWS Key Management
+  Service (AWS KMS) key for encryption. The rule is compliant if encryption is enabled
+  and the cluster is encrypted with the key provided in the kmsKeyArn parameter. The
+  rule is non-compliant if the cluster is not encrypted or encrypted with another
+  key.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when encrypted
+    and kms_key_id is not null then 'ok'\n        else 'alarm'\n      end as status,\n
+    \     case\n        when encrypted and kms_key_id is not null then title || '
+    encrypted with KMS.'\n        else title || ' not encrypted with KMS'\n      end
+    as reason\n      \n      \n    from\n      aws_redshift_cluster;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

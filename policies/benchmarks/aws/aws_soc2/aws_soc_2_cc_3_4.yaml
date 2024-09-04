@@ -1,0 +1,11 @@
+ID: aws_soc_2_cc_3_4
+Title: 'CC3.4 COSO Principle 9: The entity identifies and assesses changes that could
+  significantly impact the system of internal control'
+SectionCode: ""
+Description: ""
+Children: []
+Tags: {}
+Enabled: true
+AutoAssign: false
+Controls:
+- aws_config_enabled_all_regions

@@ -1,0 +1,17 @@
+ID: aws_soc_2_cc_7
+Title: CC7 System Operations
+SectionCode: ""
+Description: The criteria relevant to how an entity (i) manages the operation of system(s)
+  and (ii) detects and mitigates processing deviations including logical and physical
+  security deviations.
+Children:
+- aws_soc_2_cc_7_1
+- aws_soc_2_cc_7_2
+- aws_soc_2_cc_7_3
+- aws_soc_2_cc_7_4
+Tags:
+  tags:
+  - soc_2_cc_7_common_tags
+Enabled: true
+AutoAssign: false
+Controls: []

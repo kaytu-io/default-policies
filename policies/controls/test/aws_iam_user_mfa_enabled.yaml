@@ -1,0 +1,18 @@
+ID: aws_iam_user_mfa_enabled
+Title: IAM user MFA should be enabled
+Description: Enable this rule to restrict access to resources in the AWS Cloud.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      user_arn as resource,\n      case\n        when
+    not mfa_active then 'alarm'\n        else 'ok'\n      end as status,\n      case\n
+    \       when not mfa_active then user_name || ' MFA device not configured.'\n
+    \       else user_name || ' MFA device configured.'\n      end as reason\n      \n
+    \   from\n      aws_iam_credential_report;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

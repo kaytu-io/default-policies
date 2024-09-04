@@ -1,0 +1,18 @@
+ID: aws_cis_compute_service_v100_2_1_5
+Title: 2.1.5 Ensure Images are not Publicly Available
+Description: EC2 allows you to make an AMI public, sharing it with all AWS accounts.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      'arn:' || partition || ':ec2:' || region || ':'
+    || account_id || ':image/' || image_id as resource,\n      case\n        when
+    public then 'alarm'\n        else 'ok'\n      end status,\n      case\n        when
+    public then title || ' publicly accessible.'\n        else title || ' not publicly
+    accessible.'\n      end reason\n      \n      \n    from\n      aws_ec2_ami;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

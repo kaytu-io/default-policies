@@ -1,0 +1,25 @@
+ID: aws_cloudfront_distribution_use_secure_cipher
+Title: CloudFront distributions should use secure SSL cipher
+Description: Ensure that CloudFront distributions do not have any insecure SSL ciphers.
+  Using insecure and deprecated ciphers could make the SSL connection between the
+  CloudFront and the origins vulnerable to exploits.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with origin_protocols as (\n      select\n        distinct
+    arn,\n        o -> 'CustomOriginConfig' ->> 'OriginSslProtocols' as origin_ssl_policy\n
+    \     from\n        aws_cloudfront_distribution,\n        jsonb_array_elements(origins)
+    as o\n      where\n        o -> 'CustomOriginConfig' -> 'OriginSslProtocols' ->
+    'Items' @> '[\"TLSv1.2%\", \"TLSv1.1%\"]'\n    )\n    select\n      b.arn as resource,\n
+    \     case\n        when o.arn is not null then 'ok'\n        else 'alarm'\n      end
+    as status,\n      case\n        when o.arn is not null then title || ' use secure
+    cipher.'\n        else title || ' does not use secure cipher.'\n      end as reason\n
+    \     \n      \n    from\n      aws_cloudfront_distribution as b\n      left join
+    origin_protocols as o on b.arn = o.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

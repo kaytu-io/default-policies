@@ -1,0 +1,35 @@
+ID: aws_s3_bucket_acls_should_prohibit_user_access
+Title: S3 buckets access control lists (ACLs) should not be used to manage user access
+  to buckets
+Description: This control checks whether AWS S3 buckets provide user permissions via
+  ACLs. The control fails if ACLs are configured for managing user access on S3 buckets.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with bucket_acl_details as (\n      select\n        arn,\n
+    \         title,\n          array[acl -> 'Owner' ->> 'ID'] as bucket_owner,\n
+    \         array_agg(grantee_id) as bucket_acl_permissions,\n          object_ownership_controls,\n
+    \         region,\n          account_id,\n          _ctx,\n          tags\n      from\n
+    \         aws_s3_bucket,\n          jsonb_path_query(acl, '$.Grants.Grantee.ID')
+    as grantee_id\n      group by\n          arn,\n          title,\n          acl,\n
+    \         region,\n          account_id,\n          object_ownership_controls,\n
+    \         _ctx,\n          tags\n    ),\n    bucket_acl_checks as (\n      select\n
+    \         arn,\n          title,\n          to_jsonb(bucket_acl_permissions) -
+    bucket_owner as additional_permissions,\n          object_ownership_controls,\n
+    \         region,\n          account_id,\n          _ctx,\n          tags\n      from\n
+    \         bucket_acl_details\n    )\n    select\n      arn as resource,\n      case\n
+    \         when object_ownership_controls -> 'Rules' @> '[{\"ObjectOwnership\":
+    \"BucketOwnerEnforced\"} ]' then 'ok'\n          when jsonb_array_length(additional_permissions)
+    = 0 then 'ok'\n          else 'alarm'\n      end as status,\n      case\n          when
+    object_ownership_controls -> 'Rules' @> '[{\"ObjectOwnership\": \"BucketOwnerEnforced\"}
+    ]' then title || ' ACLs are disabled.'\n          when jsonb_array_length(additional_permissions)
+    = 0 then title || ' does not have ACLs for user access.'\n          else title
+    || ' has ACLs for user access.'\n      end as reason\n      \n      \n    from\n
+    \     bucket_acl_checks;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

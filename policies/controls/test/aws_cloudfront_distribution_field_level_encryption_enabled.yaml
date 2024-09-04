@@ -1,0 +1,21 @@
+ID: aws_cloudfront_distribution_field_level_encryption_enabled
+Title: CloudFront distributions should have field level encryption enabled
+Description: This control checks whether an AWS CloudFront distribution has field-level
+  encryption enabled. The control fails if CloudFront distribution field-level encryption
+  is not enabled.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    select\n      arn as resource,\n      case\n        when default_cache_behavior
+    ->> 'FieldLevelEncryptionId' = '' then 'alarm'\n        else 'ok'\n      end as
+    status,\n      case\n        when default_cache_behavior ->> 'FieldLevelEncryptionId'
+    = '' then title || ' field level encryption disabled.'\n        else title ||
+    ' field level encryption enabled.'\n      end as reason\n      \n      \n    from\n
+    \     aws_cloudfront_distribution;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

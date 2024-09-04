@@ -1,0 +1,29 @@
+ID: aws_s3_bucket_policy_restricts_cross_account_permission_changes
+Title: AWS S3 permissions granted to other AWS accounts in bucket policies should
+  be restricted
+Description: This control checks whether the S3 bucket policy prevents principals
+  from other AWS accounts from performing denied actions on resources in the S3 bucket.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with cross_account_buckets as (\n      select\n        distinct
+    arn\n      from\n        aws_s3_bucket,\n        jsonb_array_elements(policy_std
+    -> 'Statement') as s,\n        jsonb_array_elements_text(s -> 'Principal' -> 'AWS')
+    as p,\n        string_to_array(p, ':') as pa,\n        jsonb_array_elements_text(s
+    -> 'Action') as a\n      where\n        s ->> 'Effect' = 'Allow'\n        and
+    (\n          pa [5] != account_id\n          or p = '*'\n        )\n        and
+    a in (\n          's3:deletebucketpolicy',\n          's3:putbucketacl',\n          's3:putbucketpolicy',\n
+    \         's3:putencryptionconfiguration',\n          's3:putobjectacl'\n        )\n
+    \   )\n    select\n      a.arn as resource,\n      case\n        when b.arn is
+    null then 'ok'\n        else 'alarm'\n      end as status,\n      case\n        when
+    b.arn is null then title || ' restricts cross-account bucket access.'\n        else
+    title || ' allows cross-account bucket access.'\n      end as reason\n      \n
+    \     \n    from\n      aws_s3_bucket a\n      left join cross_account_buckets
+    b on a.arn = b.arn;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

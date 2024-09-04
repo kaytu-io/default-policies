@@ -1,0 +1,31 @@
+ID: aws_backup_plan_min_retention_35_days
+Title: Backup plan min frequency and min retention check
+Description: Checks if a backup plan has a backup rule that satisfies the required
+  frequency and retention period(35 Days). The rule is non-compliant if recovery points
+  are not created at least as often as the specified frequency or expire before the
+  specified period.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with all_plans as (\n      select\n        arn,\n        r
+    as Rules,\n        title,\n        region,\n        account_id,\n        _ctx\n
+    \     from\n        aws_backup_plan,\n        jsonb_array_elements(backup_plan
+    -> 'Rules') as r\n    )\n    select\n      -- The resource ARN can be duplicate
+    as we are checking all the associated rules to the backup-plan\n      -- Backup
+    plans are composed of one or more backup rules.\n      -- https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html\n
+    \     r.arn as resource,\n      case\n        when r.Rules is null then 'alarm'\n
+    \       when r.Rules ->> 'Lifecycle' is null then 'ok'\n        when (r.Rules
+    -> 'Lifecycle' ->> 'DeleteAfterDays')::int >= 35 then 'ok'\n        else 'alarm'\n
+    \     end as status,\n      case\n        when r.Rules is null then r.title ||
+    ' retention period not set.'\n        when r.Rules ->> 'Lifecycle' is null then
+    (r.Rules ->> 'RuleName') || ' retention period set to never expire.'\n        else
+    (r.Rules ->> 'RuleName') || ' retention period set to ' || (r.Rules -> 'Lifecycle'
+    ->> 'DeleteAfterDays') || ' days.'\n      end as reason\n      \n    from\n      all_plans
+    as r;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""

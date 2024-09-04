@@ -1,0 +1,29 @@
+ID: aws_ebs_volume_in_backup_plan
+Title: EBS volumes should be in a backup plan
+Description: To help with data back-up processes, ensure your AWS Elastic Block Store
+  (AWS EBS) volumes are a part of an AWS Backup plan.
+Query:
+  Engine: odysseus-v0.0.1
+  QueryToExecute: "    with mapped_with_id as (\n      select\n        jsonb_agg(elems)
+    as mapped_ids\n      from\n        aws_backup_selection,\n        jsonb_array_elements(resources)
+    as elems\n      group by backup_plan_id\n    ),\n    mapped_with_tags as (\n      select\n
+    \       jsonb_agg(elems ->> 'ConditionKey') as mapped_tags\n      from\n        aws_backup_selection,\n
+    \       jsonb_array_elements(list_of_tags) as elems\n      group by backup_plan_id\n
+    \   ),\n    backed_up_volume as (\n      select\n        v.volume_id\n      from\n
+    \       aws_ebs_volume as v\n        join mapped_with_id as t on t.mapped_ids
+    ?| array[v.arn]\n      union\n      select\n        v.volume_id\n      from\n
+    \       aws_ebs_volume as v\n        join mapped_with_tags as t on t.mapped_tags
+    ?| array(select jsonb_object_keys(tags))\n    )\n    select\n      v.arn as resource,\n
+    \     case\n        when b.volume_id is null then 'alarm'\n        else 'ok'\n
+    \     end as status,\n      case\n        when b.volume_id is null then v.title
+    || ' not in backup plan.'\n        else v.title || ' in backup plan.'\n      end
+    as reason\n      \n      \n    from\n      aws_ebs_volume as v\n      left join
+    backed_up_volume as b on v.volume_id = b.volume_id;\n"
+  Connector:
+  - aws
+  PrimaryTable: ""
+  ListOfTables: []
+  Parameters: []
+  Global: false
+Tags: {}
+Severity: ""
