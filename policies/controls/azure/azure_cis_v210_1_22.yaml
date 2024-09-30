@@ -6,7 +6,6 @@ Connector:
 Query:
   Engine: odysseus-v0.0.1
   QueryToExecute: |-
-    ```sql
     with owner_custom_roles as (
       select
         role_name,
@@ -45,7 +44,6 @@ Query:
       cr.subscription_id,
       cr._ctx,
       sub.display_name;
-    ```
   PrimaryTable: azure_role_definition
   ListOfTables:
   - azure_role_definition

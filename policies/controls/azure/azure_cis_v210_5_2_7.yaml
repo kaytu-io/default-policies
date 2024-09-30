@@ -53,6 +53,8 @@ Query:
     group by
       sub._ctx,
       sub.subscription_id,
+      sub.kaytu_account_id,
+      sub.kaytu_resource_id,
       sub.display_name;
   PrimaryTable: azure_log_alert
   ListOfTables:

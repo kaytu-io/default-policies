@@ -42,6 +42,8 @@ Query:
     group by
       a.subscription_id,
       sub.subscription_id,
+      sub.kaytu_account_id,
+      sub.kaytu_resource_id,
       sub._ctx,
       sub.display_name;
   PrimaryTable: azure_log_alert

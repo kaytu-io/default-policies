@@ -6,7 +6,6 @@ Connector:
 Query:
   Engine: odysseus-v0.0.1
   QueryToExecute: |-
-    ```sql
     with contact_info as (
       select
         count(*) filter (where alerts_to_admins = 'On') as admin_alert_count,
@@ -32,7 +31,6 @@ Query:
     from
       azure_subscription sub
       left join contact_info ci on sub.subscription_id = ci.subscription_id;
-    ```
   PrimaryTable: azure_subscription
   ListOfTables:
   - azure_security_center_contact

@@ -13,6 +13,8 @@ Query:
         _ctx,
         resource_group,
         subscription_id,
+        kaytu_account_id as kaytu_account_id,
+        kaytu_resource_id as kaytu_resource_id,
         count(*) filter (where l ->> 'enabled' = 'true'
           and l ->> 'category' in ('Administrative', 'Security', 'Alert', 'Policy')
         ) as valid_category_count,
@@ -27,7 +29,9 @@ Query:
         id,
         _ctx,
         resource_group,
-        subscription_id
+        subscription_id,
+        kaytu_account_id,
+        kaytu_resource_id
     )
     select
       sett.id as resource,
