@@ -1,5 +1,5 @@
 ID: aws_soc_2
-Title: "SOC 2"
+Title: "AWS SOC 2"
 Description: "System and Organization Controls (SOC) 2 is an auditing procedure that
   ensures a company's data is securely managed. AWS Audit Manager provides
   a prebuilt framework that supports SOC 2 to assist you with your audit preparation."
@@ -32,7 +32,7 @@ Tags:
   - "true"
   type:
   - Benchmark
-Enabled: false
-AutoAssign: false
+Enabled: true
+AutoAssign: true
 Controls: []
 TracksDriftEvents: false

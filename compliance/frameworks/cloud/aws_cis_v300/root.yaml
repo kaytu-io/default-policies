@@ -1,5 +1,5 @@
 ID: aws_cis_v300
-Title: "CIS v3.0.0"
+Title: "AWS CIS v3.0.0"
 Description: "The CIS Amazon Web Services Foundations Benchmark provides prescriptive
   guidance for configuring security options for a subset of Amazon Web Services with
   an emphasis on foundational, testable, and architecture agnostic settings."

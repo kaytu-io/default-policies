@@ -1,5 +1,5 @@
 ID: aws_nist_csf
-Title: "NIST Cybersecurity Framework (CSF) v1.1"
+Title: "AWS NIST Cybersecurity Framework (CSF) v1.1"
 Description: "NIST Cybersecurity Framework is a set of best practices, standards,
   and recommendations that help an organization improve its cybersecurity measures."
 SectionCode: "aws_nist_csf"
@@ -26,6 +26,6 @@ Tags:
   type:
   - Benchmark
 Enabled: true
-AutoAssign: false
+AutoAssign: true
 Controls: []
 TracksDriftEvents: false

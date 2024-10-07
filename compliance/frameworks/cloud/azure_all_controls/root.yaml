@@ -1,5 +1,5 @@
 ID: azure_all_controls
-Title: "All Controls"
+Title: "All Controls - Azure"
 Description: "This benchmark contains all controls grouped by service to help you
   detect resource configurations that do not meet best practices."
 SectionCode: "azure_all_controls"
