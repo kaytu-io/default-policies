@@ -1,0 +1,16 @@
+ID: s3_state
+Query: |
+  SELECT
+    b.*
+  FROM
+    aws_s3_bucket AS b
+  JOIN
+    aws_account AS a ON b.account_id = a.account_id
+  WHERE
+    (b.name ILIKE '%tfstate%' OR
+     b.name ILIKE '%trail%' OR
+     b.name ILIKE '%templates%')
+  AND
+    (a.name ILIKE '%HealthDataManager%' OR
+     a.name ILIKE '%hdm%' OR
+     a.name ILIKE '%ADorigi%');
